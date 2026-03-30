@@ -1,1 +1,0 @@
-FROM edoburu/pgbouncer:latest

@@ -1,6 +1,7 @@
 #!/bin/bash
 set -e
 
+REGISTRY="ghcr.io"
 DOCKER_ORG="dooservice"
 VERSIONS=("16" "17" "18")
 
@@ -9,7 +10,7 @@ for VERSION in "${VERSIONS[@]}"; do
     docker buildx build \
         --platform "linux/amd64" \
         --build-arg "PG_VERSION=${VERSION}" \
-        -t "${DOCKER_ORG}/dooservice-postgres:${VERSION}" \
+        -t "${REGISTRY}/${DOCKER_ORG}/dooservice-postgres:${VERSION}" \
         --push \
         -f Dockerfile .
 

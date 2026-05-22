@@ -1,9 +1,15 @@
 ARG PG_VERSION=16
 FROM postgres:${PG_VERSION}
 
-RUN apt-get update \
- && apt-get install -y --no-install-recommends postgresql-"${PG_MAJOR}"-pgvector \
- && rm -rf /var/lib/apt/lists/*
+RUN set -eux \
+ && apt-get update \
+ && apt-get install -y --no-install-recommends \
+        postgresql-"${PG_MAJOR}"-pgvector \
+ && apt-get clean \
+ && rm -rf \
+        /var/lib/apt/lists/* \
+        /tmp/* \
+        /var/tmp/*
 
 COPY init-extensions.sh /docker-entrypoint-initdb.d/10-extensions.sh
 

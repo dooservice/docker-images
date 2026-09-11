@@ -1,0 +1,76 @@
+#!/usr/bin/env python3
+"""Work on this environment from its console.
+
+What this container can do by itself runs here: installing, updating and testing modules,
+opening an Odoo shell, measuring storage. What it cannot — restarting the environment,
+reading its live log — is asked of the platform, which does it outside this container
+and only for this environment.
+"""
+
+import argparse
+import os
+import subprocess
+import sys
+
+from dooservice_control import ControlClient
+
+ODOO_BIN = "/usr/local/bin/odoo-bin"
+
+
+def run_odoo(*args):
+    os.execv(ODOO_BIN, [ODOO_BIN, *args])
+
+
+def storage():
+    sizes = subprocess.run(
+        ["du", "-sh", "/mnt/extra-addons", "/var/lib/odoo"], capture_output=True, text=True, check=False,
+    ).stdout.strip()
+    database = subprocess.run(
+        ["psql", "-tAc", "SELECT pg_size_pretty(pg_database_size(current_database()))"],
+        capture_output=True, text=True, check=False,
+    ).stdout.strip()
+    print(sizes)
+    print(f"{database or '?'}\tdatabase {os.environ.get('PGDATABASE', '')}")
+
+
+parser = argparse.ArgumentParser(prog="dooservice", description=__doc__.splitlines()[0])
+commands = parser.add_subparsers(dest="command", metavar="<command>")
+commands.required = True
+
+commands.add_parser("status", help="Show whether the environment is running")
+commands.add_parser("restart", help="Restart the environment's Odoo")
+logs = commands.add_parser("logs", help="Show the environment's Odoo log")
+logs.add_argument("-n", "--lines", type=int, default=200, help="How many lines to show (default 200)")
+logs.add_argument("-f", "--follow", action="store_true", help="Keep printing new lines until Ctrl+C")
+update = commands.add_parser("update", help="Update modules in the database")
+update.add_argument("modules", help="Comma-separated modules, or 'all'")
+install = commands.add_parser("install", help="Install modules in the database")
+install.add_argument("modules", help="Comma-separated modules")
+test = commands.add_parser("test", help="Run a module's tests")
+test.add_argument("modules", help="Comma-separated modules")
+commands.add_parser("shell", help="Open an Odoo shell on this database")
+commands.add_parser("storage", help="Show what the environment occupies")
+
+options = parser.parse_args()
+platform = ControlClient()
+
+match options.command:
+    case "status":
+        platform.run("status")
+    case "restart":
+        platform.run("restart")
+    case "logs":
+        try:
+            platform.run("logs", {"lines": options.lines, "follow": options.follow})
+        except KeyboardInterrupt:
+            sys.exit(0)
+    case "update":
+        run_odoo("-u", options.modules, "--stop-after-init")
+    case "install":
+        run_odoo("-i", options.modules, "--stop-after-init")
+    case "test":
+        run_odoo("-u", options.modules, "--test-enable", "--stop-after-init")
+    case "shell":
+        run_odoo("shell")
+    case "storage":
+        storage()

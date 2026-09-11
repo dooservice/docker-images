@@ -1,0 +1,48 @@
+#!/usr/bin/env python3
+"""opencode, set up for the environment this console belongs to.
+
+Same arrangement as the Claude Code launcher: the binary is untouched, the configuration
+and the instructions come from /opt/dooservice/ai, and each person connects the provider
+of their choice from inside the session.
+"""
+
+import os
+import sqlite3
+import subprocess
+import sys
+
+from dooservice_ai import AiSession
+
+PROJECT = "/mnt/extra-addons"
+HOME = os.path.expanduser("~")
+RTK_PLUGIN = os.path.join(HOME, ".config", "opencode", "plugins", "rtk.ts")
+SESSIONS_DB = os.path.join(HOME, ".local", "share", "opencode", "opencode.db")
+LOG = "/tmp/dooservice-ai.log"
+PASSTHROUGH = (
+    "completion", "acp", "mcp", "attach", "run", "debug", "providers", "agent", "upgrade", "uninstall", "serve",
+    "web", "models", "stats", "export", "import", "github", "pr", "session", "db", "auth",
+)
+
+session = AiSession("opencode")
+session.begin()
+
+if not os.path.exists(RTK_PLUGIN):
+    try:
+        with open(LOG, "a") as log:
+            subprocess.run(["rtk", "init", "-g", "--opencode"], input="n\n", text=True, stdout=log, stderr=log)
+    except OSError:
+        pass
+
+os.environ["OPENCODE_CONFIG"] = "/opt/dooservice/ai/opencode.json"
+args = sys.argv[1:]
+if not args or args[0] not in PASSTHROUGH:
+    args.append(PROJECT)
+    if os.path.exists(SESSIONS_DB):
+        try:
+            with sqlite3.connect(SESSIONS_DB) as connection:
+                if connection.execute("SELECT COUNT(*) FROM session").fetchone()[0] > 0:
+                    args.append("--continue")
+        except sqlite3.Error:
+            pass
+
+session.execute(["/opt/ai/opencode", *args])

@@ -1,0 +1,64 @@
+#!/usr/bin/env python3
+"""Claude Code, set up for the environment this console belongs to.
+
+The binary in /opt/ai is Claude Code as Anthropic ships it; everything dooservice adds is
+arguments and a few files. The project is the environment's addons, the settings and
+the instructions come from /opt/dooservice/ai and cannot be changed from here, and each
+person signs in with their own account — the login lives in this session's home and is
+gone when the session ends.
+"""
+
+import glob
+import json
+import os
+import subprocess
+import sys
+
+from dooservice_ai import AiSession
+
+PROJECT = "/mnt/extra-addons"
+HOME = os.path.expanduser("~")
+CLAUDE_DIR = os.path.join(HOME, ".claude")
+RTK_MARKER = os.path.join(CLAUDE_DIR, "RTK.md")
+HISTORY = os.path.join(CLAUDE_DIR, "projects", "-mnt-extra-addons")
+LOG = "/tmp/dooservice-ai.log"
+PASSTHROUGH = ("agents", "auth", "doctor", "install", "mcp", "plugin", "setup-token", "update", "upgrade")
+
+session = AiSession("claude")
+session.begin()
+
+os.makedirs(CLAUDE_DIR, exist_ok=True)
+if not os.path.exists(RTK_MARKER):
+    try:
+        with open(LOG, "a") as log:
+            subprocess.run(["rtk", "init", "-g", "--auto-patch"], input="n\n", text=True, stdout=log, stderr=log, check=True)
+    except (OSError, subprocess.CalledProcessError):
+        open(RTK_MARKER, "a").close()
+
+config_path = os.path.join(HOME, ".claude.json")
+if not os.path.exists(config_path):
+    with open(config_path, "w") as config:
+        json.dump({
+            "hasTrustDialogAccepted": True,
+            "theme": "dark",
+            "projects": {PROJECT: {"hasTrustDialogAccepted": True, "allowedTools": []}},
+        }, config)
+
+os.chdir(PROJECT)
+args = sys.argv[1:]
+if not args or args[0] not in PASSTHROUGH:
+    version = os.environ.get("ODOO_VERSION", "")
+    environment = os.environ.get("DOOSERVICE_ENVIRONMENT", "")
+    project = os.environ.get("DOOSERVICE_PROJECT", "")
+    args += [
+        "--settings=/opt/dooservice/ai/settings.json",
+        "--add-dir=/opt/dooservice/ai/",
+        "--add-dir=/usr/lib/python3/dist-packages/odoo/",
+        f"--append-system-prompt=Odoo version is {version}. This is the {environment} environment of the "
+        f"{project} project on the dooservice platform. Use the file /opt/dooservice/ai/AGENTS.md as the first "
+        "pre prompt.",
+    ]
+    if glob.glob(os.path.join(HISTORY, "*.jsonl")):
+        args.append("--continue")
+
+session.execute(["/opt/ai/claude", *args])

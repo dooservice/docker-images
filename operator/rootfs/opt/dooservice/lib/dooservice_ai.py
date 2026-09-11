@@ -7,11 +7,12 @@ files at once. And the platform has to agree: the launcher asks the agent to hol
 environment's deploys, and waits for the answer — a pull that resets the addons under a
 working agent would throw its work away.
 
-Then the agent runs inside a pseudo-terminal of its own, which rewrites two things on
-the way through. A login URL the agent prints is made clickable and announced to the
-browser with an OSC 9 sequence, so signing in is one click instead of copying a URL the
-terminal has broken across lines. And Ctrl+Z never reaches the agent: a suspended agent
-is a session that holds the environment without anyone seeing it.
+Then the agent runs inside a pseudo-terminal of its own, which watches two things on the
+way through. A login URL the agent prints is announced to the browser with an OSC 9
+sequence, so signing in is one click instead of copying a URL the terminal has broken
+across lines; what the agent prints is passed on untouched, its own links included. And
+Ctrl+Z never reaches the agent: a suspended agent is a session that holds the
+environment without anyone seeing it.
 """
 
 import base64
@@ -30,6 +31,9 @@ LOCK_PATH = "/tmp/dooservice-ai.lock"
 DEVELOPMENT = "development"
 CTRL_Z = b"\x1a"
 ANSI_ESCAPE = re.compile(rb"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
+OSC_SEQUENCE = re.compile(rb"\x1B\][^\x07\x1B]*(?:\x07|\x1B\\)")
+OSC_LINK = re.compile(rb"\x1B\]8;[^;\x07\x1B]*;(https://[^\x07\x1B]+)(?:\x07|\x1B\\)")
+SEEN_BYTES = 16 * 1024
 LOGIN_URLS = (
     b"https://console.anthropic.com/oauth/authorize",
     b"https://claude.ai/oauth/authorize",
@@ -46,6 +50,8 @@ class AiSession:
         self.lock = None
         self.platform = ControlClient()
         self.held = False
+        self.seen = b""
+        self.announced = set()
 
     def begin(self):
         """Every guard, in order. Exits with a sentence a person can act on."""
@@ -106,29 +112,40 @@ class AiSession:
         except OSError:
             pass
 
-    @staticmethod
-    def announce_login(data):
-        """Make a login URL clickable and tell the browser about it.
+    def announce_login(self, data):
+        """Tell the browser about a login URL, once, and pass the output on untouched.
 
-        The terminal wraps a long URL across lines and pads it with escape codes, so it is
-        stitched back together from the first known prefix up to the first word that is
-        plainly not part of it.
+        What arrives here is chunks of a terminal stream, so the last stretch of it is
+        kept and searched whole. A tool that prints the URL as a terminal link (OSC 8)
+        carries it there complete; that is preferred. Otherwise the URL is stitched back
+        together from the plain text — the terminal wraps it across lines and pads it
+        with escape codes — from the first known prefix up to the first word plainly not
+        part of it, and only once that word has arrived, so a URL cut at a chunk boundary
+        is never announced half written.
         """
-        target = next((url for url in LOGIN_URLS if url in data), None)
-        if target is None:
+        self.seen = (self.seen + data)[-SEEN_BYTES:]
+        url = self.linked_login() or self.printed_login()
+        if url is None or url in self.announced:
             return data
-        tail = ANSI_ESCAPE.sub(b"", data[data.find(target):])
+        self.announced.add(url)
+        announcement = json.dumps({"action": "open_url", "url": url.decode("utf-8", errors="ignore")})
+        return data + b"\x1b]9;" + base64.b64encode(announcement.encode()) + b"\x07"
+
+    def linked_login(self):
+        links = [match.group(1) for match in OSC_LINK.finditer(self.seen)]
+        return next((link for link in reversed(links) if link.startswith(LOGIN_URLS)), None)
+
+    def printed_login(self):
+        text = ANSI_ESCAPE.sub(b"", OSC_SEQUENCE.sub(b"", self.seen))
+        start = max(text.rfind(prefix) for prefix in LOGIN_URLS)
+        if start < 0:
+            return None
         pieces = []
-        for token in re.sub(rb"\s+", b" ", tail).split(b" "):
-            if not token.strip():
+        for token in re.sub(rb"\s+", b" ", text[start:]).split(b" "):
+            if not token:
                 continue
             if token.lower() in URL_TERMINATORS:
-                break
-            pieces.append(token.strip())
-        url = b"".join(pieces)
-        if not url.startswith(b"https://"):
-            return data
-        announcement = json.dumps({"action": "open_url", "url": url.decode("utf-8", errors="ignore")})
-        clickable = b"\x1b]8;;" + url + b"\x07" + target + b"\x1b]8;;\x07"
-        data = data.replace(target, clickable, 1)
-        return data + b"\x1b]9;" + base64.b64encode(announcement.encode()) + b"\x07"
+                url = b"".join(pieces)
+                return url if url.startswith(LOGIN_URLS) else None
+            pieces.append(token)
+        return None

@@ -3,11 +3,13 @@
 
 Same arrangement as the Claude Code launcher: the binary is untouched, the configuration
 and the instructions for the session's mode come from /opt/dooservice/ai, and each person
-connects the provider of their choice from inside the session.
+connects the provider of their choice from inside the session. Its plugins arrive already
+installed, copied from what the image prepared, instead of downloaded at every start.
 """
 
 import json
 import os
+import shutil
 import sqlite3
 import subprocess
 import sys
@@ -16,7 +18,9 @@ from dooservice_ai import AiSession, language_rule
 
 HOME = os.path.expanduser("~")
 SESSION_CONFIG_DIR = os.path.join(HOME, ".config", "dooservice")
-RTK_PLUGIN = os.path.join(HOME, ".config", "opencode", "plugins", "rtk.ts")
+OPENCODE_CONFIG_DIR = os.path.join(HOME, ".config", "opencode")
+RTK_PLUGIN = os.path.join(OPENCODE_CONFIG_DIR, "plugins", "rtk.ts")
+PLUGINS_TEMPLATE = "/opt/dooservice/opencode-config"
 SESSIONS_DB = os.path.join(HOME, ".local", "share", "opencode", "opencode.db")
 LOG = "/tmp/dooservice-ai.log"
 PASSTHROUGH = (
@@ -26,6 +30,9 @@ PASSTHROUGH = (
 
 session = AiSession("opencode")
 session.begin()
+
+if not os.path.exists(OPENCODE_CONFIG_DIR) and os.path.isdir(PLUGINS_TEMPLATE):
+    shutil.copytree(PLUGINS_TEMPLATE, OPENCODE_CONFIG_DIR, symlinks=True)
 
 if not os.path.exists(RTK_PLUGIN):
     try:

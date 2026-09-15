@@ -36,10 +36,14 @@ RUN mkdir -p /opt/ai \
 
 COPY rootfs/ /
 RUN chmod 755 /usr/local/bin/claude /usr/local/bin/opencode /usr/local/bin/odoo-bin /usr/local/bin/dooservice \
- && chmod 644 /opt/dooservice/ai/* /opt/dooservice/lib/* /etc/profile.d/dooservice.sh \
+ && chmod 644 /opt/dooservice/ai/* /opt/dooservice/lib/* /opt/dooservice/build/* /etc/profile.d/dooservice.sh \
  && mkdir -p /home/dooservice \
  && chown dooservice:dooservice /home/dooservice \
  && usermod -d /home/dooservice dooservice
+
+RUN python3 /opt/dooservice/build/opencode_plugins.py \
+ && chmod -R a+rX /opt/dooservice/opencode-config \
+ && rm -rf /opt/dooservice/build
 
 ENV ODOO_VERSION=${ODOO_VERSION} \
     DISABLE_AUTOUPDATER=1 \

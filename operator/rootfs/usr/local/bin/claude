@@ -62,4 +62,4 @@ if not args or args[0] not in PASSTHROUGH:
     if glob.glob(os.path.join(history, "*.jsonl")):
         args.append("--continue")
 
-session.execute(["/opt/ai/claude", *args])
+session.execute(["/opt/ai/claude", *args], "Claude Code")

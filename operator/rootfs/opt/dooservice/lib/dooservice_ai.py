@@ -26,11 +26,14 @@ import json
 import os
 import pty
 import re
+import select
 import struct
 import sys
 import termios
+import tty
 
 from dooservice_control import ControlClient, ControlError
+from dooservice_splash import Splash, readable
 
 LOCK_PATH = "/tmp/dooservice-ai.lock"
 DEVELOPMENT = "development"
@@ -81,6 +84,7 @@ class Mode:
         return cls("configuration", os.path.expanduser("~"), f"{AI_DIR}/CONFIGURATION.md",
                    f"{AI_DIR}/settings-configuration.json", f"{AI_DIR}/opencode-configuration.json")
 CTRL_Z = b"\x1a"
+FRAME_SECONDS = 0.1
 ANSI_ESCAPE = re.compile(rb"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
 OSC_SEQUENCE = re.compile(rb"\x1B\][^\x07\x1B]*(?:\x07|\x1B\\)")
 OSC_LINK = re.compile(rb"\x1B\]8;[^;\x07\x1B]*;(https://[^\x07\x1B]+)(?:\x07|\x1B\\)")
@@ -139,21 +143,68 @@ class AiSession:
         sys.stderr.write(f"\n  {message}\n\n")
         sys.exit(1)
 
-    def execute(self, command):
+    def execute(self, command, tool_name):
+        """Run the agent in a terminal of its own, with the logo drawn until it draws.
+
+        The copy loop is written out rather than left to `pty.spawn`, which waits on the
+        terminal with no timeout: the splash needs the idle moments to draw its frames,
+        and drawing them from the same loop that copies the agent's output is what keeps
+        the two from ever writing over each other.
+        """
+        splash = Splash(tool_name)
         try:
-            pty.spawn(command, self.read_agent, self.read_keyboard)
+            pid, master = pty.fork()
+            if pid == 0:
+                os.execv(command[0], command)
+            self.copy_window_size(master)
+            splash.start()
+            self.copy(master, splash)
+            os.waitpid(pid, 0)
         except Exception as error:
+            splash.stop()
             sys.stderr.write(f"Error launching the AI agent: {error}\n")
         finally:
+            splash.stop()
             self.end()
 
-    def read_agent(self, descriptor):
-        self.copy_window_size(descriptor)
-        data = os.read(descriptor, 2048)
-        return self.announce_login(data)
-
-    def read_keyboard(self, descriptor):
-        return os.read(descriptor, 1024).replace(CTRL_Z, b"\x00")
+    def copy(self, master, splash):
+        """Keystrokes to the agent, its output to the screen, until it exits."""
+        stdin = sys.stdin.fileno()
+        stdout = sys.stdout.fileno()
+        saved = None
+        try:
+            saved = termios.tcgetattr(stdin)
+            tty.setraw(stdin)
+        except termios.error:
+            saved = None
+        sources = [master, stdin]
+        try:
+            while master in sources:
+                ready, _, _ = select.select(sources, [], [], FRAME_SECONDS if splash.active else None)
+                if not ready:
+                    splash.draw()
+                    continue
+                if master in ready:
+                    self.copy_window_size(master)
+                    try:
+                        data = os.read(master, 65536)
+                    except OSError:
+                        data = b""
+                    if not data:
+                        sources.remove(master)
+                        continue
+                    if splash.active and readable(data):
+                        splash.stop()
+                    os.write(stdout, self.announce_login(data))
+                if stdin in ready:
+                    data = os.read(stdin, 1024)
+                    if not data:
+                        sources.remove(stdin)
+                        continue
+                    os.write(master, data.replace(CTRL_Z, b"\x00"))
+        finally:
+            if saved is not None:
+                termios.tcsetattr(stdin, termios.TCSAFLUSH, saved)
 
     @staticmethod
     def copy_window_size(descriptor):

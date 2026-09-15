@@ -17,7 +17,6 @@
         "deny": [
             "Edit",
             "Write",
-            "MultiEdit",
             "NotebookEdit"
         ]
     },

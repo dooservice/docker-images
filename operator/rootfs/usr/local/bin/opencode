@@ -63,4 +63,4 @@ if not args or args[0] not in PASSTHROUGH:
         except sqlite3.Error:
             pass
 
-session.execute(["/opt/ai/opencode", *args])
+session.execute(["/opt/ai/opencode", *args], "opencode")

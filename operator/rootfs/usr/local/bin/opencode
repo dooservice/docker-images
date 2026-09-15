@@ -6,14 +6,16 @@ and the instructions for the session's mode come from /opt/dooservice/ai, and ea
 connects the provider of their choice from inside the session.
 """
 
+import json
 import os
 import sqlite3
 import subprocess
 import sys
 
-from dooservice_ai import AiSession
+from dooservice_ai import AiSession, language_rule
 
 HOME = os.path.expanduser("~")
+SESSION_CONFIG_DIR = os.path.join(HOME, ".config", "dooservice")
 RTK_PLUGIN = os.path.join(HOME, ".config", "opencode", "plugins", "rtk.ts")
 SESSIONS_DB = os.path.join(HOME, ".local", "share", "opencode", "opencode.db")
 LOG = "/tmp/dooservice-ai.log"
@@ -32,7 +34,17 @@ if not os.path.exists(RTK_PLUGIN):
     except OSError:
         pass
 
-os.environ["OPENCODE_CONFIG"] = session.mode.opencode_config
+os.makedirs(SESSION_CONFIG_DIR, exist_ok=True)
+language_file = os.path.join(SESSION_CONFIG_DIR, "LANGUAGE.md")
+with open(language_file, "w") as rule:
+    rule.write(f"# Language\n\n{language_rule()}\n")
+with open(session.mode.opencode_config) as managed:
+    config = json.load(managed)
+config["instructions"] = [*config.get("instructions", []), language_file]
+session_config = os.path.join(SESSION_CONFIG_DIR, "opencode.json")
+with open(session_config, "w") as generated:
+    json.dump(config, generated)
+os.environ["OPENCODE_CONFIG"] = session_config
 args = sys.argv[1:]
 if not args or args[0] not in PASSTHROUGH:
     args.append(session.mode.project)

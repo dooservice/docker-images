@@ -15,6 +15,21 @@ server and its database — lives in a separate container that keeps running aft
 The environment, project and server names are in `DOOSERVICE_ENVIRONMENT`, `DOOSERVICE_PROJECT` and
 `DOOSERVICE_SERVER`.
 
+## Language
+The person's language is in `DOOSERVICE_LANGUAGE` (`es` is Spanish, `en` is English). Reply in that language for the
+whole session — the first answer and every one after it — even when the files, logs, code or command output you read
+are in English. Keep code, commands, file names and identifiers exactly as they are. If the variable is empty, reply in
+the language the user writes in.
+
+## Odoo edition
+This is **Odoo Community**. Enterprise modules are not installed and cannot be installed here — for example
+`l10n_pe_edi` (electronic invoicing with SUNAT), `account_accountant`, `documents`, `sign`, `planning`,
+`helpdesk` or `web_studio`.
+- Before saying a module exists, is missing or is Enterprise-only, check what is actually installed:
+  `ls /usr/lib/python3/dist-packages/odoo/addons | grep <name>`.
+- When something the user asks for is Enterprise-only, say so plainly, do the part Community covers, and name the
+  alternatives: an Odoo Enterprise subscription, or a Community module from the OCA or a local provider.
+
 ## Version
 If the Odoo version is not already given, check the environment variable `ODOO_VERSION`.
 

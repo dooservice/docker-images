@@ -15,7 +15,7 @@ import os
 import subprocess
 import sys
 
-from dooservice_ai import AiSession
+from dooservice_ai import AiSession, language_rule
 
 HOME = os.path.expanduser("~")
 CLAUDE_DIR = os.path.join(HOME, ".claude")
@@ -57,7 +57,7 @@ if not args or args[0] not in PASSTHROUGH:
         "--add-dir=/usr/lib/python3/dist-packages/odoo/",
         f"--append-system-prompt=Odoo version is {version}. This is the {environment} environment of the "
         f"{project} project on the dooservice platform, in {mode.name} mode. Use the file {mode.instructions} "
-        "as the first pre prompt.",
+        f"as the first pre prompt. {language_rule()}",
     ]
     if glob.glob(os.path.join(history, "*.jsonl")):
         args.append("--continue")

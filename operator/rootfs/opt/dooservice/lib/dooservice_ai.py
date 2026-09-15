@@ -38,6 +38,31 @@ REPOSITORY = "/mnt/extra-addons"
 AI_DIR = "/opt/dooservice/ai"
 
 
+LANGUAGE_NAMES = {
+    "es": "Spanish",
+    "en": "English",
+    "pt": "Portuguese",
+    "fr": "French",
+    "it": "Italian",
+    "de": "German",
+}
+
+
+def language_rule():
+    """The one sentence that keeps the agent in the person's language all session.
+
+    Said outright rather than left to the agent: it starts in the language it is
+    written to, and drifts to English after a few screens of logs and source code.
+    """
+    code = os.environ.get("DOOSERVICE_LANGUAGE", "")
+    name = LANGUAGE_NAMES.get(re.split(r"[-_]", code)[0].lower()) if code else None
+    if name is None:
+        return ("Always reply to the user in the language they write in, for the whole session, even when "
+                "files, logs, code or command output are in another language.")
+    return (f"Always reply to the user in {name}, for the whole session, even when files, logs, code or "
+            "command output are in another language. Keep code, commands and identifiers as they are.")
+
+
 class Mode:
     """What the agent is there to do, and the files that tell it how."""
 

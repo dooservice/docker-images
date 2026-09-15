@@ -9,6 +9,7 @@ Custom Docker images for the dooservice infrastructure stack.
 | `ghcr.io/dooservice/dooservice-odoo` | `16.0` `17.0` `18.0` `19.0` | Odoo with unified CLI patches and dooservice user (uid 1500) |
 | `ghcr.io/dooservice/dooservice-operator` | `16.0` `17.0` `18.0` `19.0` | Console for an environment: shell, psql, git, Claude Code, opencode and the `dooservice` command |
 | `ghcr.io/dooservice/dooservice-postgres` | `16` `17` `18` | PostgreSQL with pgvector, unaccent and md5 auth for PgDog |
+| `ghcr.io/dooservice/dooservice-case-runner` | `1` | Answers one question of an AI case, reading an environment's database through business tools |
 
 ## Build & push
 
@@ -27,6 +28,9 @@ cd operator && ./build.sh
 
 # Build and push all Postgres versions (16, 17, 18)
 cd postgres && ./build.sh
+
+# Build and push the AI case runner
+cd case-runner && ./build.sh
 ```
 
 ## odoo
@@ -62,3 +66,26 @@ a network of its own — and removes it when the session ends. Adds:
 - **`odoo-bin`** wrapper that injects the database connection, so it is never passed by hand
 - **Welcome banner and prompt** in `/etc/profile.d/dooservice.sh`
 
+
+## case-runner
+
+The agent starts one per question asked in an AI case and removes it once the question is
+answered. It does not need Odoo, so there is one image for every Odoo version. Hardened like
+the operator, and with less: no addons, no filestore, and a database user that can only read.
+
+- **Turn** — read from `/case/turn.json` and deleted at once, since it carries the
+  organisation's API key
+- **Providers** — Claude through the Anthropic Messages API, or GPT through the OpenAI
+  Responses API with `store=False`; the same tools and masking for both
+- **Business tools** — company profile, find and describe models, search, count and total
+  records. Domains are Odoo's, compiled to parameterised SQL over the fields
+  `ir_model_fields` and `information_schema` agree can be read. There is no free SQL
+- **Masking** — fields the organisation marks as personal come back as stable placeholders
+  such as `«EMAIL_3»`; the table stays in `/case/mask.json` and never leaves the server
+- **Output** — one JSON event per line; the agent numbers and publishes them
+
+```bash
+cd case-runner
+uv run pytest               # unit tests
+uv run pytest -m postgres   # against a throwaway PostgreSQL in Docker
+```

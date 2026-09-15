@@ -8,6 +8,10 @@ from the environment, so it never shows up in `ps`.
 
 No HTTP by default. This container is not the one serving the environment; it only
 installs, updates, tests and opens shells against the same database.
+
+Without a repository there are no modules of the project's own, and no other addons
+path is accepted: a module installed from anywhere else would be in the database and
+missing from the environment's Odoo, which would then fail to load it.
 """
 
 import os
@@ -41,6 +45,12 @@ def odoo_arguments(command, args):
 
 
 argv = sys.argv[1:]
+if not os.path.isdir("/mnt/extra-addons/.git") and any(arg.startswith("--addons-path") for arg in argv):
+    sys.stderr.write(
+        "This environment has no repository: only the modules it already has can be installed.\n"
+        "Link a repository to the project to develop modules of its own.\n"
+    )
+    sys.exit(2)
 command = argv[0] if argv and not argv[0].startswith("-") else None
 rest = argv[1:] if command else argv
 os.execv(REAL_ODOO, [REAL_ODOO, *odoo_arguments(command, rest)])

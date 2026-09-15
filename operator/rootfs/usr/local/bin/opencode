@@ -2,8 +2,8 @@
 """opencode, set up for the environment this console belongs to.
 
 Same arrangement as the Claude Code launcher: the binary is untouched, the configuration
-and the instructions come from /opt/dooservice/ai, and each person connects the provider
-of their choice from inside the session.
+and the instructions for the session's mode come from /opt/dooservice/ai, and each person
+connects the provider of their choice from inside the session.
 """
 
 import os
@@ -13,7 +13,6 @@ import sys
 
 from dooservice_ai import AiSession
 
-PROJECT = "/mnt/extra-addons"
 HOME = os.path.expanduser("~")
 RTK_PLUGIN = os.path.join(HOME, ".config", "opencode", "plugins", "rtk.ts")
 SESSIONS_DB = os.path.join(HOME, ".local", "share", "opencode", "opencode.db")
@@ -33,10 +32,10 @@ if not os.path.exists(RTK_PLUGIN):
     except OSError:
         pass
 
-os.environ["OPENCODE_CONFIG"] = "/opt/dooservice/ai/opencode.json"
+os.environ["OPENCODE_CONFIG"] = session.mode.opencode_config
 args = sys.argv[1:]
 if not args or args[0] not in PASSTHROUGH:
-    args.append(PROJECT)
+    args.append(session.mode.project)
     if os.path.exists(SESSIONS_DB):
         try:
             with sqlite3.connect(SESSIONS_DB) as connection:

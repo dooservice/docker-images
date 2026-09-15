@@ -1,11 +1,16 @@
 """What both AI launchers share: whether a session may start, and the terminal it runs in.
 
 Three guards before anything starts. The environment has to be a development one: an
-agent that edits code and runs `odoo-bin -u` without asking belongs on a database that is
-not a customer's. Only one AI session per container, so two agents never edit the same
-files at once. And the platform has to agree: the launcher asks the agent to hold this
-environment's deploys, and waits for the answer — a pull that resets the addons under a
-working agent would throw its work away.
+agent that runs `odoo-bin -u` without asking belongs on a database that is not a
+customer's. Only one AI session per container, so two agents never work over each other.
+And the platform has to agree: the launcher asks the agent for the environment's one AI
+slot, and waits for the answer.
+
+The session runs in one of two modes. With a repository it is development: the agent
+works on the environment's modules. Without one it is configuration: the agent sets up
+Odoo through its shell and database — parameters, users, companies, standard modules —
+and its file-editing tools are switched off, since there is no code of the project's own
+to change and nowhere to keep any it wrote.
 
 Then the agent runs inside a pseudo-terminal of its own, which watches two things on the
 way through. A login URL the agent prints is announced to the browser with an OSC 9
@@ -29,6 +34,27 @@ from dooservice_control import ControlClient, ControlError
 
 LOCK_PATH = "/tmp/dooservice-ai.lock"
 DEVELOPMENT = "development"
+REPOSITORY = "/mnt/extra-addons"
+AI_DIR = "/opt/dooservice/ai"
+
+
+class Mode:
+    """What the agent is there to do, and the files that tell it how."""
+
+    def __init__(self, name, project, instructions, claude_settings, opencode_config):
+        self.name = name
+        self.project = project
+        self.instructions = instructions
+        self.claude_settings = claude_settings
+        self.opencode_config = opencode_config
+
+    @classmethod
+    def current(cls):
+        if os.path.isdir(os.path.join(REPOSITORY, ".git")):
+            return cls("development", REPOSITORY, f"{AI_DIR}/AGENTS.md",
+                       f"{AI_DIR}/settings.json", f"{AI_DIR}/opencode.json")
+        return cls("configuration", os.path.expanduser("~"), f"{AI_DIR}/CONFIGURATION.md",
+                   f"{AI_DIR}/settings-configuration.json", f"{AI_DIR}/opencode-configuration.json")
 CTRL_Z = b"\x1a"
 ANSI_ESCAPE = re.compile(rb"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
 OSC_SEQUENCE = re.compile(rb"\x1B\][^\x07\x1B]*(?:\x07|\x1B\\)")
@@ -52,13 +78,13 @@ class AiSession:
         self.held = False
         self.seen = b""
         self.announced = set()
+        self.mode = Mode.current()
+        os.environ["DOOSERVICE_AI_MODE"] = self.mode.name
 
     def begin(self):
         """Every guard, in order. Exits with a sentence a person can act on."""
         if os.environ.get("DOOSERVICE_STAGE") != DEVELOPMENT:
             self.refuse("AI sessions only run on development environments. Clone this one to development first.")
-        if not os.path.isdir("/mnt/extra-addons/.git"):
-            self.refuse("This environment has no repository, so there is nowhere for the agent's work to be kept.")
         self.lock = open(LOCK_PATH, "w")
         try:
             fcntl.flock(self.lock, fcntl.LOCK_EX | fcntl.LOCK_NB)

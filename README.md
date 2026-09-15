@@ -69,17 +69,25 @@ a network of its own — and removes it when the session ends. Adds:
 
 ## case-runner
 
-The agent starts one per question asked in an AI case and removes it once the question is
-answered. It does not need Odoo, so there is one image for every Odoo version. Hardened like
-the operator, and with less: no addons, no filestore, and a database user that can only read.
+The agent starts one per turn of an AI case, and one to read an environment's company
+profile, and removes it when it is done. It does not need Odoo, so there is one image for
+every Odoo version. Hardened like the operator, and with less: no addons, no filestore, and a
+database user that can only read.
 
+- **Implementer** — works functional implementation cases for any country, on Odoo 16 to 19.
+  Its tools follow one grammar: `get_company_profile`; one `audit_*` per area (company setup,
+  localization, modules, accounting, sales, purchasing, inventory, access, automations), each
+  returning facts and findings with a code, a severity and the records that prove them;
+  `check_data_quality` for named data checks; bounded exploration (`find_models`,
+  `describe_model`, `search_records`, `count_records`, `aggregate_records`); and
+  `record_evidence` and `propose_plan`, whose steps use the operations change sets will apply.
+  It never writes
+- **Company profile** — `DOOSERVICE_RUNNER_MODE=profile` runs every audit and prints each
+  area's facts and the standing findings as one line of JSON, without calling any model
 - **Turn** — read from `/case/turn.json` and deleted at once, since it carries the
   organisation's API key
 - **Providers** — Claude through the Anthropic Messages API, or GPT through the OpenAI
   Responses API with `store=False`; the same tools and masking for both
-- **Business tools** — company profile, find and describe models, search, count and total
-  records. Domains are Odoo's, compiled to parameterised SQL over the fields
-  `ir_model_fields` and `information_schema` agree can be read. There is no free SQL
 - **Masking** — fields the organisation marks as personal come back as stable placeholders
   such as `«EMAIL_3»`; the table stays in `/case/mask.json` and never leaves the server
 - **Output** — one JSON event per line; the agent numbers and publishes them
@@ -88,4 +96,5 @@ the operator, and with less: no addons, no filestore, and a database user that c
 cd case-runner
 uv run pytest               # unit tests
 uv run pytest -m postgres   # against a throwaway PostgreSQL in Docker
+uv run pytest -m odoo       # audits and checks against Odoo 16 and 19 installed in Docker
 ```

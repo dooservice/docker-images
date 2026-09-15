@@ -7,14 +7,19 @@ and what is starting, in the person's language.
 Frames travel to the browser like any terminal output, so they are kept small: a colour
 is sent only where it changes.
 
+It plays for at least `MINIMUM_SECONDS`, whichever tool it is: Claude Code is ready in a
+second and opencode takes several, and both should open the same way rather than one
+flashing past. What a tool draws before then is held and shown when the animation ends.
+
 It is a frame renderer, not a loop of its own. The session's copy loop calls `draw` when
 it has nothing else to do, so frames and the tool's own output never interleave, and it
-calls `stop` the moment the tool prints something a person can read.
+ends the animation once the tool has something to show and the minimum has passed.
 """
 
 import os
 import re
 import sys
+import time
 
 LOGO = (
     "     _                                   _",
@@ -29,6 +34,7 @@ WHITE = (255, 255, 255)
 GRAY = "\033[38;2;110;118;129m"
 RESET = "\033[0m"
 BAR_WIDTH = 24
+MINIMUM_SECONDS = 5
 STARTING = {"es": "Iniciando", "pt": "Iniciando", "fr": "Démarrage de", "it": "Avvio di", "de": "Starte"}
 
 CONTROL_ONLY = (
@@ -63,11 +69,18 @@ class Splash:
         self.subtitle = " · ".join(part for part in ("dooservice", project, environment) if part)
         self.active = False
         self.frame = 0
+        self.started_at = 0.0
+        self.held = []
 
     def start(self):
         self.active = True
+        self.started_at = time.monotonic()
         self.write("\033[?25l\033[2J")
         self.draw()
+
+    def finished(self):
+        """The tool has something to show, and the animation has had its full time."""
+        return self.active and bool(self.held) and time.monotonic() - self.started_at >= MINIMUM_SECONDS
 
     def stop(self):
         if not self.active:

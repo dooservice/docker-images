@@ -167,8 +167,23 @@ class AiSession:
             splash.stop()
             self.end()
 
+    @staticmethod
+    def reveal(splash, stdout):
+        """End the animation and show what the agent drew while it was playing."""
+        if not splash.active:
+            return
+        splash.stop()
+        for data in splash.held:
+            os.write(stdout, data)
+        splash.held.clear()
+
     def copy(self, master, splash):
-        """Keystrokes to the agent, its output to the screen, until it exits."""
+        """Keystrokes to the agent, its output to the screen, until it exits.
+
+        While the animation plays, the agent's questions to the terminal go straight
+        through — it waits for their answers — but what it draws is held until the
+        animation has had its full time, so a fast tool and a slow one open alike.
+        """
         stdin = sys.stdin.fileno()
         stdout = sys.stdout.fileno()
         saved = None
@@ -182,7 +197,10 @@ class AiSession:
             while master in sources:
                 ready, _, _ = select.select(sources, [], [], FRAME_SECONDS if splash.active else None)
                 if not ready:
-                    splash.draw()
+                    if splash.finished():
+                        self.reveal(splash, stdout)
+                    else:
+                        splash.draw()
                     continue
                 if master in ready:
                     self.copy_window_size(master)
@@ -192,10 +210,15 @@ class AiSession:
                         data = b""
                     if not data:
                         sources.remove(master)
+                        self.reveal(splash, stdout)
                         continue
-                    if splash.active and readable(data):
-                        splash.stop()
-                    os.write(stdout, self.announce_login(data))
+                    data = self.announce_login(data)
+                    if splash.active and (splash.held or readable(data)):
+                        splash.held.append(data)
+                        if splash.finished():
+                            self.reveal(splash, stdout)
+                        continue
+                    os.write(stdout, data)
                 if stdin in ready:
                     data = os.read(stdin, 1024)
                     if not data:

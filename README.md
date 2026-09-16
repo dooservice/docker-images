@@ -9,7 +9,6 @@ Custom Docker images for the dooservice infrastructure stack.
 | `ghcr.io/dooservice/dooservice-odoo` | `16.0` `17.0` `18.0` `19.0` | Odoo with unified CLI patches and dooservice user (uid 1500) |
 | `ghcr.io/dooservice/dooservice-operator` | `16.0` `17.0` `18.0` `19.0` | Console for an environment: shell, psql, git, Claude Code, opencode and the `dooservice` command |
 | `ghcr.io/dooservice/dooservice-postgres` | `16` `17` `18` | PostgreSQL with pgvector, unaccent and md5 auth for PgDog |
-| `ghcr.io/dooservice/dooservice-case-runner` | `1` | Answers one question of an AI case, reading an environment's database through business tools |
 
 ## Build & push
 
@@ -29,8 +28,6 @@ cd operator && ./build.sh
 # Build and push all Postgres versions (16, 17, 18)
 cd postgres && ./build.sh
 
-# Build and push the AI case runner
-cd case-runner && ./build.sh
 ```
 
 ## odoo
@@ -65,36 +62,3 @@ a network of its own — and removes it when the session ends. Adds:
   any other. There is no push: the container holds no git credentials
 - **`odoo-bin`** wrapper that injects the database connection, so it is never passed by hand
 - **Welcome banner and prompt** in `/etc/profile.d/dooservice.sh`
-
-
-## case-runner
-
-The agent starts one per turn of an AI case, and one to read an environment's company
-profile, and removes it when it is done. It does not need Odoo, so there is one image for
-every Odoo version. Hardened like the operator, and with less: no addons, no filestore, and a
-database user that can only read.
-
-- **Implementer** — works functional implementation cases for any country, on Odoo 16 to 19.
-  Its tools follow one grammar: `get_company_profile`; one `audit_*` per area (company setup,
-  localization, modules, accounting, sales, purchasing, inventory, access, automations), each
-  returning facts and findings with a code, a severity and the records that prove them;
-  `check_data_quality` for named data checks; bounded exploration (`find_models`,
-  `describe_model`, `search_records`, `count_records`, `aggregate_records`); and
-  `record_evidence` and `propose_plan`, whose steps use the operations change sets will apply.
-  It never writes
-- **Company profile** — `DOOSERVICE_RUNNER_MODE=profile` runs every audit and prints each
-  area's facts and the standing findings as one line of JSON, without calling any model
-- **Turn** — read from `/case/turn.json` and deleted at once, since it carries the
-  organisation's API key
-- **Providers** — Claude through the Anthropic Messages API, or GPT through the OpenAI
-  Responses API with `store=False`; the same tools and masking for both
-- **Masking** — fields the organisation marks as personal come back as stable placeholders
-  such as `«EMAIL_3»`; the table stays in `/case/mask.json` and never leaves the server
-- **Output** — one JSON event per line; the agent numbers and publishes them
-
-```bash
-cd case-runner
-uv run pytest               # unit tests
-uv run pytest -m postgres   # against a throwaway PostgreSQL in Docker
-uv run pytest -m odoo       # audits and checks against Odoo 16 and 19 installed in Docker
-```

@@ -6,8 +6,8 @@ Custom Docker images for the dooservice infrastructure stack.
 
 | Image | Versions | Description |
 |---|---|---|
-| `ghcr.io/dooservice/dooservice-odoo` | `16.0` `17.0` `18.0` `19.0` | Odoo with unified CLI patches and dooservice user (uid 1500) |
-| `ghcr.io/dooservice/dooservice-operator` | `16.0` `17.0` `18.0` `19.0` | Console for an environment: shell, psql, git, Claude Code, opencode and the `dooservice` command |
+| `ghcr.io/dooservice/dooservice-odoo` | `16.0` `17.0` `18.0` `19.0` `20.0` | Odoo with unified CLI patches and dooservice user (uid 1500) |
+| `ghcr.io/dooservice/dooservice-operator` | `16.0` `17.0` `18.0` `19.0` `20.0` | Console for an environment: shell, psql, git, Claude Code, opencode and the `dooservice` command |
 | `ghcr.io/dooservice/dooservice-postgres` | `16` `17` `18` | PostgreSQL with pgvector, unaccent and md5 auth for PgDog |
 
 ## Build & push

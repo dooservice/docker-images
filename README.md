@@ -20,7 +20,7 @@ docker login ghcr.io
 ```
 
 ```bash
-# Build and push all Odoo versions (16, 17, 18, 19)
+# Build and push all Odoo versions (16, 17, 18, 19, 20), or one: ./build.sh 20.0
 cd odoo && ./build.sh
 
 # Build and push all operator versions (after the Odoo images)
@@ -36,10 +36,11 @@ cd case-runner && ./build.sh
 
 ## odoo
 
-Based on the official `odoo` image. Adds:
+Based on the official `odoo` image for every version, 20.0 included since Odoo published
+it. Adds:
 
 - **dooservice user** (uid/gid 1500) — matches the host agent user, avoids volume permission issues
-- **CLI patches** — unifies `odoo db dump` / `odoo db load` across v16–v19 so the agent can use a single command format
+- **CLI patches** — unifies `odoo db dump` / `odoo db load` across v16–v20 so the agent can use a single command format (v19 and v20 already ship them)
 - **entrypoint** — auto-installs pip dependencies from any `requirements.txt` found in `/mnt/extra-addons` before starting Odoo
 
 ## postgres

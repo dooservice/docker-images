@@ -12,16 +12,6 @@ for VERSION in "${VERSIONS[@]}"; do
     fi
 
     BASE="odoo:${VERSION}"
-    if [ -d "base/${VERSION}" ]; then
-        BASE="${REGISTRY}/${DOCKER_ORG}/odoo-base:${VERSION}"
-        echo "Building ${BASE} from source..."
-        docker buildx build \
-            --platform linux/amd64 \
-            -t "${BASE}" \
-            --push \
-            -f "base/${VERSION}/Dockerfile" "base/${VERSION}"
-    fi
-
     echo "Building ${REGISTRY}/${DOCKER_ORG}/dooservice-odoo:${VERSION} on ${BASE}..."
     docker buildx build \
         --platform linux/amd64 \

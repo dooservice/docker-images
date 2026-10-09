@@ -52,6 +52,13 @@ tagged: `dooservice-odoo:18.0-20261010`, `dooservice-operator:18.0-20261010`,
 
 By hand, `REVISION=20261010 ./build.sh 18.0`; without it the script takes today's date.
 
+### What is new, for customers
+
+Each revision has an entry in [CHANGELOG.md](CHANGELOG.md) with a `### Novedades` section:
+one line per change and language (`- es:`, `- en:`), written for whoever uses Odoo. It is
+signed into the platform and shown in the panel to the servers that receive it, and
+`make platform` refuses a build without one. Write it right after the build, before pinning.
+
 ### What servers run
 
 Servers never run these tags as they are, and building sends nothing to any server. A

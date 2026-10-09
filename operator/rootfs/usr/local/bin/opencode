@@ -40,6 +40,8 @@ session.begin()
 if not os.path.exists(OPENCODE_CONFIG_DIR) and os.path.isdir(PLUGINS_TEMPLATE):
     shutil.copytree(PLUGINS_TEMPLATE, OPENCODE_CONFIG_DIR, symlinks=True)
 
+session.mode.link_skills(os.path.join(OPENCODE_CONFIG_DIR, "skills"))
+
 if not os.path.exists(RTK_PLUGIN):
     try:
         with open(LOG, "a") as log:

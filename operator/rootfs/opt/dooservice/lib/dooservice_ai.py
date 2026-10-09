@@ -6,11 +6,15 @@ customer's. Only one AI session per container, so two agents never work over eac
 And the platform has to agree: the launcher asks the agent for the environment's one AI
 slot, and waits for the answer.
 
-The session runs in one of two modes. With a repository it is development: the agent
-works on the environment's modules. Without one it is configuration: the agent sets up
-Odoo through its shell and database — parameters, users, companies, standard modules —
-and its file-editing tools are switched off, since there is no code of the project's own
-to change and nowhere to keep any it wrote.
+The session runs in one of two modes, chosen when the console is opened. Development
+needs a repository: the agent works on the environment's modules and publishes them as
+pull requests. Configuration is always possible, and the only one without a repository:
+the agent sets up Odoo through its shell — parameters, users, companies, standard modules
+— with its file-editing tools switched off and the database read only from `psql`.
+
+Each mode has its instructions and its skills. Claude Code is given the instructions as
+`~/.claude/CLAUDE.md`, one line importing the mode's file, which it always loads; opencode
+reads them from its configuration. The skills are linked where each tool looks for them.
 
 Then the agent runs inside a pseudo-terminal of its own, which watches two things on the
 way through. A login URL the agent prints is announced to the browser with an OSC 9
@@ -37,8 +41,10 @@ from dooservice_splash import Splash, readable
 
 LOCK_PATH = "/tmp/dooservice-ai.lock"
 DEVELOPMENT = "development"
-REPOSITORY = "/mnt/extra-addons"
+REPOSITORY = "/mnt/addons"
 AI_DIR = "/opt/dooservice/ai"
+SKILLS_DIR = f"{AI_DIR}/skills"
+CHOSEN = "DOOSERVICE_AI_MODE_CHOSEN"
 
 
 LANGUAGE_NAMES = {
@@ -67,22 +73,46 @@ def language_rule():
 
 
 class Mode:
-    """What the agent is there to do, and the files that tell it how."""
+    """What the agent is there to do, the files that tell it how, and the skills it has."""
 
-    def __init__(self, name, project, instructions, claude_settings, opencode_config):
+    def __init__(self, name, project, instructions, claude_settings, opencode_config, skills):
         self.name = name
         self.project = project
         self.instructions = instructions
         self.claude_settings = claude_settings
         self.opencode_config = opencode_config
+        self.skills = skills
 
     @classmethod
     def current(cls):
-        if os.path.isdir(os.path.join(REPOSITORY, ".git")):
+        """Development when it was chosen and there is a repository; configuration otherwise."""
+        has_repository = os.path.isdir(os.path.join(REPOSITORY, ".git"))
+        if has_repository and os.environ.get(CHOSEN, "code") != "functional":
             return cls("development", REPOSITORY, f"{AI_DIR}/AGENTS.md",
-                       f"{AI_DIR}/settings.json", f"{AI_DIR}/opencode.json")
+                       f"{AI_DIR}/settings.json", f"{AI_DIR}/opencode.json", ("code", "dooservice"))
         return cls("configuration", os.path.expanduser("~"), f"{AI_DIR}/CONFIGURATION.md",
-                   f"{AI_DIR}/settings-configuration.json", f"{AI_DIR}/opencode-configuration.json")
+                   f"{AI_DIR}/settings-configuration.json", f"{AI_DIR}/opencode-configuration.json",
+                   ("functional",))
+
+    def link_skills(self, into):
+        """This mode's skills, linked into the directory a tool reads them from."""
+        os.makedirs(into, exist_ok=True)
+        for group in self.skills:
+            source = os.path.join(SKILLS_DIR, group)
+            if not os.path.isdir(source):
+                continue
+            for name in sorted(os.listdir(source)):
+                target = os.path.join(into, name)
+                if not os.path.lexists(target):
+                    os.symlink(os.path.join(source, name), target)
+
+    def claude_memory(self, claude_dir):
+        """The instructions, as the one file Claude Code always loads: a line importing them."""
+        os.makedirs(claude_dir, exist_ok=True)
+        with open(os.path.join(claude_dir, "CLAUDE.md"), "w") as memory:
+            memory.write(f"@{self.instructions}\n")
+
+
 CTRL_Z = b"\x1a"
 FRAME_SECONDS = 0.1
 ANSI_ESCAPE = re.compile(rb"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")

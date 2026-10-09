@@ -23,7 +23,7 @@ def run_odoo(*args):
 
 def storage():
     sizes = subprocess.run(
-        ["du", "-sh", "/mnt/extra-addons", "/var/lib/odoo"], capture_output=True, text=True, check=False,
+        ["du", "-sh", "/mnt/addons", "/var/lib/odoo"], capture_output=True, text=True, check=False,
     ).stdout.strip()
     database = subprocess.run(
         ["psql", "-tAc", "SELECT pg_size_pretty(pg_database_size(current_database()))"],

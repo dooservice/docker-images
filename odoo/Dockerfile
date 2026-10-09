@@ -6,8 +6,8 @@ USER root
 
 RUN groupadd -g 1500 dooservice \
  && useradd -u 1500 -g 1500 -d /var/lib/odoo -s /bin/bash dooservice \
- && chown -R dooservice:dooservice /var/lib/odoo /mnt/extra-addons /etc/odoo \
- && mkdir -p /mnt/backups \
+ && mkdir -p /mnt/addons /mnt/backups \
+ && chown -R dooservice:dooservice /var/lib/odoo /mnt/extra-addons /mnt/addons /etc/odoo \
  && chown dooservice:dooservice /mnt/backups
 
 ARG ODOO_VERSION

@@ -62,9 +62,34 @@ jobs:
         env:
           FIRST: ${{ fromJson(steps.pick.outputs.matrix)[0] }}
 
+  # What a console needs to find before it is built: the repository where the agent mounts
+  # it (`ODOO_ADDONS_DIR` in dooservice-core), and a set of skills for every version.
+  checks:
+    name: Paths and skills
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: The repository is at /mnt/addons
+        run: |
+          if grep -rn "/mnt/extra-addons" operator/rootfs operator/Dockerfile; then
+            echo "::error::the agent mounts the repository at /mnt/addons"
+            exit 1
+          fi
+
+      - name: Every version has its skills, each named as its directory
+        run: |
+          for version in 16.0 17.0 18.0 19.0 20.0; do
+            test -d "operator/skills/${version}" || { echo "::error::no skills for ${version}"; exit 1; }
+          done
+          for skill in operator/skills/*/*/SKILL.md; do
+            name="$(basename "$(dirname "${skill}")")"
+            grep -q "^name: ${name}$" "${skill}" || { echo "::error::${skill} is not named ${name}"; exit 1; }
+          done
+
   odoo:
     name: Odoo ${{ matrix.version }} and its console
-    needs: versions
+    needs: [versions, checks]
     runs-on: ubuntu-24.04
     strategy:
       fail-fast: false

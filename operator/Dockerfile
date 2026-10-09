@@ -12,8 +12,8 @@ ARG ODOO_VERSION=19.0
 FROM ghcr.io/dooservice/dooservice-odoo:${ODOO_VERSION}
 
 ARG ODOO_VERSION
-ARG CLAUDE_CODE_VERSION=2.1.268
-ARG OPENCODE_VERSION=1.18.30
+ARG CLAUDE_CODE_VERSION=2.1.295
+ARG OPENCODE_VERSION=1.18.35
 ARG RTK_VERSION=0.48.0
 
 USER root
@@ -42,8 +42,13 @@ RUN mkdir -p /opt/ai \
  && rm -rf /tmp/claude-install /tmp/opencode-install
 
 COPY rootfs/ /
-RUN chmod 755 /usr/local/bin/claude /usr/local/bin/opencode /usr/local/bin/odoo-bin /usr/local/bin/dooservice \
- && chmod 644 /opt/dooservice/ai/* /opt/dooservice/lib/* /opt/dooservice/build/* /etc/profile.d/dooservice.sh \
+COPY skills/${ODOO_VERSION}/ /opt/dooservice/ai/skills/code/
+COPY skills/dooservice/ /opt/dooservice/ai/skills/dooservice/
+COPY skills/functional/ /opt/dooservice/ai/skills/functional/
+RUN chmod 755 /usr/local/bin/claude /usr/local/bin/opencode /usr/local/bin/odoo-bin /usr/local/bin/dooservice /usr/local/bin/psql \
+ && find /opt/dooservice/ai -type f -exec chmod 644 {} + \
+ && chmod 644 /opt/dooservice/lib/* /opt/dooservice/build/* /etc/profile.d/dooservice.sh \
+ && find /opt/dooservice/ai -type d -exec chmod 755 {} + \
  && mkdir -p /home/dooservice \
  && chown dooservice:dooservice /home/dooservice \
  && usermod -d /home/dooservice dooservice
@@ -61,6 +66,6 @@ ENV ODOO_VERSION=${ODOO_VERSION} \
     PYTHONPATH=/opt/dooservice/lib
 
 USER dooservice
-WORKDIR /mnt/extra-addons
+WORKDIR /mnt/addons
 ENTRYPOINT ["/usr/bin/tini", "--"]
 CMD ["sleep", "infinity"]

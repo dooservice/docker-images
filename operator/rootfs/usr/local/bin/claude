@@ -3,8 +3,9 @@
 
 The binary in /opt/ai is Claude Code as Anthropic ships it; everything dooservice adds is
 arguments and a few files. The project is the environment's addons, or the session's
-home when there is no repository and the agent only configures; the settings and the
-instructions for that mode come from /opt/dooservice/ai and cannot be changed from here,
+home when there is no repository and the agent only configures; the settings, the
+instructions and the skills for that mode come from /opt/dooservice/ai and cannot be
+changed from here — the instructions reach it as `~/.claude/CLAUDE.md`, which imports them,
 and each person signs in with their own account — the login lives in this session's home
 and is gone when the session ends.
 
@@ -35,6 +36,8 @@ kept = os.environ.get("DOOSERVICE_AI_HISTORY", "")
 resume = os.environ.get("DOOSERVICE_AI_RESUME", "1") != "0"
 
 os.makedirs(CLAUDE_DIR, exist_ok=True)
+mode.claude_memory(CLAUDE_DIR)
+mode.link_skills(os.path.join(CLAUDE_DIR, "skills"))
 projects = os.path.join(CLAUDE_DIR, "projects")
 if kept and not os.path.islink(projects) and not os.path.exists(projects):
     os.symlink(os.path.join(kept, "claude"), projects)
@@ -65,8 +68,7 @@ if not args or args[0] not in PASSTHROUGH:
         "--add-dir=/opt/dooservice/ai/",
         "--add-dir=/usr/lib/python3/dist-packages/odoo/",
         f"--append-system-prompt=Odoo version is {version}. This is the {environment} environment of the "
-        f"{project} project on the dooservice platform, in {mode.name} mode. Use the file {mode.instructions} "
-        f"as the first pre prompt. {language_rule()}",
+        f"{project} project on the dooservice platform, in {mode.name} mode. {language_rule()}",
     ]
     if resume and glob.glob(os.path.join(history, "*.jsonl")):
         args.append("--continue")

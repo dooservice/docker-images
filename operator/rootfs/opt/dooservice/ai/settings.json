@@ -6,8 +6,8 @@
         "allow": [
             "Read(/opt/dooservice/ai/**)",
             "Read(/usr/lib/python3/dist-packages/odoo/**)",
-            "Read(/mnt/extra-addons/**)",
-            "Edit(/mnt/extra-addons/**)",
+            "Read(/mnt/addons/**)",
+            "Edit(/mnt/addons/**)",
             "Bash(odoo-bin:*)",
             "Bash(dooservice:*)",
             "Bash(psql:*)",

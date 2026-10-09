@@ -47,14 +47,22 @@ cd case-runner && ./build.sh
 
 ```
 
+### Revisions
+
+Every build gives all its images one **revision**, its date, the way Odoo's own images are
+tagged: `dooservice-odoo:18.0-20261010`, `dooservice-operator:18.0-20261010`,
+`dooservice-postgres:16-20261010`. A revision never moves: a second build the same day takes
+`-2`, then `-3`. Each build also moves the usual tag (`18.0`), which no server runs.
+
+By hand, `REVISION=20261010 ./build.sh 18.0`; without it the script takes today's date.
+
 ### What servers run
 
-Servers never run these tags as they are. A platform (`make platform` in the agent
-repository) resolves each tag listed in its `platform.toml` to the digest it has at that
-moment and signs it; servers pull that digest, whatever the tag points at later. A new
-image reaches servers only through a new platform, ring by ring. Every build also pushes
-`<version>-<yyyymmdd>-<hhmm>` (UTC), which never moves, so a pinned digest stays tagged.
-The whole process: [dooservice-agent/docs/actualizaciones.md](https://github.com/dooservice/agent/blob/main/docs/actualizaciones.md).
+Servers never run these tags as they are, and building sends nothing to any server. A
+platform (`make platform` in the agent repository) resolves each tag in its `platform.toml`
+to the revision and digest it has at that moment and signs it; servers pull exactly that.
+The whole process: [docs/imagenes.md](https://github.com/dooservice/agent/blob/main/docs/imagenes.md)
+and [docs/actualizaciones.md](https://github.com/dooservice/agent/blob/main/docs/actualizaciones.md).
 
 ## odoo
 

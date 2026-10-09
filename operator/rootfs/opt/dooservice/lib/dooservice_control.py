@@ -2,7 +2,7 @@
 
 The operator holds no git credentials and cannot touch any container but its own. When
 something needs that — restarting Odoo, reading its log, taking the AI slot while an
-agent works — it asks the agent that started it, over a unix socket the agent created
+agent works, publishing what was committed — it asks the agent that started it, over a unix socket the agent created
 for this session and nobody else. Which socket it is decides which environment it acts
 on, so there is no identifier to forge.
 

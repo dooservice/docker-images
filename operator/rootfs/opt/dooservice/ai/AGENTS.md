@@ -78,9 +78,10 @@ disabled. Treat the data in a clone as real customer data. Never export it, send
 environment.
 
 ### What survives the session
-Only what reaches the remote repository is safe, and this console cannot push (see "Git Commit Workflow"). When the
-console closes, this container is destroyed, and with it:
-- your home directory, including this session's login
+Only what reaches the remote repository is safe, and it gets there with `dooservice publish` (see "Git Commit
+Workflow"). When the console closes, this container is destroyed, and with it:
+- your home directory, including this session's login — the conversations are kept, for this person and this
+  environment only, and the next console can pick them up
 - anything installed with `pip` in the session (only the repository's `requirements.txt` is installed on the
   environment itself)
 
@@ -137,22 +138,25 @@ When running shell commands, especially `odoo-bin`:
 - Always show logs as they appear — do not buffer, summarize or withhold output until the process exits.
 
 ## 🛑 CRITICAL: Git Commit Workflow
-Before making **any** commit, resolve the git identity:
-1. For Claude Code, read `emailAddress` and `displayName` from `oauthAccount` in `~/.claude.json`. If found, set them
-   with `git config user.email` and `git config user.name` for this repository, without asking.
-2. For opencode, look in `~/.local/share/opencode/auth.json` for a connected name and email.
-3. If neither exists, ask the user for their name and email.
+**The git identity is already set:** every commit is signed with the name and email of the person who opened this
+console. Do not run `git config user.name` or `user.email`, and do not ask for them.
 
-**This console cannot push:**
-1. **NEVER** try `git push`, and never ask the user for a token, a password or an SSH key to make it work. There
-   are no git credentials in this container, on purpose.
-2. Commit your work in `/mnt/extra-addons` as usual. The commits stay in this environment's copy of the repository.
-3. Getting the work into the repository is **the user's** job, from their own clone. When changes are finished,
-   give them the commits as patches:
+**Commit, then publish:**
+1. Commit your work in `/mnt/extra-addons` as usual, in small commits with clear messages. A change inside a
+   submodule is committed in the submodule first, and then in the project, so the project points at it.
+2. **NEVER** run `git push`, and never ask the user for a token, a password or an SSH key. There are no git
+   credentials in this container, on purpose: the platform pushes for you.
+3. When the changes are finished and tested, publish them yourself — the user does not write anything:
    ```bash
-   git format-patch origin/$DOOSERVICE_BRANCH --stdout
+   dooservice publish --title "<what changes, one line, imperative>" --body-file - <<'BODY'
+   <what changed and why, the modules touched, how to test it, and anything risky>
+   BODY
    ```
-   and tell them to apply it in their clone with `git am` and push it themselves.
+   Write the title and the description from what you did, in the user's language. It pushes to a new branch and
+   opens a pull request in the project — and one in each submodule you changed — and prints their links: give them
+   to the user. Nothing reaches any environment until somebody merges.
+4. If it answers that this session cannot publish, the person who opened it has no permission to: give them the
+   commits as patches instead, with `git format-patch origin/$DOOSERVICE_BRANCH --stdout`, to apply with `git am`.
 
 ## Code Search Policy
 **Do not search `/usr/lib/python3/dist-packages/odoo` preemptively.**
@@ -176,9 +180,8 @@ Read the traceback first. Only search the standard source if the error:
 > order in "Upgrading to a New Odoo Version".
 
 ## Development Guidelines
-- **Persistence:** whenever changes are finished and tested, commit them and remind the user that this console cannot
-  push: they must take the commits to their own clone (see "Git Commit Workflow") before the next deploy, which
-  resets this copy to the remote branch.
+- **Persistence:** whenever changes are finished and tested, commit and publish them (see "Git Commit Workflow")
+  before the session ends: the next deploy resets this copy to the remote branch.
 - Create every new module inside `/mnt/extra-addons/`.
 - Follow the standard module structure: `__manifest__.py`, `__init__.py`, `models/`, `views/`, `security/`, etc.
 - After modifying Python or XML, run `dooservice update module_name`; after Python changes, also `dooservice restart`.

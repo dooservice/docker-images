@@ -50,6 +50,11 @@ test = commands.add_parser("test", help="Run a module's tests")
 test.add_argument("modules", help="Comma-separated modules")
 commands.add_parser("shell", help="Open an Odoo shell on this database")
 commands.add_parser("storage", help="Show what the environment occupies")
+publish = commands.add_parser("publish", help="Publish what was committed as pull requests")
+publish.add_argument("--title", default="", help="The pull request's title; made from the commits when empty")
+described = publish.add_mutually_exclusive_group()
+described.add_argument("--body", default="", help="The pull request's description")
+described.add_argument("--body-file", help="Read the description from a file, or from stdin with '-'")
 
 options = parser.parse_args()
 platform = ControlClient()
@@ -74,3 +79,8 @@ match options.command:
         run_odoo("shell")
     case "storage":
         storage()
+    case "publish":
+        body = options.body
+        if options.body_file:
+            body = sys.stdin.read() if options.body_file == "-" else open(options.body_file).read()
+        platform.run("publish", {"title": options.title, "body": body})

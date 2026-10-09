@@ -5,6 +5,11 @@ Same arrangement as the Claude Code launcher: the binary is untouched, the confi
 and the instructions for the session's mode come from /opt/dooservice/ai, and each person
 connects the provider of their choice from inside the session. Its plugins arrive already
 installed, copied from what the image prepared, instead of downloaded at every start.
+
+The sessions are kept: `OPENCODE_DB` is in the person's own directory for this
+environment, mounted into their consoles and nobody else's, while the login stays in this
+session's home and goes with it. The last session is picked up unless a new one was asked
+for.
 """
 
 import json
@@ -21,7 +26,8 @@ SESSION_CONFIG_DIR = os.path.join(HOME, ".config", "dooservice")
 OPENCODE_CONFIG_DIR = os.path.join(HOME, ".config", "opencode")
 RTK_PLUGIN = os.path.join(OPENCODE_CONFIG_DIR, "plugins", "rtk.ts")
 PLUGINS_TEMPLATE = "/opt/dooservice/opencode-config"
-SESSIONS_DB = os.path.join(HOME, ".local", "share", "opencode", "opencode.db")
+SESSIONS_DB = os.environ.get("OPENCODE_DB") or os.path.join(HOME, ".local", "share", "opencode", "opencode.db")
+RESUME = os.environ.get("DOOSERVICE_AI_RESUME", "1") != "0"
 LOG = "/tmp/dooservice-ai.log"
 PASSTHROUGH = (
     "completion", "acp", "mcp", "attach", "run", "debug", "providers", "agent", "upgrade", "uninstall", "serve",
@@ -55,7 +61,7 @@ os.environ["OPENCODE_CONFIG"] = session_config
 args = sys.argv[1:]
 if not args or args[0] not in PASSTHROUGH:
     args.append(session.mode.project)
-    if os.path.exists(SESSIONS_DB):
+    if RESUME and os.path.exists(SESSIONS_DB):
         try:
             with sqlite3.connect(SESSIONS_DB) as connection:
                 if connection.execute("SELECT COUNT(*) FROM session").fetchone()[0] > 0:

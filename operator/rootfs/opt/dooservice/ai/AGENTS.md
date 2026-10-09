@@ -28,7 +28,7 @@ Load the matching skill before the work, not after:
 - `odoo-web-guidelines` for anything under `static/`.
 - `odoo-security` for routes, `sudo()`, SQL, access rules, public methods.
 - `odoo-review` when asked to review, and on your own work before publishing.
-- `odoo-git` for commits and publishing; `dooservice-console` for the commands.
+- `odoo-git` for commits; `dooservice-console` for the commands and publishing.
 - `odoo-upgrade` to port a module or to keep data through a model change.
 
 ## The loop

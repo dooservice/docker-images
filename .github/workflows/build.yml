@@ -69,6 +69,8 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: true
 
       - name: The repository is at /mnt/addons
         run: |
@@ -80,9 +82,9 @@ jobs:
       - name: Every version has its skills, each named as its directory
         run: |
           for version in 16.0 17.0 18.0 19.0 20.0; do
-            test -d "operator/skills/${version}" || { echo "::error::no skills for ${version}"; exit 1; }
+            test -d "operator/skills/odoo/${version}" || { echo "::error::no skills for ${version}"; exit 1; }
           done
-          for skill in operator/skills/*/*/SKILL.md; do
+          for skill in operator/skills/odoo/*/*/SKILL.md operator/skills/dooservice/*/SKILL.md; do
             name="$(basename "$(dirname "${skill}")")"
             grep -q "^name: ${name}$" "${skill}" || { echo "::error::${skill} is not named ${name}"; exit 1; }
           done
@@ -97,6 +99,8 @@ jobs:
         version: ${{ fromJson(needs.versions.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: true
 
       # An Odoo image and its console come to some 8 GB; the runner starts with less free.
       - name: Make room

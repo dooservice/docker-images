@@ -98,7 +98,10 @@ a network of its own — and removes it when the session ends. Adds:
   the file in `/opt/dooservice/ai`; nothing is written into the customer's repository
 - **Skills** in `/opt/dooservice/ai/skills`, linked into each tool's skills directory by mode:
   the Odoo skills of the image's version and `dooservice-console`/`odoo-upgrade` in code
-  mode, `odoo-functional` in functional mode (see [operator/skills](operator/skills/README.md))
+  mode, `odoo-functional` in functional mode. They live in the public
+  [dooservice/odoo-skills](https://github.com/dooservice/odoo-skills) repository, a
+  submodule at `operator/skills`: clone this one with `--recurse-submodules`, and bump the
+  submodule to take new skills
 - **`dooservice`**: install, update, test and shell run here; restart, logs and status are
   asked of the agent over the session's control socket, since this container cannot touch
   any other. `publish` pushes what was committed and opens its pull requests; the push is

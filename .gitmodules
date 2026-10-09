@@ -1,0 +1,3 @@
+[submodule "operator/skills"]
+	path = operator/skills
+	url = https://github.com/dooservice/odoo-skills.git

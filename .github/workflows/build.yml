@@ -1,0 +1,88 @@
+name: Build
+
+# The images servers run, built on GitHub's machines and not on a server of ours: each Odoo
+# version on a runner of its own, its console right after it, and Postgres beside them.
+# Building only publishes; servers take the new images when a platform pins them
+# (`make platform` in the agent repository).
+#
+#   gh workflow run build.yml --repo dooservice/docker-images
+#   gh workflow run build.yml --repo dooservice/docker-images -f versions=18.0
+on:
+  workflow_dispatch:
+    inputs:
+      versions:
+        description: "Odoo versions, comma-separated; empty is all of them"
+        required: false
+        default: ""
+      postgres:
+        description: "Build the Postgres images too"
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  versions:
+    name: Which versions
+    runs-on: ubuntu-24.04
+    outputs:
+      matrix: ${{ steps.pick.outputs.matrix }}
+    steps:
+      - id: pick
+        run: |
+          wanted="${WANTED:-16.0,17.0,18.0,19.0,20.0}"
+          echo "matrix=$(jq -cn --arg wanted "${wanted}" '$wanted | split(",") | map(gsub(" "; ""))')" >> "$GITHUB_OUTPUT"
+        env:
+          WANTED: ${{ inputs.versions }}
+
+  odoo:
+    name: Odoo ${{ matrix.version }} and its console
+    needs: versions
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        version: ${{ fromJson(needs.versions.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+
+      # An Odoo image and its console come to some 8 GB; the runner starts with less free.
+      - name: Make room
+        run: sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_TOKEN || github.token }}
+
+      - name: Odoo
+        working-directory: odoo
+        run: ./build.sh "${{ matrix.version }}"
+
+      - name: Console
+        working-directory: operator
+        run: ./build.sh "${{ matrix.version }}"
+
+  postgres:
+    name: Postgres
+    if: inputs.postgres
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_TOKEN || github.token }}
+
+      - name: Postgres
+        working-directory: postgres
+        run: ./build.sh

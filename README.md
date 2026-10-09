@@ -13,6 +13,19 @@ Custom Docker images for the dooservice infrastructure stack.
 
 ## Build & push
 
+Images are built on GitHub's machines, not on a server of ours — an Odoo image and its
+console take some 8 GB, and a server's disk holds its customers' data:
+
+```bash
+gh workflow run build.yml --repo dooservice/docker-images                  # all of them
+gh workflow run build.yml --repo dooservice/docker-images -f versions=18.0 # one version
+```
+
+Each Odoo version builds on a runner of its own, its console right after it, and Postgres
+beside them. The scripts below are what the workflow runs, and still work by hand.
+
+### By hand
+
 Requires Docker Buildx and an authenticated ghcr.io session:
 
 ```bash

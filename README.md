@@ -86,11 +86,26 @@ a network of its own — and removes it when the session ends. Adds:
 
 - **Claude Code, opencode and rtk** in `/opt/ai`, pinned, with auto-update off
 - **Launchers** `claude` and `opencode` that refuse to run outside development environments,
-  ask the platform to hold deploys, and open the agent in the environment's repository with
-  the managed settings and `AGENTS.md` from `/opt/dooservice/ai`
-- **`dooservice`** — install, update, test and shell run here; restart, logs and status are
+  ask the platform to hold deploys, and open the AI in one of two modes, chosen in the
+  panel (`DOOSERVICE_AI_MODE_CHOSEN`):
+  - **code**: works in the project's repository at `/mnt/addons`, with `AGENTS.md` and
+    `settings.json`; changes leave as pull requests through `dooservice publish`
+  - **functional**: configures Odoo through its data and writes no code, with
+    `CONFIGURATION.md` and file editing denied; the agent mounts the repository read-only.
+    A console without a repository is always functional
+
+  Claude Code loads the mode's instructions from `~/.claude/CLAUDE.md`, a one-line import of
+  the file in `/opt/dooservice/ai`; nothing is written into the customer's repository
+- **Skills** in `/opt/dooservice/ai/skills`, linked into each tool's skills directory by mode:
+  the Odoo skills of the image's version and `dooservice-console`/`odoo-upgrade` in code
+  mode, `odoo-functional` in functional mode (see [operator/skills](operator/skills/README.md))
+- **`dooservice`**: install, update, test and shell run here; restart, logs and status are
   asked of the agent over the session's control socket, since this container cannot touch
-  any other. There is no push: the container holds no git credentials
-- **`odoo-bin`** wrapper that injects the database connection, so it is never passed by hand
+  any other. `publish` pushes what was committed and opens its pull requests; the push is
+  done by the agent with the account's token, never from this container, which holds no git
+  credentials
+- **`psql`** wrapper: read-only in functional mode
+- **`odoo-bin`** wrapper that injects the database connection, so it is never passed by hand,
+  and refuses another `--addons-path` in functional mode
 - **Welcome banner and prompt** in `/etc/profile.d/dooservice.sh`
 

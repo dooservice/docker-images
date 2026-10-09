@@ -41,6 +41,7 @@ repository) resolves each tag listed in its `platform.toml` to the digest it has
 moment and signs it; servers pull that digest, whatever the tag points at later. A new
 image reaches servers only through a new platform, ring by ring. Every build also pushes
 `<version>-<yyyymmddhhmm>`, which never moves, so a pinned digest stays tagged.
+The whole process: [dooservice-agent/docs/actualizaciones.md](https://github.com/dooservice/agent/blob/main/docs/actualizaciones.md).
 
 ## odoo
 

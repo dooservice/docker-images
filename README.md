@@ -34,6 +34,14 @@ cd case-runner && ./build.sh
 
 ```
 
+### What servers run
+
+Servers never run these tags as they are. A platform (`make platform` in the agent
+repository) resolves each tag listed in its `platform.toml` to the digest it has at that
+moment and signs it; servers pull that digest, whatever the tag points at later. A new
+image reaches servers only through a new platform, ring by ring. Every build also pushes
+`<version>-<yyyymmddhhmm>`, which never moves, so a pinned digest stays tagged.
+
 ## odoo
 
 Based on the official `odoo` image for every version, 20.0 included since Odoo published

@@ -25,10 +25,11 @@ permissions:
 
 jobs:
   versions:
-    name: Which versions
+    name: Which versions, and the revision
     runs-on: ubuntu-24.04
     outputs:
       matrix: ${{ steps.pick.outputs.matrix }}
+      revision: ${{ steps.revision.outputs.revision }}
     steps:
       - id: pick
         run: |
@@ -36,6 +37,30 @@ jobs:
           echo "matrix=$(jq -cn --arg wanted "${wanted}" '$wanted | split(",") | map(gsub(" "; ""))')" >> "$GITHUB_OUTPUT"
         env:
           WANTED: ${{ inputs.versions }}
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_TOKEN || github.token }}
+
+      # One revision for every image of this build: today's date, the way Odoo's own images
+      # are tagged. A second build the same day takes -2, then -3: a revision never moves,
+      # because what a platform pinned has to stay where it was.
+      - id: revision
+        run: |
+          day="$(date -u +%Y%m%d)"
+          revision="${day}"
+          number=1
+          while docker buildx imagetools inspect "ghcr.io/dooservice/dooservice-odoo:${FIRST}-${revision}" >/dev/null 2>&1 \
+             || docker buildx imagetools inspect "ghcr.io/dooservice/dooservice-postgres:16-${revision}" >/dev/null 2>&1; do
+            number=$((number + 1))
+            revision="${day}-${number}"
+          done
+          echo "revision=${revision}" >> "$GITHUB_OUTPUT"
+          echo "Revision ${revision}" >> "$GITHUB_STEP_SUMMARY"
+        env:
+          FIRST: ${{ fromJson(steps.pick.outputs.matrix)[0] }}
 
   odoo:
     name: Odoo ${{ matrix.version }} and its console
@@ -63,13 +88,18 @@ jobs:
       - name: Odoo
         working-directory: odoo
         run: ./build.sh "${{ matrix.version }}"
+        env:
+          REVISION: ${{ needs.versions.outputs.revision }}
 
       - name: Console
         working-directory: operator
         run: ./build.sh "${{ matrix.version }}"
+        env:
+          REVISION: ${{ needs.versions.outputs.revision }}
 
   postgres:
     name: Postgres
+    needs: versions
     if: inputs.postgres
     runs-on: ubuntu-24.04
     steps:
@@ -86,3 +116,5 @@ jobs:
       - name: Postgres
         working-directory: postgres
         run: ./build.sh
+        env:
+          REVISION: ${{ needs.versions.outputs.revision }}

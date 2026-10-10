@@ -10,7 +10,7 @@ las notas de versión del agente: ver «Cómo se escriben» en
 
 El resto de la entrada, si hace falta, es técnico.
 
-## [Sin publicar]
+## [20261010] — 2026-10-10
 
 ### Novedades
 - es: Consola: los commits hechos por la IA llevan a Dooservice como coautor, y cada pull

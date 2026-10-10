@@ -1,0 +1,2 @@
+[core]
+	hooksPath = /opt/dooservice/git-hooks

@@ -115,6 +115,9 @@ a network of its own — and removes it when the session ends. Adds:
   done by the agent with the account's token, never from this container, which holds no git
   credentials
 - **`psql`** wrapper: read-only in functional mode
+- **Git hooks** in `/opt/dooservice/git-hooks` (`core.hooksPath` in `/etc/gitconfig`): a commit
+  made by an AI session gets `Co-authored-by: Dooservice <noreply@dooservice.sh>`, once; then
+  the repository's own hook of the same name runs, if it has one
 - **`odoo-bin`** wrapper that injects the database connection, so it is never passed by hand,
   and refuses another `--addons-path` in functional mode
 - **Welcome banner and prompt** in `/etc/profile.d/dooservice.sh`

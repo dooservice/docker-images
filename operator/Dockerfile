@@ -50,6 +50,12 @@ RUN chmod 755 /usr/local/bin/claude /usr/local/bin/opencode /usr/local/bin/odoo-
  && find /opt/dooservice/ai -type f -exec chmod 644 {} + \
  && chmod 644 /opt/dooservice/lib/* /opt/dooservice/build/* /etc/profile.d/dooservice.sh \
  && find /opt/dooservice/ai -type d -exec chmod 755 {} + \
+ && chmod 644 /etc/gitconfig \
+ && chmod 755 /opt/dooservice/git-hooks /opt/dooservice/git-hooks/dispatch \
+ && for hook in applypatch-msg pre-applypatch post-applypatch pre-commit pre-merge-commit prepare-commit-msg \
+      commit-msg post-commit pre-rebase post-checkout post-merge pre-push post-rewrite; do \
+      ln -s dispatch "/opt/dooservice/git-hooks/${hook}"; \
+    done \
  && mkdir -p /home/dooservice \
  && chown dooservice:dooservice /home/dooservice \
  && usermod -d /home/dooservice dooservice

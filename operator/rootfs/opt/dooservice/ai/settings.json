@@ -21,6 +21,10 @@
     "env": {
         "DISABLE_AUTOUPDATER": "1"
     },
+    "attribution": {
+        "commit": "",
+        "pr": ""
+    },
     "tui": "fullscreen",
     "hooks": {
         "PreToolUse": [{

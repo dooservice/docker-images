@@ -10,6 +10,23 @@ las notas de versión del agente: ver «Cómo se escriben» en
 
 El resto de la entrada, si hace falta, es técnico.
 
+## [Sin publicar]
+
+### Novedades
+- es: Consola: los commits hechos por la IA llevan a Dooservice como coautor, y cada pull
+  request sigue una estructura fija (título y secciones) en tu idioma.
+- en: Console: commits made by the AI are co-authored by Dooservice, and every pull request
+  follows a fixed structure (title and sections) in your language.
+
+### Changed
+- Hook `prepare-commit-msg` de la consola (`/opt/dooservice/git-hooks`, vía `core.hooksPath`
+  en `/etc/gitconfig`): añade `Co-authored-by: Dooservice <noreply@dooservice.sh>` a los
+  commits de una sesión de IA, una sola vez, y después ejecuta el hook del repositorio si
+  lo tiene. Los commits hechos a mano en la terminal no lo llevan.
+- Claude Code ya no añade su propia atribución (`attribution.commit` y `attribution.pr`
+  vacíos): el coautor lo pone el hook y la firma del pull request `dooservice publish`.
+- Skill `dooservice-console`: reglas y plantilla de los pull requests.
+
 ## [20261009-3] — 2026-10-09
 
 ### Novedades

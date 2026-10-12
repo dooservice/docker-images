@@ -12,7 +12,8 @@
             "Bash(python3:*)",
             "Bash(echo *)",
             "Bash(echo)",
-            "Bash(sed *)"
+            "Bash(sed *)",
+            "mcp__dooservice"
         ],
         "deny": [
             "Edit",

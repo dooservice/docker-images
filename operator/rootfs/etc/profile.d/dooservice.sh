@@ -63,12 +63,7 @@ commands = [
     ("dooservice storage", "Ver lo que ocupa el entorno"),
     ("psql", "Base de datos del entorno"),
 ]
-configuration_only = not os.path.isdir("/mnt/addons/.git") or os.environ.get("DOOSERVICE_AI_MODE_CHOSEN") == "functional"
-if configuration_only:
-    commands = [
-        (name, f"{description}, modo configuración") if name in ("claude", "opencode") else (name, description)
-        for name, description in commands
-    ]
+no_repository = not os.path.isdir("/mnt/addons/.git")
 
 width = max(len(name) for name, _ in commands) + 4
 lines = [f"{TEAL}{logo}{RESET}", ""]
@@ -80,8 +75,8 @@ lines.append("")
 for name, description in commands:
     lines.append(f"  {WHITE}${RESET} {TEAL}{name.ljust(width)}{RESET}{description}")
 lines.append("")
-if configuration_only:
-    lines.append(f"{GRAY}Modo funcional: la IA configura Odoo, pero no crea ni modifica módulos.{RESET}")
+if no_repository:
+    lines.append(f"{GRAY}Sin repositorio: la IA configura Odoo, pero no crea ni modifica módulos.{RESET}")
 lines.append(f"{GRAY}La sesión se cierra tras 30 minutos sin actividad.{RESET}")
 print("\n".join(lines) + "\n")
 EOF

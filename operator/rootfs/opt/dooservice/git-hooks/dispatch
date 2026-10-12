@@ -17,7 +17,7 @@ import subprocess
 import sys
 
 CO_AUTHOR = "Co-authored-by: Dooservice <noreply@dooservice.sh>"
-AI_SESSION = "DOOSERVICE_AI_MODE"
+AI_SESSION = "DOOSERVICE_AI_SESSION"
 
 
 class Hook:

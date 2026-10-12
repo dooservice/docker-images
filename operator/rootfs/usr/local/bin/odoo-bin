@@ -9,7 +9,7 @@ from the environment, so it never shows up in `ps`.
 No HTTP by default. This container is not the one serving the environment; it only
 installs, updates, tests and opens shells against the same database.
 
-In functional mode, or without a repository, no other addons path is accepted: a
+Without a repository, no other addons path is accepted: a
 module installed from anywhere else would be in the database and missing from the
 environment's Odoo, which would then fail to load it.
 """
@@ -45,11 +45,11 @@ def odoo_arguments(command, args):
 
 
 argv = sys.argv[1:]
-functional = not os.path.isdir("/mnt/addons/.git") or os.environ.get("DOOSERVICE_AI_MODE_CHOSEN") == "functional"
-if functional and any(arg.startswith("--addons-path") for arg in argv):
+no_repository = not os.path.isdir("/mnt/addons/.git")
+if no_repository and any(arg.startswith("--addons-path") for arg in argv):
     sys.stderr.write(
-        "This console is in functional mode: only the modules the environment already has can be installed.\n"
-        "Open it in code mode, with the project's repository, to develop modules of its own.\n"
+        "This project has no repository: only the modules the environment already has can be installed.\n"
+        "Link a repository to the project to develop modules of its own.\n"
     )
     sys.exit(2)
 command = argv[0] if argv and not argv[0].startswith("-") else None

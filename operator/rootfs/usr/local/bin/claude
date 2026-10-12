@@ -4,7 +4,7 @@
 The binary in /opt/ai is Claude Code as Anthropic ships it; everything dooservice adds is
 arguments and a few files. The project is the environment's addons, or the session's
 home when there is no repository and the agent only configures; the settings, the
-instructions and the skills for that mode come from /opt/dooservice/ai and cannot be
+instructions and the skills come from /opt/dooservice/ai and cannot be
 changed from here — the instructions reach it as `~/.claude/CLAUDE.md`, which imports them,
 and each person signs in with their own account — the login lives in this session's home
 and is gone when the session ends.
@@ -30,14 +30,14 @@ PASSTHROUGH = ("agents", "auth", "doctor", "install", "mcp", "plugin", "setup-to
 
 session = AiSession("claude")
 session.begin()
-mode = session.mode
-history = os.path.join(CLAUDE_DIR, "projects", mode.project.replace("/", "-"))
+workspace = session.workspace
+history = os.path.join(CLAUDE_DIR, "projects", workspace.project.replace("/", "-"))
 kept = os.environ.get("DOOSERVICE_AI_HISTORY", "")
 resume = os.environ.get("DOOSERVICE_AI_RESUME", "1") != "0"
 
 os.makedirs(CLAUDE_DIR, exist_ok=True)
-mode.claude_memory(CLAUDE_DIR)
-mode.link_skills(os.path.join(CLAUDE_DIR, "skills"))
+workspace.claude_memory(CLAUDE_DIR)
+workspace.link_skills(os.path.join(CLAUDE_DIR, "skills"))
 projects = os.path.join(CLAUDE_DIR, "projects")
 if kept and not os.path.islink(projects) and not os.path.exists(projects):
     os.symlink(os.path.join(kept, "claude"), projects)
@@ -54,21 +54,22 @@ if not os.path.exists(config_path):
         json.dump({
             "hasTrustDialogAccepted": True,
             "theme": "dark",
-            "projects": {mode.project: {"hasTrustDialogAccepted": True, "allowedTools": []}},
+            "projects": {workspace.project: {"hasTrustDialogAccepted": True, "allowedTools": []}},
         }, config)
 
-os.chdir(mode.project)
+os.chdir(workspace.project)
 args = sys.argv[1:]
 if not args or args[0] not in PASSTHROUGH:
     version = os.environ.get("ODOO_VERSION", "")
     environment = os.environ.get("DOOSERVICE_ENVIRONMENT", "")
     project = os.environ.get("DOOSERVICE_PROJECT", "")
     args += [
-        f"--settings={mode.claude_settings}",
+        f"--settings={workspace.claude_settings}",
+        "--mcp-config=/opt/dooservice/ai/mcp.json",
         "--add-dir=/opt/dooservice/ai/",
         "--add-dir=/usr/lib/python3/dist-packages/odoo/",
         f"--append-system-prompt=Odoo version is {version}. This is the {environment} environment of the "
-        f"{project} project on the dooservice platform, in {mode.name} mode. {language_rule()}",
+        f"{project} project on the dooservice platform, {workspace.describe()}. {language_rule()}",
     ]
     if resume and glob.glob(os.path.join(history, "*.jsonl")):
         args.append("--continue")

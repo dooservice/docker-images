@@ -15,7 +15,8 @@
             "Bash(git:*)",
             "Bash(echo *)",
             "Bash(echo)",
-            "Bash(sed *)"
+            "Bash(sed *)",
+            "mcp__dooservice"
         ]
     },
     "env": {
@@ -27,12 +28,16 @@
     },
     "tui": "fullscreen",
     "hooks": {
-        "PreToolUse": [{
-            "matcher": "Bash",
-            "hooks": [{
-                "type": "command",
-                "command": "rtk hook claude"
-            }]
-        }]
+        "PreToolUse": [
+            {
+                "matcher": "Bash",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "rtk hook claude"
+                    }
+                ]
+            }
+        ]
     }
 }

@@ -5,5 +5,15 @@
     ],
     "lsp": false,
     "permission": "allow",
-    "autoupdate": false
+    "autoupdate": false,
+    "mcp": {
+        "dooservice": {
+            "type": "local",
+            "command": [
+                "python3",
+                "/opt/dooservice/mcp/server.py"
+            ],
+            "enabled": true
+        }
+    }
 }

@@ -2,7 +2,7 @@
 """opencode, set up for the environment this console belongs to.
 
 Same arrangement as the Claude Code launcher: the binary is untouched, the configuration
-and the instructions for the session's mode come from /opt/dooservice/ai, and each person
+and the instructions come from /opt/dooservice/ai, and each person
 connects the provider of their choice from inside the session. Its plugins arrive already
 installed, copied from what the image prepared, instead of downloaded at every start.
 
@@ -40,7 +40,7 @@ session.begin()
 if not os.path.exists(OPENCODE_CONFIG_DIR) and os.path.isdir(PLUGINS_TEMPLATE):
     shutil.copytree(PLUGINS_TEMPLATE, OPENCODE_CONFIG_DIR, symlinks=True)
 
-session.mode.link_skills(os.path.join(OPENCODE_CONFIG_DIR, "skills"))
+session.workspace.link_skills(os.path.join(OPENCODE_CONFIG_DIR, "skills"))
 
 if not os.path.exists(RTK_PLUGIN):
     try:
@@ -53,7 +53,7 @@ os.makedirs(SESSION_CONFIG_DIR, exist_ok=True)
 language_file = os.path.join(SESSION_CONFIG_DIR, "LANGUAGE.md")
 with open(language_file, "w") as rule:
     rule.write(f"# Language\n\n{language_rule()}\n")
-with open(session.mode.opencode_config) as managed:
+with open(session.workspace.opencode_config) as managed:
     config = json.load(managed)
 config["instructions"] = [*config.get("instructions", []), language_file]
 session_config = os.path.join(SESSION_CONFIG_DIR, "opencode.json")
@@ -62,7 +62,7 @@ with open(session_config, "w") as generated:
 os.environ["OPENCODE_CONFIG"] = session_config
 args = sys.argv[1:]
 if not args or args[0] not in PASSTHROUGH:
-    args.append(session.mode.project)
+    args.append(session.workspace.project)
     if RESUME and os.path.exists(SESSIONS_DB):
         try:
             with sqlite3.connect(SESSIONS_DB) as connection:

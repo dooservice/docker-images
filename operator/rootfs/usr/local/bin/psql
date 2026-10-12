@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""`psql` on this environment's database, read only for a configuration session.
+"""`psql` on this environment's database, read only for an AI session.
 
-A configuration session changes data through the ORM, which runs Odoo's own checks and
-computes; `psql` is there to read and diagnose. The AI launcher marks its session with
-`DOOSERVICE_AI_MODE`, and every `psql` the agent starts then opens its transactions read
-only. A person at the console's own shell is not affected.
+The agent changes data through the ORM, which runs Odoo's own checks and computes; `psql`
+is there to read and diagnose. The AI launcher marks its session with
+`DOOSERVICE_AI_SESSION`, and every `psql` the agent starts then opens its transactions
+read only. A person at the console's own shell is not affected.
 """
 
 import os
@@ -12,6 +12,6 @@ import sys
 
 REAL_PSQL = "/usr/bin/psql"
 
-if os.environ.get("DOOSERVICE_AI_MODE") == "configuration":
+if os.environ.get("DOOSERVICE_AI_SESSION"):
     os.environ["PGOPTIONS"] = f"{os.environ.get('PGOPTIONS', '')} -c default_transaction_read_only=on".strip()
 os.execv(REAL_PSQL, [REAL_PSQL, *sys.argv[1:]])

@@ -1,8 +1,8 @@
 """What both AI launchers share: whether a session may start, and the terminal it runs in.
 
-Three guards before anything starts. The environment has to be a development one: an
-agent that runs `odoo-bin -u` without asking belongs on a database that is not a
-customer's. Only one AI session per container, so two agents never work over each other.
+Three guards before anything starts. The environment has to be development, or
+production when the platform opened the console with the AI allowed there: on production
+it reads, proposes, and changes only through its own tools while changes are allowed. Only one AI session per container, so two agents never work over each other.
 And the platform has to agree: the launcher asks the agent for the environment's one AI
 slot, and waits for the answer.
 
@@ -40,6 +40,7 @@ from dooservice_splash import Splash, readable
 
 LOCK_PATH = "/tmp/dooservice-ai.lock"
 DEVELOPMENT = "development"
+PRODUCTION = "production"
 REPOSITORY = "/mnt/addons"
 AI_DIR = "/opt/dooservice/ai"
 SKILLS_DIR = f"{AI_DIR}/skills"
@@ -136,8 +137,8 @@ class AiSession:
 
     def begin(self):
         """Every guard, in order. Exits with a sentence a person can act on."""
-        if os.environ.get("DOOSERVICE_STAGE") != DEVELOPMENT:
-            self.refuse("AI sessions only run on development environments. Clone this one to development first.")
+        if os.environ.get("DOOSERVICE_STAGE") not in (DEVELOPMENT, PRODUCTION):
+            self.refuse("AI sessions run on development, and on production when the organization allows it.")
         self.lock = open(LOCK_PATH, "w")
         try:
             fcntl.flock(self.lock, fcntl.LOCK_EX | fcntl.LOCK_NB)

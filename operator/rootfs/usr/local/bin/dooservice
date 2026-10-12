@@ -13,6 +13,7 @@ import subprocess
 import sys
 
 from dooservice_control import ControlClient
+from dooservice_production import Production
 
 ODOO_BIN = "/usr/local/bin/odoo-bin"
 
@@ -50,6 +51,8 @@ test = commands.add_parser("test", help="Run a module's tests")
 test.add_argument("modules", help="Comma-separated modules")
 commands.add_parser("shell", help="Open an Odoo shell on this database")
 commands.add_parser("storage", help="Show what the environment occupies")
+record = commands.add_parser("record", help=argparse.SUPPRESS)
+record.add_argument("text", nargs="?", default="")
 publish = commands.add_parser("publish", help="Publish what was committed as pull requests")
 publish.add_argument("--title", default="", help="The pull request's title; made from the commits when empty")
 described = publish.add_mutually_exclusive_group()
@@ -63,23 +66,31 @@ match options.command:
     case "status":
         platform.run("status")
     case "restart":
+        Production.require_changes("Restarting Odoo")
         platform.run("restart")
     case "logs":
         try:
             platform.run("logs", {"lines": options.lines, "follow": options.follow})
         except KeyboardInterrupt:
             sys.exit(0)
-    case "update":
-        run_odoo("-u", options.modules, "--stop-after-init")
-    case "install":
-        run_odoo("-i", options.modules, "--stop-after-init")
-    case "test":
-        run_odoo("-u", options.modules, "--test-enable", "--stop-after-init")
+    case "update" | "install" | "test":
+        Production.refuse("Installing, updating or testing modules")
+        flag = "-i" if options.command == "install" else "-u"
+        extra = ["--test-enable"] if options.command == "test" else []
+        run_odoo(flag, options.modules, *extra, "--stop-after-init")
     case "shell":
         run_odoo("shell")
     case "storage":
         storage()
+    case "record":
+        if Production.here() and options.text.strip():
+            try:
+                for _ in platform.ask("record", {"text": options.text}):
+                    pass
+            except Exception:
+                pass
     case "publish":
+        Production.refuse("Publishing")
         body = options.body
         if options.body_file:
             body = sys.stdin.read() if options.body_file == "-" else open(options.body_file).read()

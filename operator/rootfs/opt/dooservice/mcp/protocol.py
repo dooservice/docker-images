@@ -9,6 +9,9 @@ seeing a protocol error.
 import json
 import sys
 
+from gate import Gate
+from refusal import ToolRefused
+
 PROTOCOL_VERSION = "2025-06-18"
 
 
@@ -54,6 +57,7 @@ class McpServer:
         tool = self.tools.get(name)
         if tool is None:
             return self.text(f"There is no tool called {name}.", failed=True)
+        Gate.record(name, arguments)
         try:
             return self.text(tool.run(arguments))
         except ToolRefused as refused:
@@ -62,7 +66,3 @@ class McpServer:
     @staticmethod
     def text(content, failed=False):
         return {"content": [{"type": "text", "text": content}], "isError": failed}
-
-
-class ToolRefused(Exception):
-    """What a tool says when it will not or could not do it, in words for the agent."""

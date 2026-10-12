@@ -11,7 +11,7 @@ import json
 import os
 import subprocess
 
-from protocol import ToolRefused
+from refusal import ToolRefused
 
 ODOO_BIN = "/usr/local/bin/odoo-bin"
 MARK = "<<dooservice-answer>>"
@@ -35,7 +35,12 @@ class OdooShell:
     def run(self, program, request):
         """`program` sets `answer` from `request` and `env`; it is committed only when the
         request says `commit`."""
-        environment = {**os.environ, "DOOSERVICE_REQUEST": json.dumps(request), "DOOSERVICE_PROGRAM": program}
+        environment = {
+            **os.environ,
+            "DOOSERVICE_REQUEST": json.dumps(request),
+            "DOOSERVICE_PROGRAM": program,
+            "DOOSERVICE_AI_TOOL": "1",
+        }
         try:
             finished = subprocess.run(
                 [ODOO_BIN, "shell", "--log-level=warn"], input=SCRIPT, text=True,

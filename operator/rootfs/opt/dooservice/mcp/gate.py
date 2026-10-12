@@ -7,13 +7,12 @@ accounting, users. The tool refuses them once with what it would do, and the age
 back with `confirmed` after asking.
 """
 
-import os
-import time
+import json
 
-from protocol import ToolRefused
+from dooservice_control import ControlClient
+from dooservice_production import Production
+from refusal import ToolRefused
 
-CONTROL_DIR = os.path.dirname(os.environ.get("DOOSERVICE_CONTROL_SOCKET", "/run/dooservice/control.sock"))
-CHANGES_UNTIL = os.path.join(CONTROL_DIR, "changes-until")
 MANY_RECORDS = 20
 SENSITIVE_PREFIXES = ("account.", "res.users", "res.groups", "ir.rule", "ir.model.access", "res.company")
 
@@ -21,17 +20,21 @@ SENSITIVE_PREFIXES = ("account.", "res.users", "res.groups", "ir.rule", "ir.mode
 class Gate:
     @staticmethod
     def production():
-        return os.environ.get("DOOSERVICE_STAGE") == "production"
+        return Production.here()
 
-    def ensure_changes_allowed(self):
-        if not self.production():
+    @staticmethod
+    def record(tool, arguments):
+        """On production every call is kept, whatever it then does."""
+        if not Production.here():
             return
         try:
-            with open(CHANGES_UNTIL) as stored:
-                until = float(stored.read().strip() or 0)
-        except (OSError, ValueError):
-            until = 0
-        if until < time.time():
+            for _ in ControlClient().ask("record", {"text": f"AI {tool} {json.dumps(arguments, ensure_ascii=False)}"}):
+                pass
+        except Exception:
+            pass
+
+    def ensure_changes_allowed(self):
+        if not Production.changes_allowed():
             raise ToolRefused(
                 "This is production and changes are not allowed in this session. Explain the change to the "
                 "user; they can press «Allow changes» in the panel, and then you can make it."

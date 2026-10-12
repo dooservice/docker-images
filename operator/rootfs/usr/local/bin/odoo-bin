@@ -17,6 +17,8 @@ environment's Odoo, which would then fail to load it.
 import os
 import sys
 
+from dooservice_production import Production
+
 REAL_ODOO = "/usr/bin/odoo"
 DATABASE_COMMANDS = ("server", "shell")
 
@@ -52,6 +54,9 @@ if no_repository and any(arg.startswith("--addons-path") for arg in argv):
         "Link a repository to the project to develop modules of its own.\n"
     )
     sys.exit(2)
+if any(arg in ("-i", "-u", "--init", "--update") or arg.startswith(("--init=", "--update=")) for arg in argv):
+    Production.refuse("Installing or updating modules")
+os.environ.update(Production.environment(writes=True))
 command = argv[0] if argv and not argv[0].startswith("-") else None
 rest = argv[1:] if command else argv
 os.execv(REAL_ODOO, [REAL_ODOO, *odoo_arguments(command, rest)])

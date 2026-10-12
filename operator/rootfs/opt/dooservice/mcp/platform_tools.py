@@ -5,7 +5,7 @@ import os
 import subprocess
 
 from gate import Gate
-from protocol import ToolRefused
+from refusal import ToolRefused
 from tool import Tool
 
 DOOSERVICE = "/usr/local/bin/dooservice"

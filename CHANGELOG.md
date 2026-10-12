@@ -10,6 +10,27 @@ las notas de versión del agente: ver «Cómo se escriben» en
 
 El resto de la entrada, si hace falta, es técnico.
 
+## [20261012-2] — 2026-10-12
+
+### Novedades
+- es: Consola en producción: en solo lectura hasta que pulses «Permitir cambios»; con los
+  cambios permitidos, la terminal puede cambiar datos durante 15 minutos y la IA solo con
+  sus herramientas y tras confirmar cada acción. No se instalan módulos ni se publica
+  código, y todo lo que se ejecuta queda registrado.
+- en: Console on production: read only until you press “Allow changes”; with changes
+  allowed, the terminal may change data for 15 minutes and the AI only with its tools and
+  after each action is confirmed. No modules are installed, no code is published, and
+  everything run there is recorded.
+
+### Added
+- `dooservice_production.py`: en producción, `psql`, `odoo-bin` y las herramientas MCP
+  leen con el usuario de solo lectura de la sesión y escriben con `write-credentials` solo
+  mientras valen; el `psql` y el `dooservice shell` de la IA, nunca. `dooservice install`,
+  `update`, `test` y `publish` se niegan, y `restart` pide cambios permitidos.
+- Cada comando de la terminal (`PROMPT_COMMAND`) y cada llamada a una herramienta MCP se
+  envían a la plataforma con `dooservice record`.
+- `AGENTS.md`: sección «On production»; el lanzador de la IA abre también en producción.
+
 ## [20261012] — 2026-10-12
 
 ### Novedades

@@ -72,10 +72,11 @@ jobs:
       # because what a platform pinned has to stay where it was.
       - id: revision
         run: |
+          first="$(jq -r '.[0]' <<< "${MATRIX}")"
           day="$(date -u +%Y%m%d)"
           revision="${day}"
           number=1
-          while docker buildx imagetools inspect "ghcr.io/dooservice/dooservice-odoo:${FIRST}-${revision}" >/dev/null 2>&1 \
+          while docker buildx imagetools inspect "ghcr.io/dooservice/dooservice-odoo:${first}-${revision}" >/dev/null 2>&1 \
              || docker buildx imagetools inspect "ghcr.io/dooservice/dooservice-postgres:16-${revision}" >/dev/null 2>&1; do
             number=$((number + 1))
             revision="${day}-${number}"
@@ -83,7 +84,7 @@ jobs:
           echo "revision=${revision}" >> "$GITHUB_OUTPUT"
           echo "Revision ${revision}" >> "$GITHUB_STEP_SUMMARY"
         env:
-          FIRST: ${{ fromJson(steps.pick.outputs.matrix)[0] }}
+          MATRIX: ${{ steps.pick.outputs.matrix }}
 
   # What a console needs to find before it is built: the repository where the agent mounts
   # it (`ODOO_ADDONS_DIR` in dooservice-core), and a set of skills for every version.

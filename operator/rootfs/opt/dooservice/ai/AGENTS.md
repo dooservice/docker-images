@@ -15,17 +15,19 @@ commit messages follow the repository's own language, English by default.
 
 ## On production
 
-Real customers' data, read only. Here you diagnose, read, explain and **propose**:
+Real customers' data. Here you diagnose, read, explain and change data only when asked:
 
 - You never write code, install or update modules, or publish. Code goes through
   development and a deploy: say so and offer to describe the change for it.
-- You change data only with `odoo_write` and `odoo_settings`, only while the user has
-  pressed «Allow changes» in the panel (the tools tell you), and each change after the
-  user said yes to exactly that change: what, which records, how many, how to undo it.
-- `psql`, `dooservice shell` and `odoo-bin` only read for you here, even with changes
-  allowed. Do not try to make them write.
-- Everything run here is recorded, and nothing leaves the server: no exports, no copies
-  of data into files, chats or anywhere else.
+- You read freely: `psql`, `odoo_read`, `odoo_find`, `odoo_logs`. Your `psql` only reads,
+  here and on development; do not try to make it write.
+- You change data only through Odoo: `dooservice shell` or `odoo_write` and
+  `odoo_settings`. Say first what will change, on which records, how many and how to
+  undo it; the console asks the user before each change runs.
+- The session made a backup as it opened, and nothing can change until it is ready: if a
+  tool says so, tell the user and try again in a few minutes.
+- Nothing leaves the server: no exports, no copies of data into files, chats or anywhere
+  else.
 
 ## Configure before you code
 

@@ -1,15 +1,12 @@
 """Whether this session may change anything, and what needs the person's yes first.
 
-A development environment may be changed; production only while its console has changes
-allowed, which the platform says by writing until when in the session's control
-directory. Some changes always need the person: many records at once, access rights,
+A development environment may be changed; production once the backup its console made
+as it opened is ready, which the platform says by writing until when in the session's
+control directory. Some changes always need the person: many records at once, access rights,
 accounting, users. The tool refuses them once with what it would do, and the agent comes
 back with `confirmed` after asking.
 """
 
-import json
-
-from dooservice_control import ControlClient
 from dooservice_production import Production
 from refusal import ToolRefused
 
@@ -22,22 +19,11 @@ class Gate:
     def production():
         return Production.here()
 
-    @staticmethod
-    def record(tool, arguments):
-        """On production every call is kept, whatever it then does."""
-        if not Production.here():
-            return
-        try:
-            for _ in ControlClient().ask("record", {"text": f"AI {tool} {json.dumps(arguments, ensure_ascii=False)}"}):
-                pass
-        except Exception:
-            pass
-
     def ensure_changes_allowed(self):
         if not Production.changes_allowed():
             raise ToolRefused(
-                "This is production and changes are not allowed in this session. Explain the change to the "
-                "user; they can press «Allow changes» in the panel, and then you can make it."
+                "This is production and the backup this session made as it opened is not ready yet, so nothing "
+                "can change. Tell the user, and try again in a few minutes."
             )
 
     def ensure_confirmed(self, model, count, confirmed):

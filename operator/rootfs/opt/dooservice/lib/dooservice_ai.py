@@ -2,7 +2,8 @@
 
 Three guards before anything starts. The environment has to be development, or
 production when the platform opened the console with the AI allowed there: on production
-it reads, proposes, and changes only through its own tools while changes are allowed. Only one AI session per container, so two agents never work over each other.
+it reads, and changes data only through Odoo, after the person said yes to each change.
+Only one AI session per container, so two agents never work over each other.
 And the platform has to agree: the launcher asks the agent for the environment's one AI
 slot, and waits for the answer.
 
@@ -74,7 +75,8 @@ def language_rule():
 
 class Workspace:
     """Where the agent works, the file that tells it how, and the skills it has: the
-    repository when the project has one, its home otherwise, where it cannot edit files."""
+    repository when the project has one, its home otherwise, where it cannot edit files.
+    On production it never has the repository, and asks before each thing that writes."""
 
     SKILL_GROUPS = ("code", "dooservice", "functional")
 
@@ -82,7 +84,8 @@ class Workspace:
         self.has_repository = os.path.isdir(os.path.join(REPOSITORY, ".git"))
         self.project = REPOSITORY if self.has_repository else os.path.expanduser("~")
         self.instructions = f"{AI_DIR}/AGENTS.md"
-        suffix = "" if self.has_repository else "-no-repository"
+        production = os.environ.get("DOOSERVICE_STAGE") == PRODUCTION
+        suffix = "-production" if production else "" if self.has_repository else "-no-repository"
         self.claude_settings = f"{AI_DIR}/settings{suffix}.json"
         self.opencode_config = f"{AI_DIR}/opencode{suffix}.json"
 

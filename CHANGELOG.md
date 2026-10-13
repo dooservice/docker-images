@@ -10,6 +10,35 @@ las notas de versión del agente: ver «Cómo se escriben» en
 
 El resto de la entrada, si hace falta, es técnico.
 
+## [20261013] — 2026-10-13
+
+### Novedades
+- es: Consola en producción: se abre directamente. Al abrirla se hace una copia de la base
+  y, en cuanto termina, puedes cambiar datos con `psql` y con el shell de Odoo. Ya no hay
+  que pulsar «Permitir cambios» ni hay límite de 15 minutos.
+- es: IA en la consola: lee libremente, pero solo cambia datos a través de Odoo, nunca con
+  SQL. En producción te pide permiso antes de cada cambio.
+- en: Console on production: it opens straight away. Opening it makes a backup of the
+  database and, as soon as it is done, you can change data with `psql` and the Odoo shell.
+  No more pressing “Allow changes” and no 15-minute limit.
+- en: AI in the console: it reads freely but changes data only through Odoo, never with
+  SQL. On production it asks you before each change.
+
+### Changed
+- `dooservice_production.py`: en producción, `psql` y `odoo-bin` escriben con
+  `write-credentials` en cuanto la copia previa de la sesión está lista; la IA también
+  escribe con `odoo-bin` (su shell de Odoo y sus herramientas MCP), y su `psql` sigue
+  siendo de solo lectura en producción y en desarrollo.
+- `settings-production.json` y `opencode-production.json`: en producción Claude Code y
+  opencode piden permiso antes de `dooservice shell`, `odoo-bin`, `python3`,
+  `odoo_write` y `odoo_settings`; las herramientas de módulos no están. Sin el hook de rtk
+  en producción, para que nada apruebe un comando por su cuenta.
+- `AGENTS.md`: sección «On production» nueva.
+
+### Removed
+- `dooservice record`, el envío de cada comando de la terminal (`PROMPT_COMMAND`) y de
+  cada llamada a una herramienta MCP: la plataforma ya no guarda lo que se ejecuta.
+
 ## [20261012-2] — 2026-10-12
 
 ### Novedades

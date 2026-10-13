@@ -1,11 +1,11 @@
 """What a console on production may do right now.
 
 A console on production connects as a database role of its own that can only read, so
-the database refuses any write whatever tool tries it. While its changes are allowed —
-after a backup — the agent leaves the environment's own credentials, and until when they
-count, in the session's control directory, which this container can read and not write;
-the console's tools then connect with them. The AI's `psql` never does: it changes data
-through the ORM tools, which ask before anything wide.
+the database refuses any write whatever tool tries it. It opens making a backup, and once
+the backup is ready the agent leaves the environment's own credentials, and until when
+they count, in the session's control directory, which this container can read and not
+write. From then on the person's `psql` and `odoo-bin` write with them, and the AI's
+`odoo-bin` — its Odoo shell and its ORM tools —; the AI's `psql` never does.
 """
 
 import json
@@ -34,17 +34,10 @@ class Production:
             return False
 
     @staticmethod
-    def through_tools():
-        """Whether this is the AI's own ORM tools, which ask before anything wide; the AI
-        anywhere else on production only reads."""
-        ai = bool(os.environ.get("DOOSERVICE_AI_SESSION"))
-        return not ai or bool(os.environ.get("DOOSERVICE_AI_TOOL"))
-
-    @staticmethod
     def environment(writes):
-        """This process's environment, read-write only when it may write and changes are allowed."""
+        """This process's environment, read-write only when it may write and the backup is ready."""
         environment = dict(os.environ)
-        if not (Production.here() and writes and Production.through_tools()):
+        if not (Production.here() and writes):
             return environment
         credentials = Production.write_credentials()
         if credentials is not None:
@@ -54,7 +47,7 @@ class Production:
 
     @staticmethod
     def write_credentials():
-        """The environment's user and password, while changes are allowed; else nothing."""
+        """The environment's user and password, once the backup is ready; else nothing."""
         try:
             with open(WRITE_CREDENTIALS) as stored:
                 credentials = json.load(stored)
@@ -73,4 +66,4 @@ class Production:
     @staticmethod
     def require_changes(what):
         if Production.here() and not Production.changes_allowed():
-            raise SystemExit(f"{what} on production needs changes allowed: press «Allow changes» in the panel.")
+            raise SystemExit(f"{what} on production waits for the backup this session made as it opened.")

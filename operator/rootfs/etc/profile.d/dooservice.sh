@@ -19,18 +19,6 @@ case "$DOOSERVICE_STAGE" in
     development) __dooservice_stage="dev"; __dooservice_color='\[\e[38;2;98;184;195m\]' ;;
     *) __dooservice_stage="$DOOSERVICE_STAGE"; __dooservice_color='\[\e[97m\]' ;;
 esac
-if [ "$DOOSERVICE_STAGE" = "production" ]; then
-    __dooservice_record() {
-        local last
-        last=$(fc -ln -1 2>/dev/null)
-        last="${last#"${last%%[![:space:]]*}"}"
-        if [ -n "$last" ] && [ "$last" != "$__dooservice_recorded" ]; then
-            __dooservice_recorded="$last"
-            dooservice record "$last" >/dev/null 2>&1
-        fi
-    }
-    PROMPT_COMMAND="__dooservice_record${PROMPT_COMMAND:+; $PROMPT_COMMAND}"
-fi
 PS1="${__dooservice_color}${DOOSERVICE_ENVIRONMENT:-dooservice}\[\e[0m\] \[\e[90m\][${__dooservice_stage}/${ODOO_VERSION}]\[\e[0m\]:\w\$ "
 unset __dooservice_stage __dooservice_color
 
@@ -80,7 +68,7 @@ no_repository = not os.path.isdir("/mnt/addons/.git")
 width = max(len(name) for name, _ in commands) + 4
 lines = [f"{TEAL}{logo}{RESET}", ""]
 lines.append(f"Estás en {WHITE}{project}{RESET} · entorno {stage_color}{stage_label}{RESET} {WHITE}{environment}{RESET}")
-lines.append(f"{WHITE}Odoo {version}{RESET} · servidor {WHITE}{server}{RESET} · sesión auditada")
+lines.append(f"{WHITE}Odoo {version}{RESET} · servidor {WHITE}{server}{RESET}")
 lines.append("")
 lines.append(f"{WHITE}Comandos útiles:{RESET}")
 lines.append("")
@@ -90,8 +78,8 @@ lines.append("")
 if no_repository:
     lines.append(f"{GRAY}Sin repositorio: la IA configura Odoo, pero no crea ni modifica módulos.{RESET}")
 if stage == "production":
-    lines.append(f"{RED}PRODUCCIÓN: datos reales. La base está en solo lectura hasta que pulses «Permitir cambios»{RESET}")
-    lines.append(f"{RED}en el panel. No se instalan módulos ni se publica código desde aquí. Todo queda registrado.{RESET}")
+    lines.append(f"{RED}PRODUCCIÓN: datos reales. Se está haciendo una copia de la base: hasta que termine, solo lectura.{RESET}")
+    lines.append(f"{RED}No se instalan módulos ni se publica código desde aquí.{RESET}")
     lines.append(f"{GRAY}La sesión dura 30 minutos como máximo y se cierra tras 10 sin actividad.{RESET}")
 else:
     lines.append(f"{GRAY}La sesión se cierra tras 30 minutos sin actividad.{RESET}")

@@ -1,0 +1,47 @@
+{
+    "$schema": "https://json.schemastore.org/claude-code-settings.json",
+    "permissions": {
+        "defaultMode": "default",
+        "allow": [
+            "Read(/opt/dooservice/ai/**)",
+            "Read(/usr/lib/python3/dist-packages/odoo/**)",
+            "Bash(psql:*)",
+            "Bash(dooservice status)",
+            "Bash(dooservice logs:*)",
+            "Bash(dooservice storage)",
+            "Bash(ls:*)",
+            "Bash(grep:*)",
+            "Bash(head:*)",
+            "Bash(tail:*)",
+            "Bash(wc:*)",
+            "Bash(echo *)",
+            "Bash(echo)",
+            "mcp__dooservice__odoo_read",
+            "mcp__dooservice__odoo_find",
+            "mcp__dooservice__odoo_logs"
+        ],
+        "ask": [
+            "Bash(dooservice shell:*)",
+            "Bash(odoo-bin:*)",
+            "Bash(python3:*)",
+            "mcp__dooservice__odoo_write",
+            "mcp__dooservice__odoo_settings"
+        ],
+        "deny": [
+            "Edit",
+            "Write",
+            "NotebookEdit",
+            "Read(/run/dooservice/**)",
+            "mcp__dooservice__module_install",
+            "mcp__dooservice__module_update"
+        ]
+    },
+    "env": {
+        "DISABLE_AUTOUPDATER": "1"
+    },
+    "attribution": {
+        "commit": "",
+        "pr": ""
+    },
+    "tui": "fullscreen"
+}

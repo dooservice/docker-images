@@ -51,8 +51,6 @@ test = commands.add_parser("test", help="Run a module's tests")
 test.add_argument("modules", help="Comma-separated modules")
 commands.add_parser("shell", help="Open an Odoo shell on this database")
 commands.add_parser("storage", help="Show what the environment occupies")
-record = commands.add_parser("record", help=argparse.SUPPRESS)
-record.add_argument("text", nargs="?", default="")
 publish = commands.add_parser("publish", help="Publish what was committed as pull requests")
 publish.add_argument("--title", default="", help="The pull request's title; made from the commits when empty")
 described = publish.add_mutually_exclusive_group()
@@ -82,13 +80,6 @@ match options.command:
         run_odoo("shell")
     case "storage":
         storage()
-    case "record":
-        if Production.here() and options.text.strip():
-            try:
-                for _ in platform.ask("record", {"text": options.text}):
-                    pass
-            except Exception:
-                pass
     case "publish":
         Production.refuse("Publishing")
         body = options.body

@@ -7,7 +7,8 @@ report seriously.
 
 Do not open a public issue. Report it privately through GitHub:
 [**Report a vulnerability**](https://github.com/dooservice/docker-images/security/advisories/new),
-in the *Security* tab of this repository.
+in the *Security* tab of this repository. If you cannot use GitHub, write to
+[soporte@apiservicesac.com](mailto:soporte@apiservicesac.com) with «Security» in the subject.
 
 Include what you can of:
 

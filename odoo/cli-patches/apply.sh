@@ -19,11 +19,8 @@ case $VERSION in
     python3 /tmp/_patch_db.py $ODOO_PATH/service/db.py
     rm /tmp/_patch_db.py
     ;;
-  19.0|20.0)
-    echo "[dooservice] v${VERSION%%.*} already has all CLI commands, skipping."
-    ;;
   *)
-    echo "[dooservice] Unknown version ${VERSION}, skipping CLI patches."
+    echo "[dooservice] v${VERSION%%.*} already has all CLI commands, skipping."
     ;;
 esac
 

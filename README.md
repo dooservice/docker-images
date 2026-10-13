@@ -25,7 +25,11 @@ beside them. The scripts below are what the workflow runs, and still work by han
 
 ### By hand
 
-Requires Docker Buildx and an authenticated ghcr.io session:
+Requires Docker Buildx, an authenticated ghcr.io session and the agent repository cloned
+beside this one: the Odoo versions are the ones `[odoo]` of its `platform.toml` offers
+(`PLATFORM_TOML` points elsewhere). The workflow reads that file with the `GH_PAT` secret.
+A new version needs its skills in `operator/skills/odoo/<version>`; the build refuses one
+without them.
 
 ```bash
 docker login ghcr.io

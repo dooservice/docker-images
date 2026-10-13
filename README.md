@@ -126,3 +126,10 @@ a network of its own — and removes it when the session ends. Adds:
   and refuses another `--addons-path` in functional mode
 - **Welcome banner and prompt** in `/etc/profile.d/dooservice.sh`
 
+
+## License
+
+[GNU Affero General Public License v3.0](LICENSE). The images are built on the official
+`odoo` and `postgres` images, which keep their own licenses, and the console's skills come
+from the [dooservice/odoo-skills](https://github.com/dooservice/odoo-skills) submodule,
+under its own terms.

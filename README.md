@@ -1,135 +1,124 @@
 # docker-images
 
-Custom Docker images for the dooservice infrastructure stack.
+The container images that [dooservice](https://dooservice.sh) servers run: Odoo, a console
+for each environment, and PostgreSQL. They are built here, published to GitHub's container
+registry, and pinned by digest in each signed platform release, so a server always runs
+exactly the bytes that were tested.
 
 ## Images
 
-| Image | Versions | Description |
+| Image | Tags | What it is |
 |---|---|---|
-| `ghcr.io/dooservice/dooservice-odoo` | `16.0` `17.0` `18.0` `19.0` `20.0` | Odoo with unified CLI patches and dooservice user (uid 1500) |
-| `ghcr.io/dooservice/dooservice-operator` | `16.0` `17.0` `18.0` `19.0` `20.0` | Console for an environment: shell, psql, git, Claude Code, opencode and the `dooservice` command |
-| `ghcr.io/dooservice/dooservice-postgres` | `16` `17` `18` | PostgreSQL with pgvector, unaccent and md5 auth for PgDog |
+| `ghcr.io/dooservice/dooservice-odoo` | `16.0` to `20.0` | The official Odoo image with a fixed user and one database CLI for every version |
+| `ghcr.io/dooservice/dooservice-operator` | `16.0` to `20.0` | The console of an environment: shell, `psql`, git, Claude Code and opencode |
+| `ghcr.io/dooservice/dooservice-postgres` | `16`, `17`, `18` | The official PostgreSQL image with the extensions Odoo needs |
 
-## Build & push
+Every build also gets a tag that never moves, its **revision**: the build date, as Odoo
+tags its own images (`dooservice-odoo:18.0-20261013`). A second build on the same day is
+`-2`, then `-3`. Servers only ever pull a revision, by digest; the plain `18.0` tag moves
+with each build and no server runs it.
 
-Images are built on GitHub's machines, not on a server of ours — an Odoo image and its
-console take some 8 GB, and a server's disk holds its customers' data:
+## dooservice-odoo
+
+Built on the official `odoo` image of the same version. It adds:
+
+- **A fixed user**, `dooservice` (uid and gid 1500), the same as the agent on the host, so
+  mounted volumes keep the right owner.
+- **One database CLI** for every version: `odoo db dump` and `odoo db load` are patched
+  into 16.0, 17.0 and 18.0, so the agent runs the same commands everywhere. 19.0 and later
+  ship them already.
+- **An entrypoint** that installs the Python dependencies of any `requirements.txt` in
+  `/mnt/addons`, the project's repository, before Odoo starts.
+
+## dooservice-postgres
+
+Built on the official `postgres` image. It adds `pgvector`, an immutable `unaccent` for
+Odoo's full-text search, and `md5` authentication, which the PgDog connection pooler needs.
+
+## dooservice-operator
+
+The console a person opens from the panel. It is built on `dooservice-odoo` of the same
+version, so it has the environment's exact Odoo. The agent starts one container per
+session next to the environment and removes it when the session ends. The container has a
+read-only root filesystem, no Linux capabilities, `no-new-privileges` and a network of its
+own, and it holds no git credentials.
+
+It adds:
+
+- **Claude Code, opencode and rtk**, pinned to a version, with auto-update off.
+- **Two modes for the AI**, chosen in the panel:
+  - **Code**: works in the repository at `/mnt/addons`; changes leave as pull requests
+    through `dooservice publish`.
+  - **Functional**: configures Odoo through its data and writes no code; the repository
+    is mounted read-only.
+- **Production rules**: on a production environment the console writes only once the
+  backup it makes as it opens is ready, and the AI changes data only through Odoo, after
+  the person approves each change.
+- **Skills** from [dooservice/odoo-skills](https://github.com/dooservice/odoo-skills), the
+  ones for the image's Odoo version. They are a submodule at `operator/skills`.
+- **The `dooservice` command**: install, update and test modules, open a shell, and ask
+  the agent to restart the environment or show its logs.
+- **Wrappers** for `psql` and `odoo-bin` that connect to the environment's database
+  without typing credentials.
+- **Git hooks**: a commit made from an AI session gets
+  `Co-authored-by: Dooservice <noreply@dooservice.sh>`, then the repository's own hook runs.
+
+## Building
+
+Builds run on GitHub Actions, one runner per Odoo version, its console right after it and
+PostgreSQL beside them:
 
 ```bash
-gh workflow run build.yml --repo dooservice/docker-images                  # all of them
-gh workflow run build.yml --repo dooservice/docker-images -f versions=18.0 # one version
+gh workflow run build.yml --repo dooservice/docker-images                   # every version
+gh workflow run build.yml --repo dooservice/docker-images -f versions=18.0  # one version
 ```
 
-Each Odoo version builds on a runner of its own, its console right after it, and Postgres
-beside them. The scripts below are what the workflow runs, and still work by hand.
+To build by hand you need Docker Buildx and a `ghcr.io` login. The Odoo versions to build
+are the keys of the `[odoo]` table in a `platform.toml`; point `PLATFORM_TOML` at one:
 
-### By hand
-
-Requires Docker Buildx, an authenticated ghcr.io session and the agent repository cloned
-beside this one: the Odoo versions are the ones `[odoo]` of its `platform.toml` offers
-(`PLATFORM_TOML` points elsewhere). The workflow reads that file with the `GH_PAT` secret.
-A new version needs its skills in `operator/skills/odoo/<version>`; the build refuses one
-without them.
-
-```bash
-docker login ghcr.io
+```toml
+[odoo]
+"18.0" = "ghcr.io/dooservice/dooservice-odoo:18.0"
+"19.0" = "ghcr.io/dooservice/dooservice-odoo:19.0"
 ```
 
 ```bash
-# Build and push all Odoo versions (16, 17, 18, 19, 20), or one: ./build.sh 20.0
-cd odoo && ./build.sh
+git clone --recurse-submodules https://github.com/dooservice/docker-images.git
+cd docker-images
+export PLATFORM_TOML="$PWD/platform.toml"
 
-# Build and push all operator versions (after the Odoo images)
-cd operator && ./build.sh
-
-# Build and push all Postgres versions (16, 17, 18)
-cd postgres && ./build.sh
-
+(cd odoo && ./build.sh 18.0)      # one version; no argument builds every listed one
+(cd operator && ./build.sh 18.0)  # after the Odoo image of that version
+(cd postgres && ./build.sh)
 ```
 
-### Revisions
+`REVISION=20261013` sets the revision; without it the scripts take today's date. A version
+that is not in `[odoo]` is refused, and a console needs its skills in
+`operator/skills/odoo/<version>`.
 
-Every build gives all its images one **revision**, its date, the way Odoo's own images are
-tagged: `dooservice-odoo:18.0-20261010`, `dooservice-operator:18.0-20261010`,
-`dooservice-postgres:16-20261010`. A revision never moves: a second build the same day takes
-`-2`, then `-3`. Each build also moves the usual tag (`18.0`), which no server runs.
+## Adding an Odoo version
 
-By hand, `REVISION=20261010 ./build.sh 18.0`; without it the script takes today's date.
+1. Add the version to `[odoo]` and `[operator]` of the platform's `platform.toml`, and to
+   `[preview]` while Odoo has not released it.
+2. Add its skills under `odoo/<version>` in the odoo-skills repository, and move the
+   `operator/skills` submodule to that commit.
+3. Run the build. Versions from 19.0 on need no CLI patch; an older one would need its own
+   in `odoo/cli-patches`.
 
-### What is new, for customers
+## Changelog
 
-Each revision has an entry in [CHANGELOG.md](CHANGELOG.md) with a `### Novedades` section:
-one line per change and language (`- es:`, `- en:`), written for whoever uses Odoo. It is
-signed into the platform and shown in the panel to the servers that receive it, and
-`make platform` refuses a build without one. Write it right after the build, before pinning.
+[CHANGELOG.md](CHANGELOG.md) has one entry per revision. Its `### Novedades` section is
+what customers read in the panel when their server receives that build, in Spanish and
+English; the rest of the entry is technical.
 
-### What servers run
+## Contributing and security
 
-Servers never run these tags as they are, and building sends nothing to any server. A
-platform (`make platform` in the agent repository) resolves each tag in its `platform.toml`
-to the revision and digest it has at that moment and signs it; servers pull exactly that.
-The whole process: [docs/imagenes.md](https://github.com/dooservice/agent/blob/main/docs/imagenes.md)
-and [docs/actualizaciones.md](https://github.com/dooservice/agent/blob/main/docs/actualizaciones.md).
-
-## odoo
-
-Based on the official `odoo` image for every version, 20.0 included since Odoo published
-it. Adds:
-
-- **dooservice user** (uid/gid 1500) — matches the host agent user, avoids volume permission issues
-- **CLI patches** — unifies `odoo db dump` / `odoo db load` across v16–v20 so the agent can use a single command format (v19 and v20 already ship them)
-- **entrypoint** — auto-installs pip dependencies from any `requirements.txt` found in `/mnt/addons` (the project's repository) before starting Odoo
-
-## postgres
-
-Based on the official `postgres` image. Adds:
-
-- **pgvector** — vector similarity extension
-- **unaccent** (immutable) — required for Odoo full-text search
-- **md5 auth** — replaces the default `scram-sha-256` so PgDog can authenticate
-
-## operator
-
-Based on `dooservice-odoo` for the same version, so it has the environment's Odoo, its CLI
-patches and its user (uid 1500). The agent starts one per console session, next to the
-environment's container, hardened — read-only root, no capabilities, `no-new-privileges`,
-a network of its own — and removes it when the session ends. Adds:
-
-- **Claude Code, opencode and rtk** in `/opt/ai`, pinned, with auto-update off
-- **Launchers** `claude` and `opencode` that refuse to run outside development environments,
-  ask the platform to hold deploys, and open the AI in one of two modes, chosen in the
-  panel (`DOOSERVICE_AI_MODE_CHOSEN`):
-  - **code**: works in the project's repository at `/mnt/addons`, with `AGENTS.md` and
-    `settings.json`; changes leave as pull requests through `dooservice publish`
-  - **functional**: configures Odoo through its data and writes no code, with
-    `CONFIGURATION.md` and file editing denied; the agent mounts the repository read-only.
-    A console without a repository is always functional
-
-  Claude Code loads the mode's instructions from `~/.claude/CLAUDE.md`, a one-line import of
-  the file in `/opt/dooservice/ai`; nothing is written into the customer's repository
-- **Skills** in `/opt/dooservice/ai/skills`, linked into each tool's skills directory by mode:
-  the Odoo skills of the image's version and `dooservice-console`/`odoo-upgrade` in code
-  mode, `odoo-functional` in functional mode. They live in the public
-  [dooservice/odoo-skills](https://github.com/dooservice/odoo-skills) repository, a
-  submodule at `operator/skills`: clone this one with `--recurse-submodules`, and bump the
-  submodule to take new skills
-- **`dooservice`**: install, update, test and shell run here; restart, logs and status are
-  asked of the agent over the session's control socket, since this container cannot touch
-  any other. `publish` pushes what was committed and opens its pull requests; the push is
-  done by the agent with the account's token, never from this container, which holds no git
-  credentials
-- **`psql`** wrapper: read-only in functional mode
-- **Git hooks** in `/opt/dooservice/git-hooks` (`core.hooksPath` in `/etc/gitconfig`): a commit
-  made by an AI session gets `Co-authored-by: Dooservice <noreply@dooservice.sh>`, once; then
-  the repository's own hook of the same name runs, if it has one
-- **`odoo-bin`** wrapper that injects the database connection, so it is never passed by hand,
-  and refuses another `--addons-path` in functional mode
-- **Welcome banner and prompt** in `/etc/profile.d/dooservice.sh`
-
+See [CONTRIBUTING.md](CONTRIBUTING.md). To report a vulnerability, do not open an issue:
+follow [SECURITY.md](SECURITY.md).
 
 ## License
 
 [GNU Affero General Public License v3.0](LICENSE). The images are built on the official
-`odoo` and `postgres` images, which keep their own licenses, and the console's skills come
-from the [dooservice/odoo-skills](https://github.com/dooservice/odoo-skills) submodule,
-under its own terms.
+`odoo` and `postgres` images, which keep their own licenses, and the skills in
+`operator/skills` are under the LGPL-3.0 of their own repository. Odoo is a trademark of
+Odoo S.A.; this project is not affiliated with or endorsed by Odoo S.A.

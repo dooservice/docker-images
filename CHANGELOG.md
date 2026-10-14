@@ -10,7 +10,7 @@ las notas de versión del agente: ver «Cómo se escriben» en
 
 El resto de la entrada, si hace falta, es técnico.
 
-## [20261015] — 2026-10-15
+## [20261014] — 2026-10-14
 
 ### Novedades
 - es: IA en la consola de desarrollo: conoce el proyecto antes de empezar. Lee el cerebro

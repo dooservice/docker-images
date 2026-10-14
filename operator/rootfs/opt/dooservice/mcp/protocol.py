@@ -9,9 +9,8 @@ seeing a protocol error.
 import json
 import sys
 
+from constants import PROTOCOL_VERSION
 from refusal import ToolRefused
-
-PROTOCOL_VERSION = "2025-06-18"
 
 
 class McpServer:

@@ -4,15 +4,11 @@ its output trimmed to what an agent needs to read."""
 import os
 import subprocess
 
+from constants import DOOSERVICE, ODOO_SOURCE, REFERENCE, SOURCE_MATCHES, TAIL
 from gate import Gate
 from refusal import ToolRefused
 from tool import Tool
 
-DOOSERVICE = "/usr/local/bin/dooservice"
-REFERENCE = "/opt/dooservice/ai/skills/code/odoo-reference"
-ODOO_SOURCE = "/usr/lib/python3/dist-packages/odoo"
-TAIL = 60
-MATCHES = 80
 gate = Gate()
 
 
@@ -76,6 +72,6 @@ class OdooFind(Tool):
             ["grep", "-rnF", "--include=*.md", "--include=*.py", "--include=*.xml", arguments["text"], where],
             capture_output=True, text=True, check=False,
         ).stdout.splitlines()
-        shown = [line.replace(where + "/", "")[:240] for line in found[:MATCHES]]
-        more = f"\n… {len(found) - MATCHES} more" if len(found) > MATCHES else ""
+        shown = [line.replace(where + "/", "")[:240] for line in found[:SOURCE_MATCHES]]
+        more = f"\n… {len(found) - SOURCE_MATCHES} more" if len(found) > SOURCE_MATCHES else ""
         return "\n".join(shown) + more if shown else "Nothing found."

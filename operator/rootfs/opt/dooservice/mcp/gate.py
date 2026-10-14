@@ -7,11 +7,9 @@ accounting, users. The tool refuses them once with what it would do, and the age
 back with `confirmed` after asking.
 """
 
+from constants import MANY_RECORDS, SENSITIVE_PREFIXES
 from dooservice_production import Production
 from refusal import ToolRefused
-
-MANY_RECORDS = 20
-SENSITIVE_PREFIXES = ("account.", "res.users", "res.groups", "ir.rule", "ir.model.access", "res.company")
 
 
 class Gate:

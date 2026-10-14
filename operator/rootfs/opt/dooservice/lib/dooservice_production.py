@@ -12,10 +12,7 @@ import json
 import os
 import time
 
-CONTROL_DIR = os.path.dirname(os.environ.get("DOOSERVICE_CONTROL_SOCKET", "/run/dooservice/control.sock"))
-CHANGES_UNTIL = os.path.join(CONTROL_DIR, "changes-until")
-WRITE_CREDENTIALS = os.path.join(CONTROL_DIR, "write-credentials")
-READ_ONLY = "-c default_transaction_read_only=on"
+from dooservice_constants import CHANGES_UNTIL, READ_ONLY, WRITE_CREDENTIALS
 
 
 class Production:

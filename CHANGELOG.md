@@ -10,6 +10,29 @@ las notas de versión del agente: ver «Cómo se escriben» en
 
 El resto de la entrada, si hace falta, es técnico.
 
+## [20261015] — 2026-10-15
+
+### Novedades
+- es: IA en la consola de desarrollo: conoce el proyecto antes de empezar. Lee el cerebro
+  del proyecto (módulos, lo añadido a mano, procesos y decisiones) en vez de explorar el
+  Odoo desde cero.
+- en: AI in the development console: it knows the project before it starts. It reads the
+  project's brain (modules, what was added by hand, processes and decisions) instead of
+  exploring Odoo from scratch.
+- es: La IA de la consola no crea campos `x_` en los módulos: ese prefijo es de los campos
+  hechos a mano en Odoo.
+- en: The console's AI does not create `x_` fields in modules: that prefix is for fields made
+  by hand in Odoo.
+
+### Added
+- Operador: herramientas MCP `brain_index`, `brain_fact`, `brain_process` y `brain_memory`
+  sobre `$DOOSERVICE_BRAIN`; la lista de herramientas pasa a `mcp/catalog.py`. `AGENTS.md`
+  explica el cerebro.
+
+### Changed
+- Las constantes del operador viven juntas: `lib/dooservice_constants.py` y
+  `mcp/constants.py`. `AGENTS.md` fija que un módulo nunca define campos `x_`.
+
 ## [20261013] — 2026-10-13
 
 ### Novedades

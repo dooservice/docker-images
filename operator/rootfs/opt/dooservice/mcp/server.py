@@ -10,10 +10,7 @@ import sys
 
 sys.path.insert(0, "/opt/dooservice/mcp")
 
-from odoo_tools import OdooRead, OdooSettings, OdooWrite  # noqa: E402
-from platform_tools import ModuleInstall, ModuleUpdate, OdooFind, OdooLogs  # noqa: E402
+from catalog import TOOLS  # noqa: E402
 from protocol import McpServer  # noqa: E402
-
-TOOLS = (OdooRead(), OdooWrite(), OdooSettings(), ModuleInstall(), ModuleUpdate(), OdooLogs(), OdooFind())
 
 McpServer("dooservice", "1.0.0", TOOLS).serve()

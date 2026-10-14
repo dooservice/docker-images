@@ -36,26 +36,26 @@ import sys
 import termios
 import tty
 
+from dooservice_constants import (
+    AI_DIR,
+    ANSI_ESCAPE,
+    CTRL_Z,
+    DEVELOPMENT,
+    FRAME_SECONDS,
+    LANGUAGE_NAMES,
+    LOCK_PATH,
+    LOGIN_URLS,
+    OSC_LINK,
+    OSC_SEQUENCE,
+    PRODUCTION,
+    REPOSITORY,
+    SEEN_BYTES,
+    SESSION_MARK,
+    SKILLS_DIR,
+    URL_TERMINATORS,
+)
 from dooservice_control import ControlClient, ControlError
 from dooservice_splash import Splash, readable
-
-LOCK_PATH = "/tmp/dooservice-ai.lock"
-DEVELOPMENT = "development"
-PRODUCTION = "production"
-REPOSITORY = "/mnt/addons"
-AI_DIR = "/opt/dooservice/ai"
-SKILLS_DIR = f"{AI_DIR}/skills"
-SESSION_MARK = "DOOSERVICE_AI_SESSION"
-
-
-LANGUAGE_NAMES = {
-    "es": "Spanish",
-    "en": "English",
-    "pt": "Portuguese",
-    "fr": "French",
-    "it": "Italian",
-    "de": "German",
-}
 
 
 def language_rule():
@@ -109,22 +109,6 @@ class Workspace:
         os.makedirs(claude_dir, exist_ok=True)
         with open(os.path.join(claude_dir, "CLAUDE.md"), "w") as memory:
             memory.write(f"@{self.instructions}\n")
-
-
-CTRL_Z = b"\x1a"
-FRAME_SECONDS = 0.1
-ANSI_ESCAPE = re.compile(rb"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
-OSC_SEQUENCE = re.compile(rb"\x1B\][^\x07\x1B]*(?:\x07|\x1B\\)")
-OSC_LINK = re.compile(rb"\x1B\]8;[^;\x07\x1B]*;(https://[^\x07\x1B]+)(?:\x07|\x1B\\)")
-SEEN_BYTES = 16 * 1024
-LOGIN_URLS = (
-    b"https://console.anthropic.com/oauth/authorize",
-    b"https://claude.ai/oauth/authorize",
-    b"https://platform.claude.com/oauth/authorize",
-    b"https://claude.com/cai/oauth/authorize",
-    b"https://auth.openai.com/oauth/authorize",
-)
-URL_TERMINATORS = {b"authorization", b"code", b"enter", b"submit", b"esc", b"paste", b"here"}
 
 
 class AiSession:

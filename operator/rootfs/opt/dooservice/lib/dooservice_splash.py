@@ -21,27 +21,17 @@ import re
 import sys
 import time
 
-LOGO = (
-    "     _                                   _",
-    "  __| | ___   ___  ___  ___ _ ____   __(_) ___ ___",
-    " / _` |/ _ \\ / _ \\/ __|/ _ \\ '__\\ \\ / /| |/ __/ _ \\",
-    "| (_| | (_) | (_) \\__ \\  __/ |   \\ V / | | (_|  __/",
-    " \\__,_|\\___/ \\___/|___/\\___|_|    \\_/  |_|\\___\\___|",
-)
-SPINNER = "⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"
-TEAL = (98, 184, 195)
-WHITE = (255, 255, 255)
-GRAY = "\033[38;2;110;118;129m"
-RESET = "\033[0m"
-BAR_WIDTH = 24
-MINIMUM_SECONDS = 5
-STARTING = {"es": "Iniciando", "pt": "Iniciando", "fr": "Démarrage de", "it": "Avvio di", "de": "Starte"}
-
-CONTROL_ONLY = (
-    re.compile(rb"\x1B\][^\x07\x1B]*(?:\x07|\x1B\\)"),
-    re.compile(rb"\x1B[P_^X][^\x1B]*\x1B\\"),
-    re.compile(rb"\x1B\[[0-?]*[ -/]*[@-~]"),
-    re.compile(rb"\x1B[@-Z\\-_]"),
+from dooservice_constants import (
+    BAR_WIDTH,
+    CONTROL_ONLY,
+    GRAY,
+    LOGO,
+    MINIMUM_SECONDS,
+    RESET,
+    SPINNER,
+    STARTING,
+    TEAL,
+    WHITE,
 )
 
 

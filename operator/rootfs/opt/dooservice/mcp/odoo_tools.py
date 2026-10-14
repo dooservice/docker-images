@@ -1,40 +1,11 @@
 """Reading and changing Odoo records and settings through the ORM, as tools."""
 
+from constants import COUNT, DOMAIN, READ, SETTINGS, TEXT, WRITE
 from gate import Gate
 from odoo_shell import OdooShell
 from tool import Tool
 
-READ = """
-model = env[request['model']]
-domain = request.get('domain') or []
-answer['count'] = model.search_count(domain)
-records = model.search(domain, limit=request['limit'], order=request.get('order') or None)
-answer['records'] = records.read(request.get('fields') or ['display_name'])
-"""
-
-COUNT = "answer['count'] = env[request['model']].search_count(request.get('domain') or [])"
-
-WRITE = """
-model = env[request['model']]
-if request.get('values_list'):
-    answer['created'] = model.create(request['values_list']).ids
-else:
-    records = model.search(request['domain'])
-    records.write(request['values'])
-    answer['written'] = records.ids
-"""
-
-SETTINGS = """
-settings = env['res.config.settings']
-names = request.get('names') or []
-if request.get('values'):
-    settings.create(request['values']).execute()
-answer['settings'] = {name: settings.default_get([name]).get(name) for name in names or request['values']}
-"""
-
 shell, gate = OdooShell(), Gate()
-TEXT = {"type": "string"}
-DOMAIN = {"type": "array", "description": "An Odoo domain, e.g. [[\"state\", \"=\", \"sale\"]]"}
 
 
 class OdooRead(Tool):

@@ -18,8 +18,7 @@ import os
 import socket
 import sys
 
-SOCKET_PATH = os.environ.get("DOOSERVICE_CONTROL_SOCKET", "/run/dooservice/control.sock")
-TIMEOUT_SECONDS = 600
+from dooservice_constants import SOCKET_PATH, TIMEOUT_SECONDS
 
 
 class ControlError(Exception):

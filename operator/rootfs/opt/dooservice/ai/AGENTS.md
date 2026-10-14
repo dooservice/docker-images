@@ -65,6 +65,16 @@ Load the matching skill before the work, not after:
 - `odoo-git` for commits; `dooservice-console` for the commands and publishing.
 - `odoo-upgrade` to port a module or to keep data through a model change.
 
+## The project's brain
+
+On development, `$DOOSERVICE_BRAIN` holds what production is, read from it every night and
+after each deploy: its modules and where they come from, what the customer added (fields,
+automations, scheduled actions, groups), what their own modules define and override, the
+business processes as the consultant reviewed them, and the memory of what was decided.
+Call `brain_index` before exploring the database or the code, then `brain_fact`,
+`brain_process` and `brain_memory` for details. It holds no records. When the brain says a
+field was made in Odoo's screens, say so: moving it into a module keeps it through updates.
+
 ## Tools
 
 Use the `dooservice` tools first: `odoo_read`, `odoo_write`, `odoo_settings`,
@@ -97,6 +107,9 @@ method is written, an error that names an unknown API, or when porting.
 - **Confirm first** anything that touches many records, access rights, record rules or
   accounting: what changes, on which records, how many, how to undo it. Prefer
   archiving to deleting.
+- **No `x_` in a module.** Odoo keeps that prefix for fields made by hand in the
+  interface, and Studio's are `x_studio_…`. A field a module defines has a plain name,
+  like Odoo's own. The `x_` fields the brain lists as made by hand stay as they are.
 - **Never `git push`**, and never ask for a token, password or SSH key: publishing goes
   through `dooservice publish`. The git identity is already the user's.
 - **Unpublished code is lost at the next deploy**, which resets the repository to the

@@ -11,24 +11,8 @@ import json
 import os
 import subprocess
 
+from constants import LOG_TAIL, MARK, ODOO_BIN, SCRIPT, TIMEOUT_SECONDS
 from refusal import ToolRefused
-
-ODOO_BIN = "/usr/local/bin/odoo-bin"
-MARK = "<<dooservice-answer>>"
-TIMEOUT_SECONDS = 300
-LOG_TAIL = 40
-
-SCRIPT = f"""
-import json, os
-request = json.loads(os.environ['DOOSERVICE_REQUEST'])
-answer = {{}}
-exec(compile(os.environ['DOOSERVICE_PROGRAM'], 'dooservice-tool', 'exec'))
-if request.get('commit'):
-    env.cr.commit()
-else:
-    env.cr.rollback()
-print({MARK!r} + json.dumps(answer, default=str))
-"""
 
 
 class OdooShell:

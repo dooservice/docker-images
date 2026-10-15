@@ -12,6 +12,7 @@ exactly the bytes that were tested.
 | `ghcr.io/dooservice/dooservice-odoo` | `16.0` to `20.0` | The official Odoo image with a fixed user and one database CLI for every version |
 | `ghcr.io/dooservice/dooservice-operator` | `16.0` to `20.0` | The console of an environment: shell, `psql`, git, Claude Code and opencode |
 | `ghcr.io/dooservice/dooservice-postgres` | `16`, `17`, `18` | The official PostgreSQL image with the extensions Odoo needs |
+| `ghcr.io/dooservice/dooservice-status` | `1` | The page a browser sees while an Odoo of the server cannot answer |
 
 Every build also gets a tag that never moves, its **revision**: the build date, as Odoo
 tags its own images (`dooservice-odoo:18.0-20261013`). A second build on the same day is
@@ -34,6 +35,18 @@ Built on the official `odoo` image of the same version. It adds:
 
 Built on the official `postgres` image. It adds `pgvector`, an immutable `unaccent` for
 Odoo's full-text search, and `md5` authentication, which the PgDog connection pooler needs.
+
+## dooservice-status
+
+One small container per server, beside the proxy. When an environment is being created,
+updated, restored or started, is stopped, or does not exist, the proxy sends the browser
+here instead of showing its own error. The agent writes one card per address in a
+directory mounted read only (`/status/<host>.json`: the case, the step and the
+percentage); this service only reads those cards and answers with a page in English that
+polls itself and goes back to Odoo as soon as Odoo answers. It holds no credentials and
+reads no database; the page never names the project, the company or an error.
+
+    cd status && python3 -m unittest discover tests
 
 ## dooservice-operator
 

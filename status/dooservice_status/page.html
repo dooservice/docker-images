@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>$title · Dooservice</title>
+<style>
+:root { --bg: #F5F8F8; --card: #FFFFFF; --ink: #17262A; --muted: #5B6D71; --line: #DCE5E6; --teal: #2A7F8A; --soft: #E8F3F4; --on-teal: #FFFFFF; color-scheme: light; }
+@media (prefers-color-scheme: dark) { :root { --bg: #0D1719; --card: #142023; --ink: #E6EEEF; --muted: #9DB0B3; --line: #2A3B3E; --teal: #4FB3BF; --soft: #13292C; --on-teal: #0D1719; color-scheme: dark; } }
+* { box-sizing: border-box; }
+body { margin: 0; min-height: 100vh; background: var(--bg); color: var(--ink); font: 15px/1.55 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; display: grid; place-items: center; padding: 32px 16px; }
+main { width: 100%; max-width: 520px; display: grid; gap: 14px; justify-items: center; }
+.card { width: 100%; background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 28px 26px 22px; display: grid; gap: 12px; text-align: center; }
+.logo { width: 40px; height: 40px; margin: 0 auto; }
+.label { font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--teal); }
+h1 { margin: 0; font: 400 1.9rem/1.15 "Instrument Serif", Georgia, "Times New Roman", serif; text-wrap: balance; }
+p { margin: 0; color: var(--muted); }
+.meter { height: 6px; border-radius: 999px; background: var(--soft); overflow: hidden; }
+.meter span { display: block; height: 100%; background: var(--teal); border-radius: 999px; transition: width .6s ease; }
+.step { display: flex; justify-content: space-between; gap: 12px; font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; text-align: left; }
+.dots { display: flex; justify-content: center; gap: 6px; }
+.dots i { width: 7px; height: 7px; border-radius: 50%; background: var(--teal); opacity: .3; }
+@media (prefers-reduced-motion: no-preference) { .dots i { animation: pulse 1.2s infinite ease-in-out; } .dots i:nth-child(2) { animation-delay: .2s; } .dots i:nth-child(3) { animation-delay: .4s; } }
+@keyframes pulse { 50% { opacity: 1; } }
+h1 mark { background: #F28A54; color: #17262A; padding: 0 .12em; border-radius: 3px; }
+.choices { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; margin-top: 6px; }
+.choices div { display: grid; gap: 6px; align-content: start; }
+.choices .btn { text-align: center; }
+.choices small { font-size: 12px; color: var(--muted); line-height: 1.4; }
+.actions { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-top: 4px; }
+.btn { font-size: 14px; font-weight: 600; padding: 9px 14px; border-radius: 9px; text-decoration: none; border: 1px solid var(--line); color: var(--ink); background: var(--card); }
+.btn.primary { background: var(--teal); border-color: var(--teal); color: var(--on-teal); }
+.btn:focus-visible { outline: 2px solid #F28A54; outline-offset: 2px; }
+.help { border-top: 1px solid var(--line); padding-top: 12px; font-size: 13px; color: var(--muted); display: grid; gap: 3px; }
+.help b { color: var(--ink); font-weight: 600; }
+.help a { color: inherit; text-decoration: none; }
+.foot { font-size: 12px; color: var(--muted); }
+.foot a { color: inherit; text-decoration: none; }
+</style>
+</head>
+<body>
+<main data-dooservice-status data-every="$every">
+  <div class="card">
+    $logo
+    <div class="label">$label</div>
+    <h1>$heading</h1>
+    <p>$text</p>
+    $progress
+    $actions
+    <div class="help"><b>Need help? Contact support</b><span>&#x1F30E; Global: <a href="mailto:$global_support">$global_support</a></span><span>&#x1F1F5;&#x1F1EA; Peru: <a href="mailto:$peru_support">$peru_support</a></span></div>
+  </div>
+  <div class="foot"><a href="$site_url">dooservice.sh</a></div>
+</main>
+<script>
+(function () {
+  var wait = function (every) { setTimeout(look, Number(every) || 3000); };
+  var look = function () {
+    fetch(location.href, { cache: "no-store", credentials: "same-origin" })
+      .then(function (answer) { return answer.text(); })
+      .then(function (html) {
+        var page = new DOMParser().parseFromString(html, "text/html");
+        var next = page.querySelector("[data-dooservice-status]");
+        if (!next) { location.reload(); return; }
+        document.querySelector("[data-dooservice-status]").replaceWith(next);
+        document.title = page.title;
+        wait(next.getAttribute("data-every"));
+      })
+      .catch(function () { wait(document.querySelector("[data-dooservice-status]").getAttribute("data-every")); });
+  };
+  wait(document.querySelector("[data-dooservice-status]").getAttribute("data-every"));
+})();
+</script>
+</body>
+</html>

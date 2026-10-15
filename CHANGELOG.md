@@ -10,6 +10,22 @@ las notas de versión del agente: ver «Cómo se escriben» en
 
 El resto de la entrada, si hace falta, es técnico.
 
+## [20261015-4] — 2026-10-15
+
+### Novedades
+- es: Páginas de estado: mientras un Odoo se crea, se actualiza, se restaura, arranca, está
+  detenido o no existe, quien lo abre ve qué pasa y cuánto falta, con el acceso a
+  Dooservice y el correo de soporte, y entra solo cuando Odoo vuelve a responder.
+- en: Status pages: while an Odoo is being created, updated, restored or started, is
+  stopped, or does not exist, whoever opens it sees what is happening and how far along,
+  with a way into Dooservice and the support address, and is taken in as soon as Odoo
+  answers. An address with no Odoo says so, as Odoo's own does.
+
+### Added
+- `ghcr.io/dooservice/dooservice-status:1`: un contenedor pequeño por servidor que lee las
+  fichas que escribe el agente (`/status/<host>.json`, en solo lectura) y sirve la página,
+  en inglés, sin credenciales ni base de datos.
+
 ## [20261015-3] — 2026-10-15
 
 ### Novedades

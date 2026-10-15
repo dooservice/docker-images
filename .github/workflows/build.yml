@@ -1,7 +1,8 @@
 name: Build
 
 # The images servers run, built on GitHub's machines and not on a server of ours: each Odoo
-# version on a runner of its own, its console right after it, and Postgres beside them.
+# version on a runner of its own, its console right after it, and Postgres and the status
+# page beside them.
 # Building only publishes; servers take the new images when a platform pins them
 # (`make platform` in the agent repository). The Odoo versions are the ones `[odoo]` of the
 # agent's platform.toml offers, read with the GH_PAT secret.
@@ -183,6 +184,31 @@ jobs:
 
       - name: Postgres
         working-directory: postgres
+        run: ./build.sh
+        env:
+          REVISION: ${{ needs.versions.outputs.revision }}
+
+  status:
+    name: Status page
+    needs: versions
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Tests
+        working-directory: status
+        run: python3 -m unittest discover tests
+
+      - uses: docker/setup-buildx-action@v4
+
+      - uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_TOKEN || github.token }}
+
+      - name: Status
+        working-directory: status
         run: ./build.sh
         env:
           REVISION: ${{ needs.versions.outputs.revision }}

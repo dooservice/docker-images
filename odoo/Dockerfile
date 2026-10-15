@@ -23,7 +23,7 @@ ARG BRAIN_COMMIT
 LABEL sh.dooservice.brain-commit="${BRAIN_COMMIT}"
 RUN test -n "${BRAIN_COMMIT}" \
  && mkdir -p /tmp/brain /opt/dooservice/addons \
- && curl -fsSL "https://codeload.github.com/dooservice/odoo-brain/tar.gz/${BRAIN_COMMIT}" \
+ && curl -fsSL "https://codeload.github.com/dooservice/odoo-addons/tar.gz/${BRAIN_COMMIT}" \
       | tar -xz --strip-components=1 -C /tmp/brain \
  && test -f /tmp/brain/dooservice_brain/__manifest__.py \
  && test -f /tmp/brain/dooservice_connect/__manifest__.py \

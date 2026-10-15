@@ -1,4 +1,4 @@
-# The commit of dooservice/odoo-brain each Odoo image carries, one per version: a branch per
+# The commit of dooservice/odoo-addons each Odoo image carries, one per version: a branch per
 # version there, and here the exact commit, so a revision of an image is always the same
 # module. Moving one is a new build: change the commit, then build the images.
 [commits]

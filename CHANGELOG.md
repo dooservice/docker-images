@@ -10,6 +10,18 @@ las notas de versión del agente: ver «Cómo se escriben» en
 
 El resto de la entrada, si hace falta, es técnico.
 
+## [20261015-6] — 2026-10-15
+
+### Novedades
+- es: Sin cambios para ti: los módulos de Dooservice para Odoo se descargan ahora de su
+  repositorio con el nombre nuevo, `dooservice/odoo-addons`.
+- en: Nothing changes for you: Dooservice's Odoo modules now come from their repository
+  under its new name, `dooservice/odoo-addons`.
+
+### Changed
+- `odoo/Dockerfile` descarga de `dooservice/odoo-addons` (antes `odoo-brain`, que GitHub
+  redirige).
+
 ## [20261015-5] — 2026-10-15
 
 ### Novedades

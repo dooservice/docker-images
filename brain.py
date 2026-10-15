@@ -1,4 +1,4 @@
-"""The commit of dooservice/odoo-brain an Odoo version's image carries, from odoo/brain.toml.
+"""The commit of dooservice/odoo-addons an Odoo version's image carries, from odoo/brain.toml.
 
     python3 brain.py odoo/brain.toml 19.0
     python3 brain.py odoo/brain.toml --check 16.0 17.0 18.0 19.0 20.0

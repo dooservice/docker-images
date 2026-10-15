@@ -7,13 +7,13 @@ DOCKER_ORG="dooservice"
 # pinned stays tagged in the registry for as long as any server may still pull it.
 # The revision the build workflow decided for every image it builds, or today by hand.
 STAMP="${REVISION:-$(date -u +%Y%m%d)}"
-MAJOR="1"
+# No version of its own: `latest` moves with each build, and the revision is the date alone.
 
-echo "Building ${REGISTRY}/${DOCKER_ORG}/dooservice-status:${MAJOR}..."
+echo "Building ${REGISTRY}/${DOCKER_ORG}/dooservice-status:latest..."
 docker buildx build \
     --platform linux/amd64 \
-    -t "${REGISTRY}/${DOCKER_ORG}/dooservice-status:${MAJOR}" \
-    -t "${REGISTRY}/${DOCKER_ORG}/dooservice-status:${MAJOR}-${STAMP}" \
+    -t "${REGISTRY}/${DOCKER_ORG}/dooservice-status:latest" \
+    -t "${REGISTRY}/${DOCKER_ORG}/dooservice-status:${STAMP}" \
     --push \
     -f Dockerfile .
 

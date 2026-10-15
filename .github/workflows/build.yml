@@ -42,7 +42,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GH_PAT }}
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: platform
           path: platform.toml
@@ -137,7 +137,7 @@ jobs:
           submodules: true
 
       # An Odoo image and its console come to some 8 GB; the runner starts with less free.
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: platform
 

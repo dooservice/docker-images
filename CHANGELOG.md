@@ -22,9 +22,9 @@ El resto de la entrada, si hace falta, es técnico.
   answers. An address with no Odoo says so, as Odoo's own does.
 
 ### Added
-- `ghcr.io/dooservice/dooservice-status:1`: un contenedor pequeño por servidor que lee las
-  fichas que escribe el agente (`/status/<host>.json`, en solo lectura) y sirve la página,
-  en inglés, sin credenciales ni base de datos.
+- `ghcr.io/dooservice/dooservice-status:latest` (revisión `20261015-4`): un contenedor
+  pequeño por servidor que lee las fichas que escribe el agente (`/status/<host>.json`, en
+  solo lectura) y sirve la página, en inglés, sin credenciales ni base de datos.
 
 ## [20261015-3] — 2026-10-15
 

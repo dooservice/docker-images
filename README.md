@@ -12,7 +12,7 @@ exactly the bytes that were tested.
 | `ghcr.io/dooservice/dooservice-odoo` | `16.0` to `20.0` | The official Odoo image with a fixed user and one database CLI for every version |
 | `ghcr.io/dooservice/dooservice-operator` | `16.0` to `20.0` | The console of an environment: shell, `psql`, git, Claude Code and opencode |
 | `ghcr.io/dooservice/dooservice-postgres` | `16`, `17`, `18` | The official PostgreSQL image with the extensions Odoo needs |
-| `ghcr.io/dooservice/dooservice-status` | `1` | The page a browser sees while an Odoo of the server cannot answer |
+| `ghcr.io/dooservice/dooservice-status` | `latest` | The page a browser sees while an Odoo of the server cannot answer |
 
 Every build also gets a tag that never moves, its **revision**: the build date, as Odoo
 tags its own images (`dooservice-odoo:18.0-20261013`). A second build on the same day is

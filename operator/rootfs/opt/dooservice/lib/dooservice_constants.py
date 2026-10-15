@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import os
 import re
+import string
 
 LOCK_PATH = "/tmp/dooservice-ai.lock"
 DEVELOPMENT = "development"
@@ -22,9 +23,6 @@ LANGUAGE_NAMES = {
 }
 CTRL_Z = b"\x1a"
 FRAME_SECONDS = 0.1
-ANSI_ESCAPE = re.compile(rb"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
-OSC_SEQUENCE = re.compile(rb"\x1B\][^\x07\x1B]*(?:\x07|\x1B\\)")
-OSC_LINK = re.compile(rb"\x1B\]8;[^;\x07\x1B]*;(https://[^\x07\x1B]+)(?:\x07|\x1B\\)")
 SEEN_BYTES = 16 * 1024
 LOGIN_URLS = (
     b"https://console.anthropic.com/oauth/authorize",
@@ -64,3 +62,28 @@ CONTROL_ONLY = (
     re.compile(rb"\x1B\[[0-?]*[ -/]*[@-~]"),
     re.compile(rb"\x1B[@-Z\\-_]"),
 )
+#: The bytes of terminal escape sequences, read by `dooservice_terminal`.
+ESC = 0x1B
+BEL = 0x07
+CSI_OPEN = ord("[")
+OSC_OPEN = ord("]")
+STRING_TERMINATOR = ord("\\")
+HYPERLINK = b"8;"
+SECURE_URL = b"https://"
+#: The providers an unattended build runs on, and what it is started with.
+BUILD_PROVIDERS = ("anthropic", "openai", "openai_compatible")
+BUILD_MODULE_CHARACTERS = frozenset(string.ascii_lowercase + string.digits + "_")
+BUILD_REQUIRED = (
+    "DOOSERVICE_BUILD_PROVIDER",
+    "DOOSERVICE_BUILD_MODEL",
+    "DOOSERVICE_BUILD_KEY",
+    "DOOSERVICE_BUILD_MODULE",
+    "DOOSERVICE_BUILD_DIR",
+    "DOOSERVICE_BUILD_PROMPT",
+)
+BUILD_KEPT_OUT = ("DOOSERVICE_BUILD_KEY", "DOOSERVICE_BUILD_PROMPT")
+#: What a build may read besides the repository, and how opencode reaches a service compatible with OpenAI.
+BUILD_ODOO_SOURCE = "/usr/lib/python3/dist-packages/odoo/"
+BUILD_PLATFORM_ADDONS = "/opt/dooservice/addons/"
+COMPATIBLE_PACKAGE = "@ai-sdk/openai-compatible"
+COMPATIBLE_PROVIDER = "dooservice"

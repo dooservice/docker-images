@@ -1,0 +1,9 @@
+# The commit of dooservice/odoo-brain each Odoo image carries, one per version: a branch per
+# version there, and here the exact commit, so a revision of an image is always the same
+# module. Moving one is a new build: change the commit, then build the images.
+[commits]
+"16.0" = "76dbf3f0ccc1422cc299eb66cbf4d146948cdca6"
+"17.0" = "699175dad717132eaefc657a8127c1a2fd170bbf"
+"18.0" = "ffad22da238d8aa8406d1db317693c03b5d7142e"
+"19.0" = "2cca5ceb26c96a46820b4695860b7592177b0996"
+"20.0" = "47b790eb2302ef7a8a4436b37d3dfe852e4b33b2"

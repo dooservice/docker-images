@@ -10,6 +10,52 @@ las notas de versión del agente: ver «Cómo se escriben» en
 
 El resto de la entrada, si hace falta, es técnico.
 
+## [20261015] — 2026-10-15
+
+### Novedades
+- es: Asistente Dooservice en Odoo: cada imagen trae el módulo «Dooservice Assistant». Una
+  vez instalado desde Aplicaciones, tu equipo pregunta a Dooservice en Conversaciones cómo
+  funciona la empresa en Odoo y pide vistas, tableros e informes nuevos.
+- en: Dooservice assistant in Odoo: every image carries the “Dooservice Assistant” module.
+  Once installed from Apps, your team asks Dooservice in Discuss how the company works in
+  Odoo and requests new views, boards and reports.
+- es: Las solicitudes del asistente se construyen solas en el entorno de desarrollo, sobre
+  una base sin datos reales, y tu consultora las revisa antes de que lleguen a producción.
+- en: Requests from the assistant are built on their own in the development environment,
+  on a database with no real data, and your consultant reviews them before they reach
+  production.
+- es: El asistente también construye avisos y tareas programadas cuando tu consultora lo
+  activa, y pasa a un módulo los campos y automatizaciones hechos a mano en Odoo sin tocar
+  sus datos ni cambiarles el nombre. El código escrito a mano nunca llega a la IA.
+- en: The assistant also builds notices and scheduled actions when your consultant turns
+  it on, and takes fields and automations made by hand in Odoo into a module without
+  touching their data or renaming them. The code written by hand never reaches the AI.
+
+### Added
+- Odoo: `dooservice_brain` de `dooservice/odoo-brain` en `/opt/dooservice/addons`, al
+  commit que `odoo/brain.toml` fija para cada versión (`brain.py` lo lee y el workflow
+  comprueba que cada versión ofrecida tenga el suyo). La etiqueta
+  `sh.dooservice.brain-commit` de la imagen dice cuál lleva.
+- Operador: `dooservice-build`, la construcción sin nadie delante que lanza `brain.build`:
+  Claude Code (`claude -p`) para Anthropic y opencode (`run --format json`) para OpenAI y
+  compatibles, con `settings-build.json` y `opencode-build.json` (sin web, sin commit, sin
+  push, sin `env`), las reglas de `AGENTS.md` y su sección nueva «Unattended builds».
+  Recibe todo por variables `DOOSERVICE_BUILD_*`; la clave solo llega al proceso de la
+  herramienta. Su última línea es JSON con los cambios, el modelo y los tokens.
+- Operador: `AGENTS.md` y las reglas de `dooservice-build` cubren los tres tipos de
+  solicitud que se construyen (`view`, `automate`, `adopt`). La única excepción a «sin
+  `x_` en un módulo» es adoptar lo hecho a mano: los campos conservan su nombre, tipo y
+  opciones, y un `pre_init_hook` enlaza los registros existentes con sus xml ids.
+  El código hecho a mano nunca llega a la IA: ve marcadores `DOOSERVICE_ADOPTED_CODE_…`
+  que deja tal cual en el XML, y la plataforma pone después el contenido original.
+- Operador: `ODOO_IMAGE` como argumento de construcción, para construirlo sobre otra
+  imagen de Odoo (por defecto la del registro).
+
+### Changed
+- `dooservice_ai.py` ya no usa regex: las secuencias de escape de la terminal se leen
+  byte a byte en `dooservice_terminal.py` (`TerminalText`), y el idioma y las URL partidas
+  se separan con `split`. Fuera `ANSI_ESCAPE`, `OSC_SEQUENCE` y `OSC_LINK`.
+
 ## [20261014] — 2026-10-14
 
 ### Novedades

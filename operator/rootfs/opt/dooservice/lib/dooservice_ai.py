@@ -29,7 +29,6 @@ import fcntl
 import json
 import os
 import pty
-import re
 import select
 import struct
 import sys
@@ -38,15 +37,12 @@ import tty
 
 from dooservice_constants import (
     AI_DIR,
-    ANSI_ESCAPE,
     CTRL_Z,
     DEVELOPMENT,
     FRAME_SECONDS,
     LANGUAGE_NAMES,
     LOCK_PATH,
     LOGIN_URLS,
-    OSC_LINK,
-    OSC_SEQUENCE,
     PRODUCTION,
     REPOSITORY,
     SEEN_BYTES,
@@ -56,6 +52,7 @@ from dooservice_constants import (
 )
 from dooservice_control import ControlClient, ControlError
 from dooservice_splash import Splash, readable
+from dooservice_terminal import TerminalText
 
 
 def language_rule():
@@ -65,7 +62,7 @@ def language_rule():
     written to, and drifts to English after a few screens of logs and source code.
     """
     code = os.environ.get("DOOSERVICE_LANGUAGE", "")
-    name = LANGUAGE_NAMES.get(re.split(r"[-_]", code)[0].lower()) if code else None
+    name = LANGUAGE_NAMES.get(code.replace("-", "_").split("_")[0].lower()) if code else None
     if name is None:
         return ("Always reply to the user in the language they write in, for the whole session, even when "
                 "files, logs, code or command output are in another language.")
@@ -269,16 +266,16 @@ class AiSession:
         return data + b"\x1b]9;" + base64.b64encode(announcement.encode()) + b"\x07"
 
     def linked_login(self):
-        links = [match.group(1) for match in OSC_LINK.finditer(self.seen)]
+        links = TerminalText.links(self.seen)
         return next((link for link in reversed(links) if link.startswith(LOGIN_URLS)), None)
 
     def printed_login(self):
-        text = ANSI_ESCAPE.sub(b"", OSC_SEQUENCE.sub(b"", self.seen))
+        text = TerminalText.plain(self.seen)
         start = max(text.rfind(prefix) for prefix in LOGIN_URLS)
         if start < 0:
             return None
         pieces = []
-        for token in re.sub(rb"\s+", b" ", text[start:]).split(b" "):
+        for token in text[start:].split():
             if not token:
                 continue
             if token.lower() in URL_TERMINATORS:

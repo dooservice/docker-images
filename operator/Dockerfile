@@ -1,7 +1,9 @@
 # The operator: the Odoo image of an environment, plus what a person or an AI agent
 # needs to work on it — a shell, psql, git, Claude Code, opencode and the `dooservice`
 # command. One is started per console session, next to the environment's own Odoo
-# container, and removed when the session ends.
+# container, and removed when the session ends. The agent also starts one with nobody
+# attached to build a request from a customer's Odoo: `dooservice-build`, against a
+# scratch database with no records.
 #
 # It never runs Odoo as a service. The environment's container does that; this one
 # only runs `odoo-bin -u`, `odoo-bin shell` and tests against the same database, with
@@ -9,7 +11,8 @@
 # can still manage.
 
 ARG ODOO_VERSION=19.0
-FROM ghcr.io/dooservice/dooservice-odoo:${ODOO_VERSION}
+ARG ODOO_IMAGE=ghcr.io/dooservice/dooservice-odoo
+FROM ${ODOO_IMAGE}:${ODOO_VERSION}
 
 ARG ODOO_VERSION
 ARG CLAUDE_CODE_VERSION=2.1.295
@@ -47,6 +50,7 @@ COPY skills/odoo/common/ /opt/dooservice/ai/skills/code/
 COPY skills/dooservice/dooservice-console/ /opt/dooservice/ai/skills/dooservice/dooservice-console/
 COPY skills/dooservice/odoo-functional/ /opt/dooservice/ai/skills/functional/odoo-functional/
 RUN chmod 755 /usr/local/bin/claude /usr/local/bin/opencode /usr/local/bin/odoo-bin /usr/local/bin/dooservice /usr/local/bin/psql \
+      /usr/local/bin/dooservice-build \
  && find /opt/dooservice/ai -type f -exec chmod 644 {} + \
  && chmod 644 /opt/dooservice/lib/* /opt/dooservice/mcp/* /opt/dooservice/build/* /etc/profile.d/dooservice.sh \
  && chmod 755 /opt/dooservice/mcp \

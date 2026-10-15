@@ -87,9 +87,10 @@ jobs:
           MATRIX: ${{ steps.pick.outputs.matrix }}
 
   # What a console needs to find before it is built: the repository where the agent mounts
-  # it (`ODOO_ADDONS_DIR` in dooservice-core), and a set of skills for every version.
+  # it (`ODOO_ADDONS_DIR` in dooservice-core), a set of skills for every version, and the
+  # commit of the assistant every Odoo image carries.
   checks:
-    name: Paths and skills
+    name: Paths, skills and the assistant
     needs: versions
     runs-on: ubuntu-24.04
     steps:
@@ -113,6 +114,11 @@ jobs:
             name="$(basename "$(dirname "${skill}")")"
             grep -q "^name: ${name}$" "${skill}" || { echo "::error::${skill} is not named ${name}"; exit 1; }
           done
+        env:
+          OFFERED: ${{ needs.versions.outputs.offered }}
+
+      - name: Every version has the assistant's commit
+        run: python3 brain.py odoo/brain.toml --check $(jq -r '.[]' <<< "${OFFERED}")
         env:
           OFFERED: ${{ needs.versions.outputs.offered }}
 

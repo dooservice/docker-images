@@ -110,6 +110,9 @@ method is written, an error that names an unknown API, or when porting.
 - **No `x_` in a module.** Odoo keeps that prefix for fields made by hand in the
   interface, and Studio's are `x_studio_…`. A field a module defines has a plain name,
   like Odoo's own. The `x_` fields the brain lists as made by hand stay as they are.
+  The one exception is **adopting**: when a module takes in what somebody made by hand,
+  it declares those fields with their `x_` name, type and options exactly as they are,
+  so no data moves. Never a new `x_` field, adopting or not.
 - **Never `git push`**, and never ask for a token, password or SSH key: publishing goes
   through `dooservice publish`. The git identity is already the user's.
 - **Unpublished code is lost at the next deploy**, which resets the repository to the
@@ -122,3 +125,38 @@ method is written, an error that names an unknown API, or when porting.
 - No long-running servers or background jobs; no large files in the repository or home.
 - When resuming, check the history for an interrupted action and ask before continuing
   it; otherwise welcome the user back.
+
+## Unattended builds
+
+When the platform starts you with `dooservice-build`, nobody is reading: you build one
+request from a customer's Odoo as one module, in the directory it names and nowhere else.
+The database is a scratch one with the project's modules and no records, so there is
+nothing real to look at: write tests that make the records they need. Install and test
+with `odoo-bin` and `dooservice`. Never commit, push or touch git remotes; the platform
+checks the module, commits it and opens the pull request. Finish with a short summary of
+what the module adds, for the person who asked, in their language.
+
+The request says its kind:
+
+- **view**: lists, kanban, filters, groupings, boards, reports, computed columns. It only
+  reads.
+- **automate**: notices by email or activity, scheduled actions, new fields on a form.
+  Its automations and scheduled actions are created active but must do nothing while the
+  module installs, and its tests run them by hand. Nothing sends email: the platform
+  checks there is no outgoing mail server. A consultant reads every line before it is
+  approved, so keep it small and plain.
+- **adopt**: the request lists the ids of facts made by hand (`field:sale.order.x_channel`,
+  `automation:12`, ...). Declare each field with its `x_` name and its type, label,
+  relation and options as they are; recreate each automation, scheduled action, server
+  action, group or rule with its current content, under an xml id of the module. A
+  `pre_init_hook` creates the `ir.model.data` rows that link those xml ids to the existing
+  records, so installing adopts them instead of making copies. The request carries each
+  fact as the brain read it from production; the scratch database does not have them.
+  Code written by hand never reaches you: in its place each fact carries a marker that
+  starts with `DOOSERVICE_ADOPTED_CODE_`, one per table, row and column (`code`,
+  `filter_domain`, `filter_pre_domain`, `domain_force`, `compute`, `domain`). Put each
+  marker alone, exactly as it is, as the text of that field in the XML. Never rewrite,
+  split or move it, never put it in Python or anywhere else: the platform puts the
+  original content back in its place afterwards.
+  The platform then installs the module on the environment's database and checks that no
+  count and no value changed.

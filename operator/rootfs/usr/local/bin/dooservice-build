@@ -1,0 +1,25 @@
+#!/usr/bin/env python3
+"""Build one request as a module, unattended: the agent's entry point for `brain.build`.
+
+Takes nothing on the command line; everything comes in the environment the agent sets
+(see `dooservice_build`). Runs Claude Code for Anthropic and opencode for OpenAI and
+services compatible with it, in the repository, against the scratch database. Its last
+line on stdout is JSON: what changed, the model, and the tokens spent. Exits 0 when the
+tool finished, 1 when it did not, 2 when the build could not start.
+"""
+
+import sys
+
+from dooservice_build import BuildError, BuildOutcome, BuildTask
+from dooservice_build_tools import ClaudeBuild, OpencodeBuild
+
+try:
+    task = BuildTask()
+except BuildError as error:
+    sys.stderr.write(f"dooservice-build: {error}\n")
+    print(BuildOutcome(False, "", "", 0, 0).line())
+    sys.exit(2)
+builder = ClaudeBuild() if task.provider == "anthropic" else OpencodeBuild()
+outcome = builder.run(task)
+print(outcome.line())
+sys.exit(0 if outcome.finished else 1)

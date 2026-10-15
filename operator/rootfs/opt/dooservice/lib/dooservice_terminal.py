@@ -1,13 +1,23 @@
 """Escape sequences in what a terminal program prints, read byte by byte: no patterns.
 
 CSI is ESC [ with parameter and intermediate bytes and one final byte; OSC is ESC ] up
-to BEL or the string terminator; any other is ESC, its intermediate bytes and one more.
+to BEL or the string terminator, and so are DCS, SOS, PM and APC (ESC P, X, ^, _); any
+other is ESC, its intermediate bytes and one more.
 A sequence cut at the end of the buffer runs to its end, as it would once the rest arrives.
 """
 
 from __future__ import annotations
 
-from dooservice_constants import BEL, CSI_OPEN, ESC, HYPERLINK, OSC_OPEN, SECURE_URL, STRING_TERMINATOR
+from dooservice_constants import (
+    BEL,
+    CONTROL_STRING_OPENS,
+    CSI_OPEN,
+    ESC,
+    HYPERLINK,
+    OSC_OPEN,
+    SECURE_URL,
+    STRING_TERMINATOR,
+)
 
 
 class TerminalText:
@@ -25,6 +35,8 @@ class TerminalText:
         index = start + 1
         while index < len(data) and 0x20 <= data[index] <= 0x2F:
             index += 1
+        if index < len(data) and data[index] == ESC:
+            return index
         return min(index + 1, len(data))
 
     @staticmethod
@@ -56,6 +68,8 @@ class TerminalText:
                 if closed:
                     yield data[index + 2 : body_end], b""
                 index = max(ends, index + 1)
+            elif following in CONTROL_STRING_OPENS:
+                index = max(cls.osc_end(data, index)[1], index + 2)
             elif following == CSI_OPEN:
                 index = cls.csi_end(data, index)
             else:
@@ -67,6 +81,11 @@ class TerminalText:
     @classmethod
     def plain(cls, data: bytes) -> bytes:
         return b"".join(text for body, text in cls.pieces(data) if body is None)
+
+    @classmethod
+    def readable(cls, data: bytes) -> bool:
+        """Whether output carries text for a person, not only questions to the terminal."""
+        return any(byte > 0x20 for byte in cls.plain(data))
 
     @classmethod
     def links(cls, data: bytes) -> list[bytes]:

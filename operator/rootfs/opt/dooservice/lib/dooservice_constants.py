@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import os
-import re
 import string
 
 LOCK_PATH = "/tmp/dooservice-ai.lock"
@@ -56,18 +55,14 @@ RESET = "\033[0m"
 BAR_WIDTH = 24
 MINIMUM_SECONDS = 5
 STARTING = {"es": "Iniciando", "pt": "Iniciando", "fr": "Démarrage de", "it": "Avvio di", "de": "Starte"}
-CONTROL_ONLY = (
-    re.compile(rb"\x1B\][^\x07\x1B]*(?:\x07|\x1B\\)"),
-    re.compile(rb"\x1B[P_^X][^\x1B]*\x1B\\"),
-    re.compile(rb"\x1B\[[0-?]*[ -/]*[@-~]"),
-    re.compile(rb"\x1B[@-Z\\-_]"),
-)
 #: The bytes of terminal escape sequences, read by `dooservice_terminal`.
 ESC = 0x1B
 BEL = 0x07
 CSI_OPEN = ord("[")
 OSC_OPEN = ord("]")
 STRING_TERMINATOR = ord("\\")
+#: DCS, SOS, PM and APC: strings a terminal answers or keeps, run up to the string terminator.
+CONTROL_STRING_OPENS = frozenset(b"PX^_")
 HYPERLINK = b"8;"
 SECURE_URL = b"https://"
 #: The providers an unattended build runs on, and what it is started with.

@@ -51,7 +51,7 @@ from dooservice_constants import (
     URL_TERMINATORS,
 )
 from dooservice_control import ControlClient, ControlError
-from dooservice_splash import Splash, readable
+from dooservice_splash import Splash
 from dooservice_terminal import TerminalText
 
 
@@ -222,7 +222,7 @@ class AiSession:
                         self.reveal(splash, stdout)
                         continue
                     data = self.announce_login(data)
-                    if splash.active and (splash.held or readable(data)):
+                    if splash.active and (splash.held or TerminalText.readable(data)):
                         splash.held.append(data)
                         if splash.finished():
                             self.reveal(splash, stdout)

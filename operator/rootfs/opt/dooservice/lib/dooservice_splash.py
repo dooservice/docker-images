@@ -17,13 +17,11 @@ ends the animation once the tool has something to show and the minimum has passe
 """
 
 import os
-import re
 import sys
 import time
 
 from dooservice_constants import (
     BAR_WIDTH,
-    CONTROL_ONLY,
     GRAY,
     LOGO,
     MINIMUM_SECONDS,
@@ -33,13 +31,6 @@ from dooservice_constants import (
     TEAL,
     WHITE,
 )
-
-
-def readable(data):
-    """Whether output carries text for a person, not only questions to the terminal."""
-    for sequence in CONTROL_ONLY:
-        data = sequence.sub(b"", data)
-    return re.search(rb"[^\s\x00-\x1f]", data) is not None
 
 
 def color(rgb):
@@ -52,7 +43,7 @@ def blend(start, end, amount):
 
 class Splash:
     def __init__(self, tool_name):
-        code = re.split(r"[-_]", os.environ.get("DOOSERVICE_LANGUAGE", ""))[0].lower()
+        code = os.environ.get("DOOSERVICE_LANGUAGE", "").replace("_", "-").partition("-")[0].lower()
         self.title = f"{STARTING.get(code, 'Starting')} {tool_name}"
         environment = os.environ.get("DOOSERVICE_ENVIRONMENT", "")
         project = os.environ.get("DOOSERVICE_PROJECT", "")

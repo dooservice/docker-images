@@ -10,6 +10,19 @@ las notas de versión del agente: ver «Cómo se escriben» en
 
 El resto de la entrada, si hace falta, es técnico.
 
+## [20261015-7] — 2026-10-15
+
+### Novedades
+- es: Sin cambios para ti: el build nombra los módulos de Dooservice como lo que son, sus
+  addons para Odoo.
+- en: Nothing changes for you: the build names Dooservice's modules for what they are, its
+  Odoo addons.
+
+### Changed
+- `brain.py` → `addons.py`, `odoo/brain.toml` → `odoo/addons.toml`, `BRAIN_COMMIT` →
+  `ADDONS_COMMIT`, la etiqueta `sh.dooservice.addons-commit` y la descarga en
+  `/tmp/dooservice-addons`.
+
 ## [20261015-6] — 2026-10-15
 
 ### Novedades

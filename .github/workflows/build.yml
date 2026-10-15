@@ -89,9 +89,9 @@ jobs:
 
   # What a console needs to find before it is built: the repository where the agent mounts
   # it (`ODOO_ADDONS_DIR` in dooservice-core), a set of skills for every version, and the
-  # commit of the assistant every Odoo image carries.
+  # commit of dooservice/odoo-addons every Odoo image carries.
   checks:
-    name: Paths, skills and the assistant
+    name: Paths, skills and the Dooservice addons
     needs: versions
     runs-on: ubuntu-24.04
     steps:
@@ -118,8 +118,8 @@ jobs:
         env:
           OFFERED: ${{ needs.versions.outputs.offered }}
 
-      - name: Every version has the assistant's commit
-        run: python3 brain.py odoo/brain.toml --check $(jq -r '.[]' <<< "${OFFERED}")
+      - name: Every version has the addons' commit
+        run: python3 addons.py odoo/addons.toml --check $(jq -r '.[]' <<< "${OFFERED}")
         env:
           OFFERED: ${{ needs.versions.outputs.offered }}
 

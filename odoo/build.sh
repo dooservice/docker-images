@@ -26,13 +26,13 @@ for VERSION in "${VERSIONS[@]}"; do
     fi
 
     BASE="odoo:${VERSION}"
-    BRAIN_COMMIT="$(python3 ../brain.py brain.toml "${VERSION}")"
+    ADDONS_COMMIT="$(python3 ../addons.py addons.toml "${VERSION}")"
     echo "Building ${REGISTRY}/${DOCKER_ORG}/dooservice-odoo:${VERSION} on ${BASE}..."
     docker buildx build \
         --platform linux/amd64 \
         --build-arg "ODOO_VERSION=${VERSION}" \
         --build-arg "ODOO_BASE=${BASE}" \
-        --build-arg "BRAIN_COMMIT=${BRAIN_COMMIT}" \
+        --build-arg "ADDONS_COMMIT=${ADDONS_COMMIT}" \
         -t "${REGISTRY}/${DOCKER_ORG}/dooservice-odoo:${VERSION}" \
         -t "${REGISTRY}/${DOCKER_ORG}/dooservice-odoo:${VERSION}-${STAMP}" \
         --push \

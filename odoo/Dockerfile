@@ -16,20 +16,20 @@ RUN chmod +x /tmp/cli-patches/apply.sh \
  && /tmp/cli-patches/apply.sh ${ODOO_VERSION} \
  && rm -rf /tmp/cli-patches/
 
-# The Dooservice assistant and Connect, at the commit odoo/brain.toml names for this version,
+# The Dooservice assistant and Connect, at the commit odoo/addons.toml names for this version,
 # on every environment's addons path: the assistant installed only when somebody installs it
 # from Apps, Connect loaded as a server-wide module from odoo.conf and never installed.
-ARG BRAIN_COMMIT
-LABEL sh.dooservice.brain-commit="${BRAIN_COMMIT}"
-RUN test -n "${BRAIN_COMMIT}" \
- && mkdir -p /tmp/brain /opt/dooservice/addons \
- && curl -fsSL "https://codeload.github.com/dooservice/odoo-addons/tar.gz/${BRAIN_COMMIT}" \
-      | tar -xz --strip-components=1 -C /tmp/brain \
- && test -f /tmp/brain/dooservice_brain/__manifest__.py \
- && test -f /tmp/brain/dooservice_connect/__manifest__.py \
- && mv /tmp/brain/dooservice_brain /opt/dooservice/addons/dooservice_brain \
- && mv /tmp/brain/dooservice_connect /opt/dooservice/addons/dooservice_connect \
- && rm -rf /tmp/brain \
+ARG ADDONS_COMMIT
+LABEL sh.dooservice.addons-commit="${ADDONS_COMMIT}"
+RUN test -n "${ADDONS_COMMIT}" \
+ && mkdir -p /tmp/dooservice-addons /opt/dooservice/addons \
+ && curl -fsSL "https://codeload.github.com/dooservice/odoo-addons/tar.gz/${ADDONS_COMMIT}" \
+      | tar -xz --strip-components=1 -C /tmp/dooservice-addons \
+ && test -f /tmp/dooservice-addons/dooservice_brain/__manifest__.py \
+ && test -f /tmp/dooservice-addons/dooservice_connect/__manifest__.py \
+ && mv /tmp/dooservice-addons/dooservice_brain /opt/dooservice/addons/dooservice_brain \
+ && mv /tmp/dooservice-addons/dooservice_connect /opt/dooservice/addons/dooservice_connect \
+ && rm -rf /tmp/dooservice-addons \
  && chmod -R a+rX,go-w /opt/dooservice
 
 COPY entrypoint.sh /dooservice-entrypoint.sh

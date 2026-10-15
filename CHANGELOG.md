@@ -10,6 +10,24 @@ las notas de versión del agente: ver «Cómo se escriben» en
 
 El resto de la entrada, si hace falta, es técnico.
 
+## [20261015-2] — 2026-10-15
+
+### Novedades
+- es: Asistente Dooservice en Odoo: sus permisos aparecen en la ficha de cada usuario
+  («Asistente Dooservice › Preguntar» o «Pedir cambios»), el administrador los tiene al
+  instalarlo, y el chat muestra el logo de Dooservice tras actualizar el módulo.
+- en: Dooservice assistant in Odoo: its permissions show in each user's form
+  (“Dooservice Assistant › Ask” or “Request changes”), the administrator has them on
+  install, and the chat shows the Dooservice logo once the module is updated.
+
+### Changed
+- `dooservice_brain` 1.1.0 en las cinco versiones: grupos bajo un privilegio (19–20) o una
+  categoría (16–18), el admin con «Pedir cambios», y migración que pone la foto del bot.
+- Sin expresiones regulares en las imágenes: la pantalla de inicio de la consola lee las
+  secuencias de terminal con `TerminalText` (que ahora salta también DCS, SOS, PM y APC),
+  y el parche de `dump_db` de Odoo 16–18 reemplaza texto exacto y para el build si no
+  encuentra el bloque, en vez de dejar la imagen sin parchear.
+
 ## [20261015] — 2026-10-15
 
 ### Novedades

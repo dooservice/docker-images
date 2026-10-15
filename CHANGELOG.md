@@ -10,6 +10,24 @@ las notas de versión del agente: ver «Cómo se escriben» en
 
 El resto de la entrada, si hace falta, es técnico.
 
+## [20261015-8] — 2026-10-15
+
+### Novedades
+- es: El asistente de Odoo responde con botones: elige una opción, envía o corrige una
+  solicitud, mira un gráfico contado con tus permisos o el diagrama del proceso, y valora
+  la respuesta. Nada se crea ni se envía sin pulsar un botón. Llega al actualizar el
+  módulo «Dooservice Assistant» en cada Odoo.
+- en: The Odoo assistant answers with buttons: pick an option, send or correct a request,
+  see a chart counted with your own access or the process diagram, and rate the answer.
+  Nothing is created or sent without pressing a button. It arrives when the “Dooservice
+  Assistant” module is updated in each Odoo.
+
+### Changed
+- `dooservice_brain` 1.2.0 en las cinco versiones: las piezas de cada respuesta se guardan
+  en su mensaje (`dooservice_cards`, `dooservice_card_state`); en 17–20 las dibuja un
+  componente OWL bajo el mensaje, en 16 van como enlaces firmados en la respuesta. El
+  icono del asistente vuelve a abrir el chat en Odoo 20 (Owl 3).
+
 ## [20261015-7] — 2026-10-15
 
 ### Novedades

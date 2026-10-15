@@ -10,6 +10,22 @@ las notas de versión del agente: ver «Cómo se escriben» en
 
 El resto de la entrada, si hace falta, es técnico.
 
+## [20261015-5] — 2026-10-15
+
+### Novedades
+- es: «Abrir instancia» en el panel entra directamente como administrador de Odoo, como en
+  Odoo.sh, para quien puede abrir la consola del entorno (en producción, solo los admins).
+  Si no puede, llega al login de Odoo en vez de a un error.
+- en: “Open instance” in the panel signs straight in as Odoo's administrator, as on Odoo.sh,
+  for whoever may open the environment's console (on production, only admins). When it
+  cannot, it lands on Odoo's login instead of an error.
+
+### Changed
+- `dooservice_connect` 1.0.1 en las cinco versiones: sesión de `base.user_admin`, y el
+  correo de quien entra solo en el log.
+- `dooservice-status` se etiqueta `latest` y su revisión es la fecha sola.
+- Artefactos del build en Node 24 (`upload-artifact@v7`, `download-artifact@v8`).
+
 ## [20261015-4] — 2026-10-15
 
 ### Novedades

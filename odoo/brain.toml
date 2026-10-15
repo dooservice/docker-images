@@ -2,8 +2,8 @@
 # version there, and here the exact commit, so a revision of an image is always the same
 # module. Moving one is a new build: change the commit, then build the images.
 [commits]
-"16.0" = "1dee213bb8b10905abc153c48585b6073a6cdd76"
-"17.0" = "2796f0621ded4d85e7e6c02f88c827ffb6ddab92"
-"18.0" = "baacb3fc7da70bde0e820285cd7043bb20684830"
-"19.0" = "3d0fa20681005170fd6b64d509c683212b766deb"
-"20.0" = "c3e0bfeb6f0d1c06a48a1b6a8c34ec4dced07f58"
+"16.0" = "f85255ebc35195b641ec088d77295e5a36a0dabe"
+"17.0" = "8d0a4d05d8c68e984982fcd4b8d3b66a75a43143"
+"18.0" = "c96ce4bd38466e35c9f08bde96ce5df9f9301b52"
+"19.0" = "6df7275686fac61c985a43f184fd97b525878597"
+"20.0" = "2106de129a984370d2a8f4495331d03407cf62c4"

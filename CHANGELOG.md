@@ -10,6 +10,19 @@ las notas de versión del agente: ver «Cómo se escriben» en
 
 El resto de la entrada, si hace falta, es técnico.
 
+## [20261015-3] — 2026-10-15
+
+### Novedades
+- es: «Conectar» en el panel: entra en el Odoo de un entorno ya con tu usuario, sin escribir
+  la contraseña. Funciona tras el próximo reinicio de cada entorno.
+- en: “Connect” in the panel: sign in to an environment's Odoo as your own user, without
+  typing a password. It works after each environment's next restart.
+
+### Added
+- `dooservice_connect` en `/opt/dooservice/addons`, junto a `dooservice_brain`: módulo de
+  servidor que se carga desde `odoo.conf` y no se instala, así que una base llevada a otro
+  sitio no guarda nada de él.
+
 ## [20261015-2] — 2026-10-15
 
 ### Novedades

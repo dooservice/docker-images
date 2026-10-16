@@ -10,6 +10,20 @@ las notas de versión del agente: ver «Cómo se escriben» en
 
 El resto de la entrada, si hace falta, es técnico.
 
+## [20261016] — 2026-10-16
+
+### Novedades
+- es: Arreglado: el chat con el asistente de Odoo podía quedarse en blanco. Las páginas que
+  ves mientras un Odoo arranca o se actualiza salen ahora siempre en tema claro.
+- en: Fixed: the chat with the Odoo assistant could stay blank. The pages shown while an
+  Odoo starts or updates are now always light.
+
+### Fixed
+- `dooservice_brain` 1.2.1: las piezas se cargan después de pintar el mensaje y con el ORM
+  del cliente web; antes, un mensaje que Odoo rehacía dejaba sin respuesta la carga y la
+  conversación entera esperaba sin pintarse.
+- `dooservice-status`: solo tema claro.
+
 ## [20261015-8] — 2026-10-15
 
 ### Novedades

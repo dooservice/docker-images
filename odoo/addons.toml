@@ -3,12 +3,11 @@
 # module. Moving one is a new build: change the commit, then build the images.
 #
 # Each branch carries `dooservice_brain` at the version `<odoo>.<module>`: the commits below
-# are its 1.2.1 (the assistant). Its 2.0.0 (tickets to the consultancy, display name
-# "Dooservice") is on 19.0 first and is ported to 16.0–20.0; a commit goes here only once its
-# branch is pushed to dooservice/odoo-addons, never a local one.
+# are its 2.0.0 (tickets to the consultancy, display name "Dooservice"). A commit goes here
+# only once its branch is pushed to dooservice/odoo-addons, never a local one.
 [commits]
-"16.0" = "3e34bd60afd9a5fa7010ddf23560d2cf2a983e0e"
-"17.0" = "536435d29fcacd7b2ad589bebbd4e4f2f4dd00d1"
-"18.0" = "5d17a917cca0cc0b3625d436915f92249338d4d8"
-"19.0" = "3cb293805edf06ebc612f4d75160e10348e5e4ac"
-"20.0" = "45fe29de9e07d651de768c32215a2762c9731974"
+"16.0" = "d44c567db80a01d38c1dc3ff20874c167e443163"
+"17.0" = "2213db622f3a7997bc0e9908ce0f608d39cb9fda"
+"18.0" = "43e1a106350b16da09952973997809edae1a1b06"
+"19.0" = "30fcc77afb728d3bcf90baabeeb880bd77438c2a"
+"20.0" = "60269b95f3279bc4a17bf9bbe8539d4f53f78734"

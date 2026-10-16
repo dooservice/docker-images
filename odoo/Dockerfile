@@ -16,9 +16,10 @@ RUN chmod +x /tmp/cli-patches/apply.sh \
  && /tmp/cli-patches/apply.sh ${ODOO_VERSION} \
  && rm -rf /tmp/cli-patches/
 
-# The Dooservice assistant and Connect, at the commit odoo/addons.toml names for this version,
-# on every environment's addons path: the assistant installed only when somebody installs it
-# from Apps, Connect loaded as a server-wide module from odoo.conf and never installed.
+# The Dooservice module (tickets to the consultancy) and Connect, at the commit
+# odoo/addons.toml names for this version, on every environment's addons path: the module
+# installed only when somebody installs it from Apps, Connect loaded as a server-wide module
+# from odoo.conf and never installed.
 ARG ADDONS_COMMIT
 LABEL sh.dooservice.addons-commit="${ADDONS_COMMIT}"
 RUN test -n "${ADDONS_COMMIT}" \

@@ -1,6 +1,11 @@
 # The commit of dooservice/odoo-addons each Odoo image carries, one per version: a branch per
 # version there, and here the exact commit, so a revision of an image is always the same
 # module. Moving one is a new build: change the commit, then build the images.
+#
+# Each branch carries `dooservice_brain` at the version `<odoo>.<module>`: the commits below
+# are its 1.2.1 (the assistant). Its 2.0.0 (tickets to the consultancy, display name
+# "Dooservice") is on 19.0 first and is ported to 16.0–20.0; a commit goes here only once its
+# branch is pushed to dooservice/odoo-addons, never a local one.
 [commits]
 "16.0" = "3e34bd60afd9a5fa7010ddf23560d2cf2a983e0e"
 "17.0" = "536435d29fcacd7b2ad589bebbd4e4f2f4dd00d1"

@@ -10,6 +10,34 @@ las notas de versión del agente: ver «Cómo se escriben» en
 
 El resto de la entrada, si hace falta, es técnico.
 
+## [20261016-2] — 2026-10-16
+
+### Novedades
+- es: La consola de desarrollo lee la capa de negocio de tu proyecto: qué usa cada área
+  de producción, cómo está configurada, qué se hizo a mano y qué cambió desde la última
+  lectura. Las fichas de proceso y los tickets están en el panel de Dooservice. El módulo
+  «Dooservice» de Odoo abre tickets a tu consultora desde cualquier pantalla y los sigue
+  en Conversaciones, uno con su chat; llega al actualizar el módulo en cada Odoo.
+- en: The development console reads your project's business layer: what each production
+  area uses, how it is configured, what was made by hand and what changed since the last
+  reading. The process forms and the tickets live in the Dooservice panel. The “Dooservice”
+  Odoo module opens tickets to your consultancy from any screen and follows them in
+  Discuss, each with its own chat; it arrives when the module is updated in each Odoo.
+
+### Changed
+- Operador: la lectura se monta en `/opt/dooservice/business` (`DOOSERVICE_BUSINESS`) con
+  `facts.json`, `changes.json`, `reading.json` e `index.md`; las herramientas MCP pasan a
+  `business_index`, `business_area`, `business_fact` y `business_changes`
+  (`business_tools.py`). Desaparecen `brain_process` y `brain_memory`: ya no hay
+  `processes.json` ni `memory.jsonl`.
+- `dooservice_brain` 2.0.0 (`<odoo>.2.0.0` por rama): nombre visible «Dooservice»; tickets
+  con un chat cada uno en lugar del asistente único y sus solicitudes. Los commits de
+  `odoo/addons.toml` se mueven cuando cada rama esté publicada.
+
+### Removed
+- `dooservice-build`, `dooservice_build*.py`, `settings-build.json` y `opencode-build.json`:
+  la construcción desatendida de solicitudes (`brain.build`) ya no existe.
+
 ## [20261016] — 2026-10-16
 
 ### Novedades

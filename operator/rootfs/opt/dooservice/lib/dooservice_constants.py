@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import os
-import string
 
 LOCK_PATH = "/tmp/dooservice-ai.lock"
 DEVELOPMENT = "development"
@@ -65,20 +64,3 @@ STRING_TERMINATOR = ord("\\")
 CONTROL_STRING_OPENS = frozenset(b"PX^_")
 HYPERLINK = b"8;"
 SECURE_URL = b"https://"
-#: The providers an unattended build runs on, and what it is started with.
-BUILD_PROVIDERS = ("anthropic", "openai", "openai_compatible")
-BUILD_MODULE_CHARACTERS = frozenset(string.ascii_lowercase + string.digits + "_")
-BUILD_REQUIRED = (
-    "DOOSERVICE_BUILD_PROVIDER",
-    "DOOSERVICE_BUILD_MODEL",
-    "DOOSERVICE_BUILD_KEY",
-    "DOOSERVICE_BUILD_MODULE",
-    "DOOSERVICE_BUILD_DIR",
-    "DOOSERVICE_BUILD_PROMPT",
-)
-BUILD_KEPT_OUT = ("DOOSERVICE_BUILD_KEY", "DOOSERVICE_BUILD_PROMPT")
-#: What a build may read besides the repository, and how opencode reaches a service compatible with OpenAI.
-BUILD_ODOO_SOURCE = "/usr/lib/python3/dist-packages/odoo/"
-BUILD_PLATFORM_ADDONS = "/opt/dooservice/addons/"
-COMPATIBLE_PACKAGE = "@ai-sdk/openai-compatible"
-COMPATIBLE_PROVIDER = "dooservice"

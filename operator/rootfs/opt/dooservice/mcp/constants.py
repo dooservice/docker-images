@@ -4,9 +4,9 @@ from __future__ import annotations
 
 import os
 
-BRAIN = os.environ.get("DOOSERVICE_BRAIN", "")
-#: The most brain facts one search answers with.
-BRAIN_MATCHES = 60
+BUSINESS = os.environ.get("DOOSERVICE_BUSINESS", "")
+#: The most facts of production one search answers with.
+BUSINESS_MATCHES = 60
 
 MANY_RECORDS = 20
 SENSITIVE_PREFIXES = ("account.", "res.users", "res.groups", "ir.rule", "ir.model.access", "res.company")

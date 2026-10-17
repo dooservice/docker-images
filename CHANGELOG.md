@@ -10,6 +10,21 @@ las notas de versión del agente: ver «Cómo se escriben» en
 
 El resto de la entrada, si hace falta, es técnico.
 
+## [20261017-2] — 2026-10-17
+
+### Novedades
+- es: Si tu Odoo de producción falla (por ejemplo, no puede abrir su base de datos), quien
+  entre verá una página de Dooservice que reintenta sola, en lugar de un «Internal Server
+  Error».
+- en: If your production Odoo fails (for example, it cannot open its database), visitors
+  see a Dooservice page that keeps retrying instead of an "Internal Server Error".
+
+### Added
+- `dooservice-status`: caso `failing` («This Odoo ran into a problem»). Lo muestra cuando el
+  proxy le manda un 500 de producción (`/_dooservice/status/500`) y la tarjeta dice que el
+  entorno corre; si hay un despliegue o una restauración en curso, manda la tarjeta. Responde
+  503 con `Retry-After`, así que la página se recarga sola.
+
 ## [20261017] — 2026-10-17
 
 ### Novedades

@@ -1,12 +1,13 @@
 """The page of whatever address the proxy could not serve: from its catch-all router when no
 environment is routed there, or from its errors middleware when the environment answered
-502 to 504. Either way the browser asked for the original address, which is in `Host`."""
+502 to 504, or 500 in production. Either way the browser asked for the original address,
+which is in `Host`."""
 
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
-from .card import Cards, Host
-from .cases import WORDING
-from .constants import FINAL_STATUS, HEALTH_PATH, PORT, RETRY_AFTER_SECONDS, WAITING_STATUS
+from .card import Card, Cards, Host
+from .cases import WORDING, Case
+from .constants import FAILED_PATH, FINAL_STATUS, HEALTH_PATH, PORT, RETRY_AFTER_SECONDS, WAITING_STATUS
 from .page import Page
 
 
@@ -32,6 +33,8 @@ class StatusHandler(BaseHTTPRequestHandler):
             return
         host = Host.of(self.headers.get("Host", ""))
         card = self.cards.of(host)
+        if self.path.partition("?")[0] == FAILED_PATH and card.case == Case.NOT_RESPONDING:
+            card = Card(Case.FAILING)
         final = WORDING[card.case].final
         self.send(
             FINAL_STATUS if final else WAITING_STATUS,

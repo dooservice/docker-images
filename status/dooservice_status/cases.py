@@ -11,6 +11,7 @@ class Case(StrEnum):
     STARTING = "starting"
     MAINTENANCE = "maintenance"
     NOT_RESPONDING = "not_responding"
+    FAILING = "failing"
     VERIFYING_DOMAIN = "verifying_domain"
     STOPPED = "stopped"
     EXPIRED = "expired"
@@ -55,6 +56,11 @@ WORDING = {
         "Not responding",
         "This Odoo is not responding",
         "This is usually temporary. This page keeps retrying and takes you in when it answers.",
+    ),
+    Case.FAILING: Wording(
+        "Having a problem",
+        "This Odoo ran into a problem",
+        "Its team has been told. This page keeps retrying and takes you in as soon as it works again.",
     ),
     Case.VERIFYING_DOMAIN: Wording(
         "Preparing the domain",

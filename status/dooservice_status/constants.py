@@ -10,6 +10,9 @@ MAX_HOST_LENGTH = 253
 
 PORT = 8080
 HEALTH_PATH = "/_dooservice/health"
+#: Where the proxy sends a production Odoo that answered 500. Its card still says what
+#: the environment is; while nothing else is happening to it, the page says it failed.
+FAILED_PATH = "/_dooservice/status/500"
 
 #: Cases that move on by themselves poll often; the rest, in case somebody starts it again.
 ACTIVE_POLL_MILLISECONDS = 3000

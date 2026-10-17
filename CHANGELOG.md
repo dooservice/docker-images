@@ -10,6 +10,24 @@ las notas de versión del agente: ver «Cómo se escriben» en
 
 El resto de la entrada, si hace falta, es técnico.
 
+## [20261017] — 2026-10-17
+
+### Novedades
+- es: La capa de negocio se retira. La consola de desarrollo deja de leerla, y el módulo
+  «Dooservice» se desinstala de cada Odoo cuando su entorno toma esta imagen.
+- en: The business layer is retired. The development console no longer reads it, and the
+  “Dooservice” module is uninstalled from each Odoo as its environment takes this image.
+
+### Removed
+- Las herramientas MCP `business_index`, `business_area`, `business_fact` y
+  `business_changes` de la consola, la variable `DOOSERVICE_BUSINESS` y la sección de la
+  capa en el `AGENTS.md` del operador.
+
+### Kept
+- `dooservice_brain` sigue en las imágenes de Odoo de esta revisión: el agente lo
+  desinstala al cambiar de imagen y necesita su código para hacerlo. Sale en un build
+  posterior, cuando todos los servidores lo hayan desinstalado.
+
 ## [20261016-2] — 2026-10-16
 
 ### Novedades

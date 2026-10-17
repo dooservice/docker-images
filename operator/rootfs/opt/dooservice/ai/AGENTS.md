@@ -65,18 +65,6 @@ Load the matching skill before the work, not after:
 - `odoo-git` for commits; `dooservice-console` for the commands and publishing.
 - `odoo-upgrade` to port a module or to keep data through a model change.
 
-## Business layer
-
-On development, `$DOOSERVICE_BUSINESS` holds the reading of production, taken every night
-and after each deploy: its modules and where they come from, what each area uses and how
-it is configured, what the customer added by hand (fields, automations, scheduled actions,
-groups), what their own modules define and override, and what changed since the last
-reading. Call `business_index` before exploring the database or the code, then
-`business_area`, `business_fact` and `business_changes` for details. It holds no records.
-The process forms, their cases and the tickets live in the Dooservice panel, not in this
-console: you only see the reading. When the reading says a field was made in Odoo's
-screens, say so: moving it into a module keeps it through updates.
-
 ## Tools
 
 Use the `dooservice` tools first: `odoo_read`, `odoo_write`, `odoo_settings`,
@@ -111,7 +99,7 @@ method is written, an error that names an unknown API, or when porting.
   archiving to deleting.
 - **No `x_` in a module.** Odoo keeps that prefix for fields made by hand in the
   interface, and Studio's are `x_studio_…`. A field a module defines has a plain name,
-  like Odoo's own. The `x_` fields the reading lists as made by hand stay as they are.
+  like Odoo's own. The `x_` fields somebody made by hand stay as they are.
   The one exception is **adopting**: when a module takes in what somebody made by hand,
   it declares those fields with their `x_` name, type and options exactly as they are,
   so no data moves. Never a new `x_` field, adopting or not.

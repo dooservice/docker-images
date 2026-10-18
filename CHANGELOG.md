@@ -10,7 +10,7 @@ las notas de versión del agente: ver «Cómo se escriben» en
 
 El resto de la entrada, si hace falta, es técnico.
 
-## [20261017-2] — 2026-10-17
+## [20261018] — 2026-10-18
 
 ### Novedades
 - es: Si tu Odoo de producción falla (por ejemplo, no puede abrir su base de datos), quien

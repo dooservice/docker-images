@@ -10,7 +10,7 @@ las notas de versión del agente: ver «Cómo se escriben» en
 
 El resto de la entrada, si hace falta, es técnico.
 
-## [20261020] — 2026-10-20
+## [20261020-2] — 2026-10-20
 
 ### Novedades
 - es: La IA de la consola configura Odoo mejor: sigue el método de un consultor funcional,

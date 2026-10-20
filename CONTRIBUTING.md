@@ -18,8 +18,9 @@ production, so changes are reviewed with that in mind.
    an Odoo image must serve its login page, a console must open a shell.
 3. Keep each pull request to one change, and say in it what you checked.
 
-Skills live in [dooservice/odoo-skills](https://github.com/dooservice/odoo-skills): change
-them there, not in `operator/skills`.
+The Odoo skills live in [dooservice/odoo-skills](https://github.com/dooservice/odoo-skills):
+change them there, not in `operator/skills`. The console's own skill, `dooservice-console`,
+lives here, in `operator/rootfs/opt/dooservice/ai/skills/dooservice/`.
 
 ## Style
 

@@ -62,35 +62,20 @@ Load the matching skill before the work, not after:
   exists in this Odoo version. `odoo-web-guidelines` for anything under `static/`.
 - `odoo-security` for routes, `sudo()`, SQL, access rules, public methods.
 - `odoo-review` when asked to review, and on your own code before publishing.
-- `odoo-git` for commits; `dooservice-console` for the commands and publishing.
+- `odoo-git` for commits.
 - `odoo-upgrade` to port a module or to keep data through a model change.
 
-## Tools
+## Tools and commands
 
-Use the `dooservice` tools first: `odoo_read`, `odoo_write`, `odoo_settings`,
-`module_install`, `module_update`, `odoo_logs`, `odoo_find`. They go through the ORM, come
-back trimmed, and refuse what needs the user's yes until you call again with
-`confirmed=true` after asking. The terminal is for what they do not cover:
+Load `dooservice-console` before the first action: it has the `dooservice` tools
+(`odoo_read`, `odoo_write`, `odoo_settings`, `module_install`, `module_update`,
+`odoo_logs`, `odoo_find`), the `dooservice` command, the code loop and publishing. Use the
+tools first; they refuse what needs the user's yes until you call again with
+`confirmed=true` after asking. The other skills are written for any Odoo:
+`dooservice-console` says how to run their steps here.
 
-- `dooservice shell`: Odoo shell on this database. Pipe a script in with a heredoc and
-  end it with `env.cr.commit()`, or nothing is saved.
-- `psql`: **read-only**, for looking and diagnosing. Data changes go through the ORM.
-- `dooservice install <mod>` the first time, `dooservice update <mod>` after a change,
-  then `dooservice restart` after Python changes and `dooservice logs -n 200` on errors.
-- `dooservice test <mod>`; `dooservice status`, `dooservice logs -f`, `dooservice storage`.
-- `odoo-bin` already carries the database, addons path and data directory: never pass
-  them. Stream command output as it comes.
-
-## The code loop
-
-1. Edit in `/mnt/addons`. Prefer extending standard models and views (`_inherit`).
-2. Install or update, restart, read the logs, run the tests. For new modules, ask
-   whether the user wants tests, tours and demo data.
-3. Ask the user to check it at `$DOOSERVICE_BUILD_URL`.
-4. Commit, then `dooservice publish` (see `odoo-git`). Give the user the links.
-
-Search `/usr/lib/python3/dist-packages/odoo` when `odoo-reference` does not answer: how a
-method is written, an error that names an unknown API, or when porting.
+For new modules, prefer extending standard models and views (`_inherit`), and ask whether
+the user wants tests, tours and demo data.
 
 ## Rules
 
@@ -107,8 +92,8 @@ method is written, an error that names an unknown API, or when porting.
   through `dooservice publish`. The git identity is already the user's.
 - **Unpublished code is lost at the next deploy**, which resets the repository to the
   remote branch. Commit as you go; publish before the session ends.
-- Configuration does not travel to production on its own: summarize what you changed so
-  the user can repeat it there.
+- Configuration does not travel to production on its own: leave the change note of
+  `odoo-functional` so the user can repeat it there.
 - One environment only: never reach another database, environment or production.
 - The data may be a neutralized clone of production: real customer data. Never export
   it or send it anywhere.

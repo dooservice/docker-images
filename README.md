@@ -59,16 +59,16 @@ own, and it holds no git credentials.
 It adds:
 
 - **Claude Code, opencode and rtk**, pinned to a version, with auto-update off.
-- **Two modes for the AI**, chosen in the panel:
-  - **Code**: works in the repository at `/mnt/addons`; changes leave as pull requests
-    through `dooservice publish`.
-  - **Functional**: configures Odoo through its data and writes no code; the repository
-    is mounted read-only.
+- **One AI session** that configures Odoo through its data first and writes code only when
+  configuration cannot do it, in the repository at `/mnt/addons`; code leaves as pull
+  requests through `dooservice publish`.
 - **Production rules**: on a production environment the console writes only once the
   backup it makes as it opens is ready, and the AI changes data only through Odoo, after
   the person approves each change.
 - **Skills** from [dooservice/odoo-skills](https://github.com/dooservice/odoo-skills), the
-  ones for the image's Odoo version. They are a submodule at `operator/skills`.
+  ones for the image's Odoo version and the common ones, a submodule at `operator/skills`;
+  and `dooservice-console`, this console's own, in
+  `operator/rootfs/opt/dooservice/ai/skills/dooservice/`.
 - **The `dooservice` command**: install, update and test modules, open a shell, and ask
   the agent to restart the environment or show its logs.
 - **Wrappers** for `psql` and `odoo-bin` that connect to the environment's database

@@ -10,6 +10,26 @@ las notas de versión del agente: ver «Cómo se escriben» en
 
 El resto de la entrada, si hace falta, es técnico.
 
+## [20261020] — 2026-10-20
+
+### Novedades
+- es: La IA de la consola configura Odoo mejor: sigue el método de un consultor funcional,
+  revisa lo que hay antes de cambiarlo, comprueba el resultado y te deja una nota con cada
+  cambio para repetirlo en producción. Conoce más áreas: impuestos, posiciones fiscales,
+  productos, importaciones, compras, CRM, correo, reportes e idiomas.
+- en: The console's AI configures Odoo better: it follows a functional consultant's method,
+  reads what is there before changing it, checks the result and leaves you a note of each
+  change so you can repeat it in production. It knows more areas: taxes, fiscal positions,
+  products, imports, purchases, CRM, mail, reports and languages.
+
+### Changed
+- `operator`: skills de odoo-skills 1.0.0. `odoo-functional` pasa a `odoo/common` y se
+  instala con las de código; ya no hay grupo `functional`.
+- `dooservice-console` vive en esta imagen (`rootfs/opt/dooservice/ai/skills/dooservice/`),
+  al día con producción y con las herramientas `odoo_*` y `module_*`.
+- `AGENTS.md` deja las herramientas, los comandos y el bucle de código a
+  `dooservice-console`.
+
 ## [20261018] — 2026-10-18
 
 ### Novedades

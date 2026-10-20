@@ -45,8 +45,6 @@ RUN mkdir -p /opt/ai \
 COPY rootfs/ /
 COPY skills/odoo/${ODOO_VERSION}/ /opt/dooservice/ai/skills/code/
 COPY skills/odoo/common/ /opt/dooservice/ai/skills/code/
-COPY skills/dooservice/dooservice-console/ /opt/dooservice/ai/skills/dooservice/dooservice-console/
-COPY skills/dooservice/odoo-functional/ /opt/dooservice/ai/skills/functional/odoo-functional/
 RUN chmod 755 /usr/local/bin/claude /usr/local/bin/opencode /usr/local/bin/odoo-bin /usr/local/bin/dooservice /usr/local/bin/psql \
  && find /opt/dooservice/ai -type f -exec chmod 644 {} + \
  && chmod 644 /opt/dooservice/lib/* /opt/dooservice/mcp/* /opt/dooservice/build/* /etc/profile.d/dooservice.sh \

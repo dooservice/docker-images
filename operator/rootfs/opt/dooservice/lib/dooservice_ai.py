@@ -75,7 +75,7 @@ class Workspace:
     repository when the project has one, its home otherwise, where it cannot edit files.
     On production it never has the repository, and asks before each thing that writes."""
 
-    SKILL_GROUPS = ("code", "dooservice", "functional")
+    SKILL_GROUPS = ("code", "dooservice")
 
     def __init__(self):
         self.has_repository = os.path.isdir(os.path.join(REPOSITORY, ".git"))

@@ -111,7 +111,7 @@ jobs:
           for version in $(jq -r '.[]' <<< "${OFFERED}"); do
             test -d "operator/skills/odoo/${version}" || { echo "::error::no skills for ${version}"; exit 1; }
           done
-          for skill in operator/skills/odoo/*/*/SKILL.md operator/skills/dooservice/*/SKILL.md; do
+          for skill in operator/skills/odoo/*/*/SKILL.md operator/rootfs/opt/dooservice/ai/skills/dooservice/*/SKILL.md; do
             name="$(basename "$(dirname "${skill}")")"
             grep -q "^name: ${name}$" "${skill}" || { echo "::error::${skill} is not named ${name}"; exit 1; }
           done

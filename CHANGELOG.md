@@ -10,6 +10,20 @@ las notas de versión del agente: ver «Cómo se escriben» en
 
 El resto de la entrada, si hace falta, es técnico.
 
+## [20261030-3] — 2026-10-30
+
+### Novedades
+- es: La IA de la consola es más precisa y más ligera: lee primero un mapa breve y abre
+  solo la parte que necesita cada tarea, así responde con menos contexto (hasta un 34 %
+  menos) y acierta más con los nombres y valores de tu versión de Odoo.
+- en: The console's AI is more accurate and lighter: it reads a short map first and opens
+  only the part each task needs, so it answers with less context (up to 34% less) and
+  gets the names and values of your Odoo version right more often.
+
+### Changed
+- `operator`: skills de odoo-skills 2.0.0 (información por capas, descripciones con
+  valores exactos).
+
 ## [20261030-2] — 2026-10-30
 
 ### Novedades

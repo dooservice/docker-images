@@ -10,6 +10,19 @@ las notas de versión del agente: ver «Cómo se escriben» en
 
 El resto de la entrada, si hace falta, es técnico.
 
+## [20261030-2] — 2026-10-30
+
+### Novedades
+- es: La IA de la consola acierta más con la versión de Odoo que usas: antes de escribir
+  revisa los nombres que cambian entre versiones (permisos, grupos, impuestos, tarifas,
+  diarios de banco...), así que ya no mezcla código o campos de otra versión.
+- en: The console's AI gets your Odoo version right more often: before writing, it checks
+  the names that change between versions (access rights, groups, taxes, pricelists, bank
+  journals...), so it no longer mixes in code or fields from another version.
+
+### Changed
+- `operator`: skills de odoo-skills 1.1.1 (descripciones con los nombres de cada versión).
+
 ## [20261030] — 2026-10-30
 
 ### Novedades

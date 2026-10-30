@@ -10,6 +10,24 @@ las notas de versión del agente: ver «Cómo se escriben» en
 
 El resto de la entrada, si hace falta, es técnico.
 
+## [20261030] — 2026-10-30
+
+### Novedades
+- es: La IA de la consola conoce ahora todo Odoo Community, de la versión 16 a la 20:
+  cada aplicación y cada módulo tiene su flujo paso a paso (contabilidad, ventas, compras,
+  inventario, fabricación, reparaciones, Punto de Venta, sitio web, marketing, eventos,
+  proyectos, recursos humanos, flota y ajustes), y al programar conoce cada tipo de campo,
+  vista, acción y método de tu versión. Escribe siempre para la versión que usas.
+- en: The console's AI now knows all of Odoo Community, from version 16 to 20: every app
+  and module has its step-by-step flow (accounting, sales, purchase, inventory,
+  manufacturing, repairs, Point of Sale, website, marketing, events, projects, HR, fleet
+  and settings), and when coding it knows every field type, view, action and method of
+  your version. It always writes for the version you run.
+
+### Changed
+- `operator`: skills de odoo-skills 1.1.0 (70 recetas, guías de desarrollo completas por
+  versión, sin localizaciones).
+
 ## [20261020-2] — 2026-10-20
 
 ### Novedades

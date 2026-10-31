@@ -33,11 +33,11 @@ variable "SOURCE_COMMIT" {
 variable "ADDONS_COMMITS" {
   type = map(string)
   default = {
-    "16.0" = "d44c567db80a01d38c1dc3ff20874c167e443163"
-    "17.0" = "2213db622f3a7997bc0e9908ce0f608d39cb9fda"
-    "18.0" = "43e1a106350b16da09952973997809edae1a1b06"
-    "19.0" = "30fcc77afb728d3bcf90baabeeb880bd77438c2a"
-    "20.0" = "60269b95f3279bc4a17bf9bbe8539d4f53f78734"
+    "16.0" = "4514c57bd8b76219f2dd07815e9276e73752e686"
+    "17.0" = "f4081dfd0b891a3bb747c1461eaa45b5909544f0"
+    "18.0" = "a8f8ec7ca52104c346fcbb3b6365d0bf5ef7ea73"
+    "19.0" = "5f2d4489736599133751f9c5a309c6e10a36fb6e"
+    "20.0" = "c53251d19a30f00c5db499485202618eae06f6cf"
   }
 }
 

@@ -2,10 +2,7 @@ blank_issues_enabled: false
 contact_links:
   - name: Report a vulnerability
     url: https://github.com/dooservice/docker-images/security/advisories/new
-    about: Privately, never in a public issue.
-  - name: Report a vulnerability by email
-    url: mailto:security@dooservice.sh
-    about: If you cannot use GitHub's private reporting.
+    about: Privately, never in a public issue; or write to security@dooservice.sh.
   - name: Get help
-    url: mailto:support@dooservice.sh
-    about: Questions about Dooservice and its images.
+    url: https://dooservice.sh
+    about: Questions about Dooservice and its images go to support@dooservice.sh.

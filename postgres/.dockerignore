@@ -1,0 +1,11 @@
+**/__pycache__
+**/*.py[cod]
+**/.ruff_cache
+**/*.swp
+**/*.swo
+**/*~
+**/.#*
+**/.DS_Store
+**/.idea
+**/.vscode
+.dockerignore

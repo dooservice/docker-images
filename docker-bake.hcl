@@ -41,6 +41,19 @@ variable "ADDONS_COMMITS" {
   }
 }
 
+# The official odoo image each version is built on, by digest: a revision is built from
+# exactly these bytes, and a new digest arrives as a reviewed change (Renovate proposes it).
+variable "ODOO_DIGESTS" {
+  type = map(string)
+  default = {
+    "16.0" = "sha256:0f36a5002a200bb1649771c2cb9403ca5392d7ac4bb23f9ad500b339df3f5a3a"
+    "17.0" = "sha256:8779f8157ddcc37b84014c94646073f46fd4ad776b7a5d95fc3b0dc73a24a8fa"
+    "18.0" = "sha256:9668abacd894276ed009e8db7db1d1ffb8068af6982f76a3400ed0d68e40432d"
+    "19.0" = "sha256:27f920e002c43a1af7022a68f3cc17db71a2f9f3348800cb050721ce54893e49"
+    "20.0" = "sha256:d5e3a26baa044867c826dddc09058f10e2582706bf83c146ea04fea889720c76"
+  }
+}
+
 function "versions" {
   params = []
   result = [for version in split(",", ODOO_VERSIONS) : trimspace(version)]
@@ -85,6 +98,7 @@ target "odoo" {
   context = "odoo"
   args = {
     ODOO_VERSION  = version
+    ODOO_DIGEST   = ODOO_DIGESTS[version]
     ADDONS_COMMIT = ADDONS_COMMITS[version]
   }
   labels = merge(labels("dooservice-odoo", "Odoo ${version} as Dooservice runs it", "${version}-${REVISION}"), {

@@ -3,7 +3,8 @@
 # Built with `docker buildx bake` (docker-bake.hcl at the repository's root).
 
 ARG ODOO_VERSION=19.0
-FROM odoo:${ODOO_VERSION}
+ARG ODOO_DIGEST
+FROM odoo:${ODOO_VERSION}@${ODOO_DIGEST}
 
 USER root
 

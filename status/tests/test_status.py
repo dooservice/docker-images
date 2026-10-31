@@ -1,6 +1,6 @@
 """The status page: which card an address gets, and what the page shows of it.
 
-    cd status && python3 -m unittest discover tests
+cd status && python3 -m unittest discover tests
 """
 
 import json

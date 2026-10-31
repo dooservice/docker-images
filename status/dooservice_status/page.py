@@ -67,7 +67,11 @@ class Page:
 
     @staticmethod
     def choices() -> str:
-        return '<div class="choices">' + "".join(
-            f'<div><a class="btn{kind}" href="{url}">{label}</a><small>{caption}</small></div>'
-            for kind, url, label, caption in CHOICES
-        ) + "</div>"
+        return (
+            '<div class="choices">'
+            + "".join(
+                f'<div><a class="btn{kind}" href="{url}">{label}</a><small>{caption}</small></div>'
+                for kind, url, label, caption in CHOICES
+            )
+            + "</div>"
+        )

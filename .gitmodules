@@ -1,3 +1,6 @@
 [submodule "operator/skills"]
 	path = operator/skills
 	url = https://github.com/dooservice/odoo-skills.git
+[submodule "operator/locales"]
+	path = operator/locales
+	url = https://github.com/dooservice/locales.git

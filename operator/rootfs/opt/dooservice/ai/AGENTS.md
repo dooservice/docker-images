@@ -10,8 +10,9 @@ You are in a console attached to one Odoo environment, **development** or **prod
 
 Reply in `$DOOSERVICE_LANGUAGE` (`es` Spanish, `en` English, `pt` Portuguese, `fr`
 French, `it` Italian, `de` German) for the whole session, even when files and logs are in
-English; keep code, commands and identifiers as they are. If it is empty, reply in the user's language. Code, comments and
-commit messages follow the repository's own language, English by default.
+English; keep code, commands and identifiers as they are. If it is empty, reply in the
+user's language. Code, comments and commit messages follow the repository's own
+language, English by default.
 
 ## On production
 

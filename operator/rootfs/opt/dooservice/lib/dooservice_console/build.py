@@ -1,9 +1,10 @@
 """What the image prepares once, at build time, so each session starts ready.
 
-opencode installs `@opencode-ai/plugin` with npm the first time it finds a plugin in its
-config directory, and every console starts with an empty home: that was ten seconds of a
-blank screen at the start of every session. It is run here once, with the rtk plugin in
-place, and the resulting directory is kept for the launcher to copy into each session.
+The AI tools' settings are merged from their layers (`settings`). Then opencode: it
+installs `@opencode-ai/plugin` with npm the first time it finds a plugin in its config
+directory, and every console starts with an empty home: that was ten seconds of a blank
+screen at the start of every session. It is run here once, with the rtk plugin in place,
+and the resulting directory is kept for the launcher to copy into each session.
 
 Run as `python3 -m dooservice_console.build` from the Dockerfile.
 """
@@ -30,6 +31,7 @@ from .constants import (
     READ_BYTES,
     SETTINGS_FILES,
 )
+from .settings import SettingsLayers
 
 
 class OpencodePlugins:
@@ -68,4 +70,5 @@ class OpencodePlugins:
 
 
 if __name__ == "__main__":
+    SettingsLayers().write()
     OpencodePlugins().prepare()

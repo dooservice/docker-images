@@ -4,7 +4,6 @@
         "/opt/dooservice/ai/AGENTS.md"
     ],
     "lsp": false,
-    "permission": "allow",
     "autoupdate": false,
     "mcp": {
         "dooservice": {

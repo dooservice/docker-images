@@ -1,9 +1,4 @@
 {
-    "$schema": "https://opencode.ai/config.json",
-    "instructions": [
-        "/opt/dooservice/ai/AGENTS.md"
-    ],
-    "lsp": false,
     "permission": {
         "edit": "deny",
         "read": {
@@ -27,18 +22,6 @@
         "webfetch": "allow",
         "dooservice_odoo_write": "ask",
         "dooservice_odoo_settings": "ask"
-    },
-    "autoupdate": false,
-    "mcp": {
-        "dooservice": {
-            "type": "local",
-            "command": [
-                "python3",
-                "-m",
-                "dooservice_mcp"
-            ],
-            "enabled": true
-        }
     },
     "tools": {
         "dooservice_module_*": false

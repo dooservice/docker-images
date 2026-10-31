@@ -1,32 +1,15 @@
 {
-    "$schema": "https://json.schemastore.org/claude-code-settings.json",
     "skipDangerousModePermissionPrompt": true,
     "permissions": {
         "defaultMode": "bypassPermissions",
         "allow": [
-            "Read(/opt/dooservice/ai/**)",
-            "Read(/usr/lib/python3/dist-packages/odoo/**)",
-            "Read(/mnt/addons/**)",
-            "Edit(/mnt/addons/**)",
             "Bash(odoo-bin:*)",
             "Bash(dooservice:*)",
-            "Bash(psql:*)",
             "Bash(python3:*)",
-            "Bash(git:*)",
-            "Bash(echo *)",
-            "Bash(echo)",
             "Bash(sed *)",
             "mcp__dooservice"
         ]
     },
-    "env": {
-        "DISABLE_AUTOUPDATER": "1"
-    },
-    "attribution": {
-        "commit": "",
-        "pr": ""
-    },
-    "tui": "fullscreen",
     "hooks": {
         "PreToolUse": [
             {

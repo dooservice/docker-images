@@ -1,0 +1,9 @@
+{
+    "permissions": {
+        "allow": [
+            "Read(/mnt/addons/**)",
+            "Edit(/mnt/addons/**)",
+            "Bash(git:*)"
+        ]
+    }
+}

@@ -83,6 +83,21 @@ SETTINGS_FILES = {
         PRODUCTION: f"{AI_DIR}/opencode-production.json",
     },
 }
+#: The layers each settings file is merged from at build time: a base per tool and overlays.
+LAYERS_DIR = f"{AI_DIR}/layers"
+#: The layers of each tool's settings, by case, in the order they are merged.
+SETTINGS_LAYERS = {
+    "claude": {
+        DEVELOPMENT: ("base", "unattended", DEVELOPMENT),
+        NO_REPOSITORY: ("base", "unattended", NO_REPOSITORY),
+        PRODUCTION: ("base", PRODUCTION),
+    },
+    "opencode": {
+        DEVELOPMENT: ("base", DEVELOPMENT),
+        NO_REPOSITORY: ("base", NO_REPOSITORY),
+        PRODUCTION: ("base", PRODUCTION),
+    },
+}
 #: What opencode's plugins need, installed once at build time and copied into each session.
 PLUGINS_TEMPLATE = "/opt/dooservice/opencode-config"
 #: The home the build uses to let opencode install its plugins.

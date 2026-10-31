@@ -34,7 +34,8 @@
             "type": "local",
             "command": [
                 "python3",
-                "/opt/dooservice/mcp/server.py"
+                "-m",
+                "dooservice_mcp"
             ],
             "enabled": true
         }

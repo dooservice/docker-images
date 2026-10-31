@@ -4,13 +4,12 @@ Reading and changing Odoo goes through the ORM in `odoo-bin shell`, so Odoo's ow
 run; installing, updating and the log go through the `dooservice` command. The agent is
 given these first and the terminal second: answers come back trimmed, and what needs the
 person's yes, or is not allowed here, is refused with words that say so.
+
+Started as `python3 -m dooservice_mcp`.
 """
 
-import sys
+from .catalog import TOOLS
+from .constants import SERVER_NAME, SERVER_VERSION
+from .protocol import McpServer
 
-sys.path.insert(0, "/opt/dooservice/mcp")
-
-from catalog import TOOLS  # noqa: E402
-from protocol import McpServer  # noqa: E402
-
-McpServer("dooservice", "1.0.0", TOOLS).serve()
+McpServer(SERVER_NAME, SERVER_VERSION, TOOLS).serve()

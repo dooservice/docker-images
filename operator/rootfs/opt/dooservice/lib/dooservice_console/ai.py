@@ -25,6 +25,7 @@ environment without anyone seeing it.
 """
 
 import base64
+import contextlib
 import fcntl
 import json
 import os
@@ -35,39 +36,32 @@ import sys
 import termios
 import tty
 
-from dooservice_constants import (
-    AI_DIR,
+from .constants import (
+    ANNOUNCE_CLOSE,
+    ANNOUNCE_OPEN,
     CTRL_Z,
     DEVELOPMENT,
     FRAME_SECONDS,
-    LANGUAGE_NAMES,
+    INSTRUCTIONS,
+    KEYS_BYTES,
     LOCK_PATH,
     LOGIN_URLS,
+    NO_REPOSITORY,
+    NUL,
     PRODUCTION,
+    READ_BYTES,
     REPOSITORY,
     SEEN_BYTES,
     SESSION_MARK,
+    SETTINGS_FILES,
+    SKILL_GROUPS,
     SKILLS_DIR,
+    STAGE_VARIABLE,
     URL_TERMINATORS,
 )
-from dooservice_control import ControlClient, ControlError
-from dooservice_splash import Splash
-from dooservice_terminal import TerminalText
-
-
-def language_rule():
-    """The one sentence that keeps the agent in the person's language all session.
-
-    Said outright rather than left to the agent: it starts in the language it is
-    written to, and drifts to English after a few screens of logs and source code.
-    """
-    code = os.environ.get("DOOSERVICE_LANGUAGE", "")
-    name = LANGUAGE_NAMES.get(code.replace("-", "_").split("_")[0].lower()) if code else None
-    if name is None:
-        return ("Always reply to the user in the language they write in, for the whole session, even when "
-                "files, logs, code or command output are in another language.")
-    return (f"Always reply to the user in {name}, for the whole session, even when files, logs, code or "
-            "command output are in another language. Keep code, commands and identifiers as they are.")
+from .control import ControlClient, ControlError
+from .splash import Splash
+from .terminal import TerminalText
 
 
 class Workspace:
@@ -75,16 +69,16 @@ class Workspace:
     repository when the project has one, its home otherwise, where it cannot edit files.
     On production it never has the repository, and asks before each thing that writes."""
 
-    SKILL_GROUPS = ("code", "dooservice")
-
     def __init__(self):
         self.has_repository = os.path.isdir(os.path.join(REPOSITORY, ".git"))
         self.project = REPOSITORY if self.has_repository else os.path.expanduser("~")
-        self.instructions = f"{AI_DIR}/AGENTS.md"
-        production = os.environ.get("DOOSERVICE_STAGE") == PRODUCTION
-        suffix = "-production" if production else "" if self.has_repository else "-no-repository"
-        self.claude_settings = f"{AI_DIR}/settings{suffix}.json"
-        self.opencode_config = f"{AI_DIR}/opencode{suffix}.json"
+        self.instructions = INSTRUCTIONS
+        if os.environ.get(STAGE_VARIABLE) == PRODUCTION:
+            case = PRODUCTION
+        else:
+            case = DEVELOPMENT if self.has_repository else NO_REPOSITORY
+        self.claude_settings = SETTINGS_FILES["claude"][case]
+        self.opencode_config = SETTINGS_FILES["opencode"][case]
 
     def describe(self):
         return "with the project's repository" if self.has_repository else "without a repository, to configure only"
@@ -92,7 +86,7 @@ class Workspace:
     def link_skills(self, into):
         """Every skill, linked into the directory a tool reads them from."""
         os.makedirs(into, exist_ok=True)
-        for group in self.SKILL_GROUPS:
+        for group in SKILL_GROUPS:
             source = os.path.join(SKILLS_DIR, group)
             if not os.path.isdir(source):
                 continue
@@ -109,6 +103,8 @@ class Workspace:
 
 
 class AiSession:
+    """One AI tool's run: the guards before it, the terminal it runs in, the slot it holds."""
+
     def __init__(self, tool):
         self.tool = tool
         self.lock = None
@@ -121,7 +117,7 @@ class AiSession:
 
     def begin(self):
         """Every guard, in order. Exits with a sentence a person can act on."""
-        if os.environ.get("DOOSERVICE_STAGE") not in (DEVELOPMENT, PRODUCTION):
+        if os.environ.get(STAGE_VARIABLE) not in (DEVELOPMENT, PRODUCTION):
             self.refuse("AI sessions run on development, and on production when the organization allows it.")
         self.lock = open(LOCK_PATH, "w")
         try:
@@ -131,8 +127,7 @@ class AiSession:
         if "--version" in sys.argv or "--help" in sys.argv:
             return
         try:
-            for _ in self.platform.ask("ai_begin", {"tool": self.tool}):
-                pass
+            self.platform.settle("ai_begin", {"tool": self.tool})
         except ControlError as error:
             self.refuse(str(error))
         except OSError as error:
@@ -140,15 +135,14 @@ class AiSession:
         self.held = True
 
     def end(self):
+        """Give the AI slot back, once."""
         if self.held:
-            try:
-                for _ in self.platform.ask("ai_end", {"tool": self.tool}):
-                    pass
-            except (ControlError, OSError):
-                pass
+            with contextlib.suppress(ControlError, OSError):
+                self.platform.settle("ai_end", {"tool": self.tool})
             self.held = False
 
     def refuse(self, message):
+        """Stop before anything starts, with a sentence a person can act on."""
         sys.stderr.write(f"\n  {message}\n\n")
         sys.exit(1)
 
@@ -162,13 +156,13 @@ class AiSession:
         """
         splash = Splash(tool_name)
         try:
-            pid, master = pty.fork()
-            if pid == 0:
+            child, master = pty.fork()
+            if child == 0:
                 os.execv(command[0], command)
             self.copy_window_size(master)
             splash.start()
             self.copy(master, splash)
-            os.waitpid(pid, 0)
+            os.waitpid(child, 0)
         except Exception as error:
             splash.stop()
             sys.stderr.write(f"Error launching the AI agent: {error}\n")
@@ -204,7 +198,7 @@ class AiSession:
         sources = [master, stdin]
         try:
             while master in sources:
-                ready, _, _ = select.select(sources, [], [], FRAME_SECONDS if splash.active else None)
+                ready = select.select(sources, [], [], FRAME_SECONDS if splash.active else None)[0]
                 if not ready:
                     if splash.finished():
                         self.reveal(splash, stdout)
@@ -214,7 +208,7 @@ class AiSession:
                 if master in ready:
                     self.copy_window_size(master)
                     try:
-                        data = os.read(master, 65536)
+                        data = os.read(master, READ_BYTES)
                     except OSError:
                         data = b""
                     if not data:
@@ -229,17 +223,18 @@ class AiSession:
                         continue
                     os.write(stdout, data)
                 if stdin in ready:
-                    data = os.read(stdin, 1024)
+                    data = os.read(stdin, KEYS_BYTES)
                     if not data:
                         sources.remove(stdin)
                         continue
-                    os.write(master, data.replace(CTRL_Z, b"\x00"))
+                    os.write(master, data.replace(CTRL_Z, NUL))
         finally:
             if saved is not None:
                 termios.tcsetattr(stdin, termios.TCSAFLUSH, saved)
 
     @staticmethod
     def copy_window_size(descriptor):
+        """The person's terminal size, given to the agent's."""
         try:
             size = fcntl.ioctl(sys.stdout.fileno(), termios.TIOCGWINSZ, struct.pack("HHHH", 0, 0, 0, 0))
             fcntl.ioctl(descriptor, termios.TIOCSWINSZ, size)
@@ -263,13 +258,15 @@ class AiSession:
             return data
         self.announced.add(url)
         announcement = json.dumps({"action": "open_url", "url": url.decode("utf-8", errors="ignore")})
-        return data + b"\x1b]9;" + base64.b64encode(announcement.encode()) + b"\x07"
+        return data + ANNOUNCE_OPEN + base64.b64encode(announcement.encode()) + ANNOUNCE_CLOSE
 
     def linked_login(self):
+        """The last login URL printed as a terminal link."""
         links = TerminalText.links(self.seen)
         return next((link for link in reversed(links) if link.startswith(LOGIN_URLS)), None)
 
     def printed_login(self):
+        """The last login URL printed as plain text, once its end has arrived."""
         text = TerminalText.plain(self.seen)
         start = max(text.rfind(prefix) for prefix in LOGIN_URLS)
         if start < 0:

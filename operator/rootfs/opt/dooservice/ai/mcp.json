@@ -3,7 +3,7 @@
         "dooservice": {
             "type": "stdio",
             "command": "python3",
-            "args": ["/opt/dooservice/mcp/server.py"]
+            "args": ["-m", "dooservice_mcp"]
         }
     }
 }

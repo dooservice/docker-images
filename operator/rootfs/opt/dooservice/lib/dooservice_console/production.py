@@ -12,16 +12,19 @@ import json
 import os
 import time
 
-from dooservice_constants import CHANGES_UNTIL, READ_ONLY, WRITE_CREDENTIALS
+from .constants import CHANGES_UNTIL, PRODUCTION, READ_ONLY, STAGE_VARIABLE, WRITE_CREDENTIALS
 
 
 class Production:
+    """Whether this console is on production, and what it may do there right now."""
+
     @staticmethod
     def here():
-        return os.environ.get("DOOSERVICE_STAGE") == "production"
+        return os.environ.get(STAGE_VARIABLE) == PRODUCTION
 
     @staticmethod
     def changes_allowed():
+        """Anywhere but production; there, until the time the platform wrote once the backup was ready."""
         if not Production.here():
             return True
         try:
@@ -62,5 +65,6 @@ class Production:
 
     @staticmethod
     def require_changes(what):
+        """Refuse what changes production before the opening backup is ready."""
         if Production.here() and not Production.changes_allowed():
             raise SystemExit(f"{what} on production waits for the backup this session made as it opened.")

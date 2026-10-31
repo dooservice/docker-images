@@ -1,0 +1,20 @@
+[tool.ruff]
+target-version = "py39"
+line-length = 120
+src = ["rootfs/opt/dooservice/lib"]
+extend-include = [
+    "rootfs/usr/local/bin/claude",
+    "rootfs/usr/local/bin/dooservice",
+    "rootfs/usr/local/bin/odoo-bin",
+    "rootfs/usr/local/bin/opencode",
+    "rootfs/usr/local/bin/psql",
+    "rootfs/opt/dooservice/git-hooks/dispatch",
+]
+extend-exclude = ["skills"]
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "UP", "B", "SIM", "N", "C4", "RET", "PIE", "PL"]
+ignore = ["N818", "PLR0912", "PLR0913", "PLR2004", "PLW2901", "SIM115", "UP006", "UP007", "UP035", "UP045"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["dooservice_console", "dooservice_mcp"]

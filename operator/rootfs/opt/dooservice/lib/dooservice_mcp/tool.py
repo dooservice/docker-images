@@ -4,6 +4,8 @@ import json
 
 
 class Tool:
+    """The base of every tool: its description for the client and how it runs."""
+
     name = ""
     description = ""
     schema: dict = {}

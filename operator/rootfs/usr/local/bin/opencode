@@ -1,74 +1,8 @@
 #!/usr/bin/env python3
-"""opencode, set up for the environment this console belongs to.
+"""opencode, set up for the environment this console belongs to (`dooservice_console.opencode`)."""
 
-Same arrangement as the Claude Code launcher: the binary is untouched, the configuration
-and the instructions come from /opt/dooservice/ai, and each person
-connects the provider of their choice from inside the session. Its plugins arrive already
-installed, copied from what the image prepared, instead of downloaded at every start.
-
-The sessions are kept: `OPENCODE_DB` is in the person's own directory for this
-environment, mounted into their consoles and nobody else's, while the login stays in this
-session's home and goes with it. The last session is picked up unless a new one was asked
-for.
-"""
-
-import json
-import os
-import shutil
-import sqlite3
-import subprocess
 import sys
 
-from dooservice_ai import AiSession, language_rule
+from dooservice_console.opencode import OpencodeLauncher
 
-HOME = os.path.expanduser("~")
-SESSION_CONFIG_DIR = os.path.join(HOME, ".config", "dooservice")
-OPENCODE_CONFIG_DIR = os.path.join(HOME, ".config", "opencode")
-RTK_PLUGIN = os.path.join(OPENCODE_CONFIG_DIR, "plugins", "rtk.ts")
-PLUGINS_TEMPLATE = "/opt/dooservice/opencode-config"
-SESSIONS_DB = os.environ.get("OPENCODE_DB") or os.path.join(HOME, ".local", "share", "opencode", "opencode.db")
-RESUME = os.environ.get("DOOSERVICE_AI_RESUME", "1") != "0"
-LOG = "/tmp/dooservice-ai.log"
-PASSTHROUGH = (
-    "completion", "acp", "mcp", "attach", "run", "debug", "providers", "agent", "upgrade", "uninstall", "serve",
-    "web", "models", "stats", "export", "import", "github", "pr", "session", "db", "auth",
-)
-
-session = AiSession("opencode")
-session.begin()
-
-if not os.path.exists(OPENCODE_CONFIG_DIR) and os.path.isdir(PLUGINS_TEMPLATE):
-    shutil.copytree(PLUGINS_TEMPLATE, OPENCODE_CONFIG_DIR, symlinks=True)
-
-session.workspace.link_skills(os.path.join(OPENCODE_CONFIG_DIR, "skills"))
-
-if not os.path.exists(RTK_PLUGIN):
-    try:
-        with open(LOG, "a") as log:
-            subprocess.run(["rtk", "init", "-g", "--opencode"], input="n\n", text=True, stdout=log, stderr=log)
-    except OSError:
-        pass
-
-os.makedirs(SESSION_CONFIG_DIR, exist_ok=True)
-language_file = os.path.join(SESSION_CONFIG_DIR, "LANGUAGE.md")
-with open(language_file, "w") as rule:
-    rule.write(f"# Language\n\n{language_rule()}\n")
-with open(session.workspace.opencode_config) as managed:
-    config = json.load(managed)
-config["instructions"] = [*config.get("instructions", []), language_file]
-session_config = os.path.join(SESSION_CONFIG_DIR, "opencode.json")
-with open(session_config, "w") as generated:
-    json.dump(config, generated)
-os.environ["OPENCODE_CONFIG"] = session_config
-args = sys.argv[1:]
-if not args or args[0] not in PASSTHROUGH:
-    args.append(session.workspace.project)
-    if RESUME and os.path.exists(SESSIONS_DB):
-        try:
-            with sqlite3.connect(SESSIONS_DB) as connection:
-                if connection.execute("SELECT COUNT(*) FROM session").fetchone()[0] > 0:
-                    args.append("--continue")
-        except sqlite3.Error:
-            pass
-
-session.execute(["/opt/ai/opencode", *args], "opencode")
+OpencodeLauncher(sys.argv[1:]).run()

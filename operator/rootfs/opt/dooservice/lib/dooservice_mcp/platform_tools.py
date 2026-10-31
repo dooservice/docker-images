@@ -4,17 +4,30 @@ its output trimmed to what an agent needs to read."""
 import os
 import subprocess
 
-from constants import DOOSERVICE, ODOO_SOURCE, REFERENCE, SOURCE_MATCHES, TAIL
-from gate import Gate
-from refusal import ToolRefused
-from tool import Tool
+from dooservice_console.constants import DOOSERVICE_COMMAND, ODOO_SOURCE
+
+from .constants import (
+    COMMAND_TIMEOUT_SECONDS,
+    LOG_LINES,
+    LOG_LINES_MAXIMUM,
+    LOGS_TIMEOUT_SECONDS,
+    MATCH_WIDTH,
+    REFERENCE,
+    SOURCE_MATCHES,
+    TAIL,
+)
+from .gate import Gate
+from .refusal import ToolRefused
+from .tool import Tool
 
 gate = Gate()
 
 
 class Command:
+    """A console command run for a tool, its output trimmed."""
+
     @staticmethod
-    def run(*args, timeout=900):
+    def run(*args, timeout=COMMAND_TIMEOUT_SECONDS):
         try:
             done = subprocess.run(args, capture_output=True, text=True, timeout=timeout, check=False)
         except subprocess.TimeoutExpired as late:
@@ -26,6 +39,8 @@ class Command:
 
 
 class ModuleInstall(Tool):
+    """Modules installed with `dooservice install`."""
+
     name = "module_install"
     description = "Install modules (comma-separated) in this database. Restart afterwards for Python code."
     schema = {"modules": {"type": "string"}}
@@ -33,29 +48,35 @@ class ModuleInstall(Tool):
 
     def run(self, arguments):
         gate.ensure_modules_allowed()
-        return Command.run(DOOSERVICE, "install", arguments["modules"])
+        return Command.run(DOOSERVICE_COMMAND, "install", arguments["modules"])
 
 
 class ModuleUpdate(ModuleInstall):
+    """Modules updated with `dooservice update`."""
+
     name = "module_update"
     description = "Update modules (comma-separated) in this database after their code or data changed."
 
     def run(self, arguments):
         gate.ensure_modules_allowed()
-        return Command.run(DOOSERVICE, "update", arguments["modules"])
+        return Command.run(DOOSERVICE_COMMAND, "update", arguments["modules"])
 
 
 class OdooLogs(Tool):
+    """The environment's Odoo log."""
+
     name = "odoo_logs"
     description = "The last lines of this environment's Odoo log, errors included."
     schema = {"lines": {"type": "integer"}}
 
     def run(self, arguments):
-        lines = min(int(arguments.get("lines") or 200), 1000)
-        return Command.run(DOOSERVICE, "logs", "-n", str(lines), timeout=60)
+        lines = min(int(arguments.get("lines") or LOG_LINES), LOG_LINES_MAXIMUM)
+        return Command.run(DOOSERVICE_COMMAND, "logs", "-n", str(lines), timeout=LOGS_TIMEOUT_SECONDS)
 
 
 class OdooFind(Tool):
+    """A text search of the reference or of Odoo's source."""
+
     name = "odoo_find"
     description = (
         "Search the odoo-reference of this version (models, fields, settings, XML ids) and, with source=true, "
@@ -72,6 +93,6 @@ class OdooFind(Tool):
             ["grep", "-rnF", "--include=*.md", "--include=*.py", "--include=*.xml", arguments["text"], where],
             capture_output=True, text=True, check=False,
         ).stdout.splitlines()
-        shown = [line.replace(where + "/", "")[:240] for line in found[:SOURCE_MATCHES]]
+        shown = [line.replace(where + "/", "")[:MATCH_WIDTH] for line in found[:SOURCE_MATCHES]]
         more = f"\n… {len(found) - SOURCE_MATCHES} more" if len(found) > SOURCE_MATCHES else ""
         return "\n".join(shown) + more if shown else "Nothing found."

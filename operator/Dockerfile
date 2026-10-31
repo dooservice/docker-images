@@ -44,32 +44,25 @@ RUN mkdir -p /opt/ai \
 COPY rootfs/ /
 COPY skills/odoo/${ODOO_VERSION}/ /opt/dooservice/ai/skills/code/
 COPY skills/odoo/common/ /opt/dooservice/ai/skills/code/
-RUN chmod 755 /usr/local/bin/claude /usr/local/bin/opencode /usr/local/bin/odoo-bin /usr/local/bin/dooservice /usr/local/bin/psql \
- && find /opt/dooservice/ai -type f -exec chmod 644 {} + \
- && chmod 644 /opt/dooservice/lib/* /opt/dooservice/mcp/* /opt/dooservice/build/* /etc/profile.d/dooservice.sh \
- && chmod 755 /opt/dooservice/mcp \
- && find /opt/dooservice/ai -type d -exec chmod 755 {} + \
- && chmod 644 /etc/gitconfig \
- && chmod 755 /opt/dooservice/git-hooks /opt/dooservice/git-hooks/dispatch \
- && for hook in applypatch-msg pre-applypatch post-applypatch pre-commit pre-merge-commit prepare-commit-msg \
-      commit-msg post-commit pre-rebase post-checkout post-merge pre-push post-rewrite; do \
-      ln -s dispatch "/opt/dooservice/git-hooks/${hook}"; \
-    done \
+ENV PYTHONPATH=/opt/dooservice/lib
+
+# Files keep the mode git gives them, executables included: here everyone may read them and
+# nobody but root may change them.
+RUN chmod -R a+rX,go-w /opt/dooservice /etc/profile.d/dooservice.sh /etc/gitconfig \
+      /usr/local/bin/claude /usr/local/bin/opencode /usr/local/bin/odoo-bin /usr/local/bin/dooservice \
+      /usr/local/bin/psql \
  && mkdir -p /home/dooservice \
  && chown dooservice:dooservice /home/dooservice \
- && usermod -d /home/dooservice dooservice
-
-RUN python3 /opt/dooservice/build/opencode_plugins.py \
- && chmod -R a+rX /opt/dooservice/opencode-config \
- && rm -rf /opt/dooservice/build
+ && usermod -d /home/dooservice dooservice \
+ && python3 -m dooservice_console.build \
+ && chmod -R a+rX /opt/dooservice/opencode-config
 
 ENV ODOO_VERSION=${ODOO_VERSION} \
     DISABLE_AUTOUPDATER=1 \
     TERM=xterm-256color \
     COLORTERM=truecolor \
     LANG=C.UTF-8 \
-    HOME=/home/dooservice \
-    PYTHONPATH=/opt/dooservice/lib
+    HOME=/home/dooservice
 
 USER dooservice
 WORKDIR /mnt/addons

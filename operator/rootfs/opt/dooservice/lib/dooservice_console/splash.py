@@ -16,37 +16,53 @@ it has nothing else to do, so frames and the tool's own output never interleave,
 ends the animation once the tool has something to show and the minimum has passed.
 """
 
+import contextlib
 import os
 import sys
 import time
 
-from dooservice_constants import (
+from .constants import (
     BAR_WIDTH,
+    DEFAULT_TERMINAL_SIZE,
+    ENVIRONMENT_VARIABLE,
     GRAY,
     LOGO,
     MINIMUM_SECONDS,
+    PROJECT_VARIABLE,
     RESET,
     SPINNER,
     STARTING,
+    STARTING_DEFAULT,
     TEAL,
     WHITE,
 )
+from .language import Language
 
 
-def color(rgb):
-    return f"\033[38;2;{rgb[0]};{rgb[1]};{rgb[2]}m"
+class Shade:
+    """A colour between two, as the terminal's escape for it."""
 
+    @staticmethod
+    def escape(rgb):
+        return f"\033[38;2;{rgb[0]};{rgb[1]};{rgb[2]}m"
 
-def blend(start, end, amount):
-    return tuple(round(a + (b - a) * amount) for a, b in zip(start, end))
+    @staticmethod
+    def blend(start, end, amount):
+        return tuple(round(first + (second - first) * amount) for first, second in zip(start, end))
+
+    @classmethod
+    def between(cls, amount):
+        """Teal at 0, white at 1."""
+        return cls.escape(cls.blend(TEAL, WHITE, amount))
 
 
 class Splash:
+    """The animation, drawn one frame at a time by the session's copy loop."""
+
     def __init__(self, tool_name):
-        code = os.environ.get("DOOSERVICE_LANGUAGE", "").replace("_", "-").partition("-")[0].lower()
-        self.title = f"{STARTING.get(code, 'Starting')} {tool_name}"
-        environment = os.environ.get("DOOSERVICE_ENVIRONMENT", "")
-        project = os.environ.get("DOOSERVICE_PROJECT", "")
+        self.title = f"{Language().pick(STARTING, STARTING_DEFAULT)} {tool_name}"
+        environment = os.environ.get(ENVIRONMENT_VARIABLE, "")
+        project = os.environ.get(PROJECT_VARIABLE, "")
         self.subtitle = " · ".join(part for part in ("dooservice", project, environment) if part)
         self.active = False
         self.frame = 0
@@ -75,45 +91,51 @@ class Splash:
         try:
             columns, rows = os.get_terminal_size(sys.stdout.fileno())
         except OSError:
-            columns, rows = 80, 24
+            columns, rows = DEFAULT_TERMINAL_SIZE
         width = max(len(line) for line in LOGO)
         top = max(1, (rows - len(LOGO) - 5) // 2)
         sweep = (self.frame * 1.5) % (width + 24) - 12
-        out = ["\0337"]
+        frame = ["\0337"]
         for index, line in enumerate(LOGO):
             left = max(1, (columns - width) // 2 + 1)
-            out.append(f"\033[{top + index};{left}H")
+            frame.append(f"\033[{top + index};{left}H")
             current = None
             for column, char in enumerate(line):
-                shade = color(blend(TEAL, WHITE, round(max(0.0, 1 - abs(column - sweep) / 6), 1)))
+                shade = Shade.between(round(max(0.0, 1 - abs(column - sweep) / 6), 1))
                 if char != " " and shade != current:
-                    out.append(shade)
+                    frame.append(shade)
                     current = shade
-                out.append(char)
+                frame.append(char)
         spinner = SPINNER[self.frame % len(SPINNER)]
         dots = "." * (self.frame // 4 % 4)
         title = f"{spinner}  {self.title}{dots:<3}"
-        head = self.frame % (BAR_WIDTH * 2)
-        head = head if head < BAR_WIDTH else BAR_WIDTH * 2 - head - 1
-        bar = "".join(
-            (color(blend(TEAL, WHITE, round(1 - abs(i - head) / 4, 1))) + "━") if abs(i - head) < 4
-            else (color(TEAL) + "─" if abs(i - head) == 4 else "─")
-            for i in range(BAR_WIDTH)
-        )
-        for offset, (text, visible, styled) in enumerate((
-            (title, len(title), color(TEAL) + title),
-            (bar, BAR_WIDTH, bar),
-            (self.subtitle, len(self.subtitle), GRAY + self.subtitle),
+        for offset, (visible, styled) in enumerate((
+            (len(title), Shade.escape(TEAL) + title),
+            (BAR_WIDTH, self.bar()),
+            (len(self.subtitle), GRAY + self.subtitle),
         )):
             left = max(1, (columns - visible) // 2 + 1)
-            out.append(f"\033[{top + len(LOGO) + 2 + offset};{left}H\033[2K\033[{left}G{styled}")
-        out.append(RESET + "\0338")
-        self.write("".join(out))
+            frame.append(f"\033[{top + len(LOGO) + 2 + offset};{left}H\033[2K\033[{left}G{styled}")
+        frame.append(RESET + "\0338")
+        self.write("".join(frame))
         self.frame += 1
+
+    def bar(self):
+        """The progress bar, with a light running back and forth along it."""
+        head = self.frame % (BAR_WIDTH * 2)
+        head = head if head < BAR_WIDTH else BAR_WIDTH * 2 - head - 1
+        cells = []
+        for cell in range(BAR_WIDTH):
+            distance = abs(cell - head)
+            if distance < 4:
+                cells.append(Shade.between(round(1 - distance / 4, 1)) + "━")
+            elif distance == 4:
+                cells.append(Shade.escape(TEAL) + "─")
+            else:
+                cells.append("─")
+        return "".join(cells)
 
     @staticmethod
     def write(text):
-        try:
+        with contextlib.suppress(OSError):
             os.write(sys.stdout.fileno(), text.encode())
-        except OSError:
-            pass

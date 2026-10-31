@@ -9,11 +9,13 @@ seeing a protocol error.
 import json
 import sys
 
-from constants import PROTOCOL_VERSION
-from refusal import ToolRefused
+from .constants import PROTOCOL_VERSION, UNKNOWN_METHOD
+from .refusal import ToolRefused
 
 
 class McpServer:
+    """Answers one client on stdin and stdout with the tools it was given."""
+
     def __init__(self, name, version, tools):
         self.name = name
         self.version = version
@@ -49,7 +51,7 @@ class McpServer:
             return {"result": {}}
         if method.startswith("notifications/"):
             return None
-        return {"error": {"code": -32601, "message": f"unknown method {method}"}}
+        return {"error": {"code": UNKNOWN_METHOD, "message": f"unknown method {method}"}}
 
     def call(self, name, arguments):
         tool = self.tools.get(name)

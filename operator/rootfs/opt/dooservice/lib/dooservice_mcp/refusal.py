@@ -2,4 +2,4 @@
 
 
 class ToolRefused(Exception):
-    pass
+    """The tool will not or could not do it; the message is for the agent."""

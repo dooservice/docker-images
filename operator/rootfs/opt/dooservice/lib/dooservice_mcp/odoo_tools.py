@@ -1,14 +1,16 @@
 """Reading and changing Odoo records and settings through the ORM, as tools."""
 
-from constants import COUNT, DOMAIN, READ, SETTINGS, TEXT, WRITE
-from gate import Gate
-from odoo_shell import OdooShell
-from tool import Tool
+from .constants import COUNT, DOMAIN, READ, READ_LIMIT, READ_MAXIMUM, SETTINGS, TEXT, WRITE
+from .gate import Gate
+from .odoo_shell import OdooShell
+from .tool import Tool
 
 shell, gate = OdooShell(), Gate()
 
 
 class OdooRead(Tool):
+    """How many records match, and the first ones."""
+
     name = "odoo_read"
     description = "Read records of an Odoo model: how many match, and the first ones with the fields asked for."
     schema = {"model": TEXT, "domain": DOMAIN, "fields": {"type": "array", "items": TEXT},
@@ -16,11 +18,13 @@ class OdooRead(Tool):
     required = ("model",)
 
     def run(self, arguments):
-        request = {**arguments, "limit": min(int(arguments.get("limit") or 20), 200)}
+        request = {**arguments, "limit": min(int(arguments.get("limit") or READ_LIMIT), READ_MAXIMUM)}
         return self.json(shell.run(READ, request))
 
 
 class OdooWrite(Tool):
+    """Records created or written through the ORM, once allowed and confirmed."""
+
     name = "odoo_write"
     description = (
         "Create records (values_list) or write values on the records a domain matches, through the ORM. "
@@ -39,6 +43,8 @@ class OdooWrite(Tool):
 
 
 class OdooSettings(Tool):
+    """Settings read, or changed the way the Settings screen does."""
+
     name = "odoo_settings"
     description = (
         "Read Settings fields (names), or change them (values) the way the Settings screen does, so their "

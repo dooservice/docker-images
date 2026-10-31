@@ -7,12 +7,15 @@ accounting, users. The tool refuses them once with what it would do, and the age
 back with `confirmed` after asking.
 """
 
-from constants import MANY_RECORDS, SENSITIVE_PREFIXES
-from dooservice_production import Production
-from refusal import ToolRefused
+from dooservice_console.production import Production
+
+from .constants import MANY_RECORDS, SENSITIVE_PREFIXES
+from .refusal import ToolRefused
 
 
 class Gate:
+    """Refuses what this session may not do yet, in words for the agent."""
+
     @staticmethod
     def production():
         return Production.here()

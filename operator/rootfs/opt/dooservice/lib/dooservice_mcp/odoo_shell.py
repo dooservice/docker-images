@@ -11,11 +11,15 @@ import json
 import os
 import subprocess
 
-from constants import LOG_TAIL, MARK, ODOO_BIN, SCRIPT, TIMEOUT_SECONDS
-from refusal import ToolRefused
+from dooservice_console.constants import ODOO_WRAPPER
+
+from .constants import LOG_TAIL, MARK, SCRIPT, TIMEOUT_SECONDS
+from .refusal import ToolRefused
 
 
 class OdooShell:
+    """One `odoo-bin shell` per call, its answer read back."""
+
     def run(self, program, request):
         """`program` sets `answer` from `request` and `env`; it is committed only when the
         request says `commit`."""
@@ -27,7 +31,7 @@ class OdooShell:
         }
         try:
             finished = subprocess.run(
-                [ODOO_BIN, "shell", "--log-level=warn"], input=SCRIPT, text=True,
+                [ODOO_WRAPPER, "shell", "--log-level=warn"], input=SCRIPT, text=True,
                 capture_output=True, env=environment, timeout=TIMEOUT_SECONDS, check=False,
             )
         except subprocess.TimeoutExpired as late:

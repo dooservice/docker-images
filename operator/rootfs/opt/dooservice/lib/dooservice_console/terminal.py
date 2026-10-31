@@ -8,12 +8,16 @@ A sequence cut at the end of the buffer runs to its end, as it would once the re
 
 from __future__ import annotations
 
-from dooservice_constants import (
+from .constants import (
     BEL,
     CONTROL_STRING_OPENS,
+    CSI_FINALS,
     CSI_OPEN,
+    CSI_PARAMETERS,
     ESC,
     HYPERLINK,
+    INTERMEDIATES,
+    LAST_BLANK,
     OSC_OPEN,
     SECURE_URL,
     STRING_TERMINATOR,
@@ -21,19 +25,21 @@ from dooservice_constants import (
 
 
 class TerminalText:
+    """Reading terminal output as text, links and the sequences between them."""
+
     @staticmethod
     def csi_end(data: bytes, start: int) -> int:
         index = start + 2
-        while index < len(data) and 0x30 <= data[index] <= 0x3F:
+        while index < len(data) and CSI_PARAMETERS[0] <= data[index] <= CSI_PARAMETERS[1]:
             index += 1
-        while index < len(data) and 0x20 <= data[index] <= 0x2F:
+        while index < len(data) and INTERMEDIATES[0] <= data[index] <= INTERMEDIATES[1]:
             index += 1
-        return index + 1 if index < len(data) and 0x40 <= data[index] <= 0x7E else index
+        return index + 1 if index < len(data) and CSI_FINALS[0] <= data[index] <= CSI_FINALS[1] else index
 
     @staticmethod
     def escape_end(data: bytes, start: int) -> int:
         index = start + 1
-        while index < len(data) and 0x20 <= data[index] <= 0x2F:
+        while index < len(data) and INTERMEDIATES[0] <= data[index] <= INTERMEDIATES[1]:
             index += 1
         if index < len(data) and data[index] == ESC:
             return index
@@ -85,16 +91,16 @@ class TerminalText:
     @classmethod
     def readable(cls, data: bytes) -> bool:
         """Whether output carries text for a person, not only questions to the terminal."""
-        return any(byte > 0x20 for byte in cls.plain(data))
+        return any(byte > LAST_BLANK for byte in cls.plain(data))
 
     @classmethod
     def links(cls, data: bytes) -> list[bytes]:
         """The https targets of OSC 8 hyperlinks, in order."""
         found = []
-        for body, _ in cls.pieces(data):
+        for body in (piece[0] for piece in cls.pieces(data)):
             if body is None or not body.startswith(HYPERLINK):
                 continue
-            _, separator, target = body[len(HYPERLINK) :].partition(b";")
+            separator, target = body[len(HYPERLINK) :].partition(b";")[1:]
             if separator and target.startswith(SECURE_URL):
                 found.append(target)
         return found

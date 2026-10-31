@@ -7,6 +7,35 @@ server takes the platform with this build: one line per change and language (`- 
 agent does not sign a platform with a build that has no Novedades here, and reads that
 heading by name. The rest of an entry, when needed, is technical.
 
+## [20261031-2] — 2026-10-31
+
+### Novedades
+- es: Publicar desde la consola pide siempre un título y una descripción, puede abrir la
+  pull request como borrador y añade sola las pruebas que ejecutaste en la sesión. La
+  bienvenida de la terminal sale en tu idioma y dice cuánto dura la sesión. En Odoo 16, los
+  `requirements.txt` de tus módulos ahora sí se instalan.
+- en: Publishing from the console always asks for a title and a description, can open the
+  pull request as a draft and adds the tests you ran in the session by itself. The
+  terminal's welcome is in your language and says how long the session lasts. On Odoo 16,
+  your modules' `requirements.txt` are now installed.
+
+### Changed
+- `operator`: the console's Python is two packages, `dooservice_console` and
+  `dooservice_mcp`; the AI settings are a base per tool plus overlays, merged at build time,
+  with a test that keeps the production rules.
+- `operator`: `dooservice publish` requires `--title` and `--body`/`--body-file`, takes
+  `--draft` and sends the session's `dooservice test` runs; the console skill documents
+  submodule pull requests and updates within a session.
+- `odoo`: a `requirements.txt` pip cannot install is logged as an `ERROR`; Odoo still starts.
+- Base images pinned by digest; Actions pinned by commit; SBOM, provenance and attestations
+  on every image, a Trivy report in code scanning, and a git tag per revision.
+- CI on every pull request and push (hadolint, shellcheck, ruff, actionlint, tests);
+  Renovate, Makefile, CODEOWNERS, `.editorconfig`; README, CONTRIBUTING and the pull
+  request template rewritten in English.
+
+### Removed
+- `/mnt/extra-addons`, a duplicated `odoo db` patch, and stale `.gitignore` entries.
+
 ## [20261031] — 2026-10-31
 
 ### Novedades

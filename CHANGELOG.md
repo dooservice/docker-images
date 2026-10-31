@@ -7,6 +7,28 @@ server takes the platform with this build: one line per change and language (`- 
 agent does not sign a platform with a build that has no Novedades here, and reads that
 heading by name. The rest of an entry, when needed, is technical.
 
+## [20261031-6] — 2026-10-31
+
+### Novedades
+- es: La página que se ve mientras un entorno no está disponible sale en el idioma del
+  navegador de quien la visita.
+- en: The page shown while an environment is unavailable is in the visitor's browser
+  language.
+- pt: A página exibida enquanto um ambiente está indisponível aparece no idioma do
+  navegador de quem a visita.
+- fr: La page affichée pendant qu'un environnement est indisponible s'affiche dans la
+  langue du navigateur du visiteur.
+- it: La pagina mostrata mentre un ambiente non è disponibile appare nella lingua del
+  browser di chi la visita.
+- de: Die Seite, die erscheint, solange eine Umgebung nicht erreichbar ist, zeigt sich in
+  der Browsersprache der Besucher.
+
+### Changed
+- `status`: its texts come from `status/locales` (dooservice/locales, `<code>/status.json`);
+  the language comes from `Accept-Language` (q-values, base code, English otherwise), the
+  page sets `<html lang>` and answers `Vary: Accept-Language`. The image carries only the
+  six `status.json` files.
+
 ## [20261031-5] — 2026-10-31
 
 ### Novedades

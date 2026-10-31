@@ -67,14 +67,12 @@ skills:
 
 compile:
 	export PYTHONPYCACHEPREFIX="$$(mktemp -d)"; \
-	$(PYTHON) -m compileall -q odoo status operator/rootfs versions.py; \
+	$(PYTHON) -m compileall -q odoo status operator/rootfs operator/tests versions.py; \
 	for script in $(PYTHON_SCRIPTS); do $(PYTHON) -m py_compile "$${script}"; done
 
 unittest:
-	PYTHONPATH=status $(PYTHON) -m unittest discover status/tests
-	if [ -d operator/tests ]; then \
-	  PYTHONPATH=operator/rootfs/opt/dooservice/lib $(PYTHON) -m unittest discover operator/tests; \
-	fi
+	PYTHONPATH=status $(PYTHON) -m unittest discover -s status/tests
+	PYTHONPATH=operator/rootfs/opt/dooservice/lib $(PYTHON) -m unittest discover -s operator/tests
 
 build:
 	case "$(IMAGE)" in odoo|operator|postgres|status) ;; \

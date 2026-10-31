@@ -6,6 +6,11 @@ name: Build
 # (`make images` in the agent repository). The Odoo versions are the keys of [odoo] in the
 # agent's platform.toml, read with the GH_PAT secret.
 #
+# Every pushed image carries an SBOM and a provenance attestation from BuildKit, gets a
+# GitHub artifact attestation, and has its SBOM scanned by Trivy into code scanning (a
+# report only: findings never fail the build). Once every build succeeded, the built commit
+# is tagged with the revision.
+#
 #   gh workflow run build.yml --repo dooservice/docker-images
 #   gh workflow run build.yml --repo dooservice/docker-images -f versions=18.0 -f postgres=false
 on:
@@ -32,6 +37,10 @@ concurrency:
 permissions:
   contents: read
 
+defaults:
+  run:
+    shell: bash
+
 jobs:
   plan:
     name: Versions and revision
@@ -39,6 +48,7 @@ jobs:
     outputs:
       versions: ${{ steps.versions.outputs.versions }}
       revision: ${{ steps.revision.outputs.revision }}
+      images: ${{ steps.revision.outputs.images }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
@@ -66,8 +76,8 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GHCR_TOKEN || github.token }}
 
-      # Today's UTC date, then -2, -3... until no image this run pushes has that tag yet:
-      # a revision never moves once a platform may have pinned it.
+      # Today's UTC date, then -2, -3... until neither a git tag nor an image this run pushes
+      # has it yet: a revision never moves once a platform may have pinned it.
       - id: revision
         name: Revision
         run: |
@@ -81,6 +91,7 @@ jobs:
           revision="${day}"
           number=1
           taken() {
+            git ls-remote --exit-code --tags origin "refs/tags/${revision}" > /dev/null && return 0
             for image in "${images[@]}"; do
               docker buildx imagetools inspect "ghcr.io/dooservice/${image}${revision}" > /dev/null 2>&1 && return 0
             done
@@ -91,6 +102,7 @@ jobs:
             revision="${day}-${number}"
           done
           echo "revision=${revision}" >> "${GITHUB_OUTPUT}"
+          echo "images=$(printf '%s\n' "${images[@]/%/${revision}}" | jq -Rsc 'split("\n") | map(select(. != ""))')" >> "${GITHUB_OUTPUT}"
           echo "Revision ${revision}" >> "${GITHUB_STEP_SUMMARY}"
         env:
           VERSIONS: ${{ steps.versions.outputs.versions }}
@@ -130,6 +142,8 @@ jobs:
           source: .
           targets: odoo,operator
           push: true
+          provenance: mode=max
+          sbom: true
           set: |
             *.cache-from=type=gha,scope=odoo-${{ matrix.version }}
             *.cache-to=type=gha,scope=odoo-${{ matrix.version }},mode=max
@@ -162,6 +176,8 @@ jobs:
           source: .
           targets: postgres
           push: true
+          provenance: mode=max
+          sbom: true
         env:
           REVISION: ${{ needs.plan.outputs.revision }}
           SOURCE_COMMIT: ${{ github.sha }}
@@ -190,6 +206,94 @@ jobs:
           source: .
           targets: status
           push: true
+          provenance: mode=max
+          sbom: true
         env:
           REVISION: ${{ needs.plan.outputs.revision }}
           SOURCE_COMMIT: ${{ github.sha }}
+
+  # Each image this run pushed, found by its revision tag, which never moves.
+  attest:
+    name: Attest and scan ${{ matrix.image }}
+    needs: [plan, odoo, postgres, status]
+    if: ${{ !cancelled() && needs.plan.result == 'success' }}
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+      attestations: write
+      security-events: write
+    strategy:
+      fail-fast: false
+      matrix:
+        image: ${{ fromJson(needs.plan.outputs.images) }}
+    steps:
+      - uses: docker/login-action@81c6f93d4bc991e510b342a00b419b3bb4efc5c6 # v4.7.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_TOKEN || github.token }}
+
+      - id: image
+        name: Digest and SBOM
+        run: |
+          reference="ghcr.io/dooservice/${IMAGE}"
+          if ! digest="$(docker buildx imagetools inspect "${reference}" --format '{{ json .Manifest }}' | jq -r .digest)"; then
+            echo "::warning::${reference} was not pushed; its build failed"
+            exit 0
+          fi
+          docker buildx imagetools inspect "${reference}" --format '{{ json .SBOM }}' \
+            | jq 'if has("SPDX") then .SPDX else .["linux/amd64"].SPDX end' > "${RUNNER_TEMP}/sbom.spdx.json"
+          tag="${IMAGE#*:}"
+          tag="${tag%"${REVISION}"}"
+          tag="${tag%-}"
+          {
+            echo "name=${reference%:*}"
+            echo "digest=${digest}"
+            echo "category=trivy-${IMAGE%%:*}${tag:+-${tag}}"
+          } >> "${GITHUB_OUTPUT}"
+        env:
+          IMAGE: ${{ matrix.image }}
+          REVISION: ${{ needs.plan.outputs.revision }}
+
+      - uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        if: ${{ steps.image.outputs.digest }}
+        with:
+          subject-name: ${{ steps.image.outputs.name }}
+          subject-digest: ${{ steps.image.outputs.digest }}
+          push-to-registry: true
+
+      - name: Vulnerabilities
+        if: ${{ steps.image.outputs.digest }}
+        continue-on-error: true
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          scan-type: sbom
+          scan-ref: ${{ runner.temp }}/sbom.spdx.json
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          format: sarif
+          limit-severities-for-sarif: true
+          output: ${{ runner.temp }}/trivy.sarif
+
+      - if: ${{ steps.image.outputs.digest }}
+        continue-on-error: true
+        uses: github/codeql-action/upload-sarif@9b3254085494b55a0f7c4c2b3d2d52cc712ce370 # v4.39.1
+        with:
+          sarif_file: ${{ runner.temp }}/trivy.sarif
+          category: ${{ steps.image.outputs.category }}
+
+  tag:
+    name: Tag the revision
+    needs: [plan, odoo, postgres, status]
+    if: ${{ !cancelled() && !failure() }}
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - name: Tag ${{ needs.plan.outputs.revision }}
+        run: gh api "repos/${GITHUB_REPOSITORY}/git/refs" -f ref="refs/tags/${REVISION}" -f sha="${GITHUB_SHA}"
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REVISION: ${{ needs.plan.outputs.revision }}

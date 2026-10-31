@@ -15,6 +15,7 @@ ARG ODOO_VERSION
 ARG CLAUDE_CODE_VERSION=2.1.295
 ARG OPENCODE_VERSION=1.18.35
 ARG RTK_VERSION=0.48.0
+ARG RTK_SHA256=e4e650fa1677c0de2f6839a6040d7b17f312d32f163c402b75af70e9e5af1a91
 
 USER root
 
@@ -30,16 +31,18 @@ RUN apt-get update \
       ca-certificates curl git less vim-tiny procps tini postgresql-client \
  && rm -rf /var/lib/apt/lists/*
 
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 RUN mkdir -p /opt/ai \
- && HOME=/tmp/claude-install bash -c "curl -fsSL https://claude.ai/install.sh | bash -s ${CLAUDE_CODE_VERSION}" \
+ && HOME=/tmp/claude-install bash -o pipefail -c "curl -fsSL https://claude.ai/install.sh | bash -s ${CLAUDE_CODE_VERSION}" \
  && install -m 755 "$(readlink -f /tmp/claude-install/.local/bin/claude)" /opt/ai/claude \
- && HOME=/tmp/opencode-install bash -c "curl -fsSL https://opencode.ai/install | bash -s -- --version ${OPENCODE_VERSION} --no-modify-path" \
+ && HOME=/tmp/opencode-install bash -o pipefail -c "curl -fsSL https://opencode.ai/install | bash -s -- --version ${OPENCODE_VERSION} --no-modify-path" \
  && install -m 755 /tmp/opencode-install/.opencode/bin/opencode /opt/ai/opencode \
- && curl -fsSL "https://github.com/rtk-ai/rtk/releases/download/v${RTK_VERSION}/rtk-x86_64-unknown-linux-musl.tar.gz" \
-      | tar -xz -C /opt/ai rtk \
+ && curl -fsSL -o /tmp/rtk.tar.gz "https://github.com/rtk-ai/rtk/releases/download/v${RTK_VERSION}/rtk-x86_64-unknown-linux-musl.tar.gz" \
+ && echo "${RTK_SHA256}  /tmp/rtk.tar.gz" | sha256sum -c - \
+ && tar -xzf /tmp/rtk.tar.gz -C /opt/ai rtk \
  && chmod 755 /opt/ai/rtk \
  && ln -s /opt/ai/rtk /usr/local/bin/rtk \
- && rm -rf /tmp/claude-install /tmp/opencode-install
+ && rm -rf /tmp/claude-install /tmp/opencode-install /tmp/rtk.tar.gz
 
 COPY rootfs/ /
 COPY skills/odoo/${ODOO_VERSION}/ /opt/dooservice/ai/skills/code/

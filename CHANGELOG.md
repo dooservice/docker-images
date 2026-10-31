@@ -7,6 +7,22 @@ server takes the platform with this build: one line per change and language (`- 
 agent does not sign a platform with a build that has no Novedades here, and reads that
 heading by name. The rest of an entry, when needed, is technical.
 
+## [20261031-4] — 2026-10-31
+
+### Novedades
+- es: La IA de la consola escribe la descripción de las pull requests en tu idioma, con
+  sus apartados también en tu idioma; el título y el código siguen en inglés.
+- en: The console's AI writes the description of pull requests in your language, with its
+  headings in your language too; the title and the code stay in English.
+
+### Changed
+- `operator`: the console's texts (welcome, splash) moved from `constants.py` to one
+  catalog file per language, `dooservice_console/locales/<code>.toml`, with English for any
+  text a language lacks; a test keeps every locale on the English keys and placeholders.
+- `operator`: `AGENTS.md` and the console skill say what is in English (code, comments,
+  commits, a pull request's title) and what is in the person's language (replies, a pull
+  request's description, under `$DOOSERVICE_PULL_TEMPLATE`, which agent 1.129.0 sets).
+
 ## [20261031-3] — 2026-10-31
 
 ### Novedades

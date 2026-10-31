@@ -130,9 +130,8 @@ So: commit as you go, and publish before the session ends.
 - Always pass `--title` and a description (`--body` or `--body-file -`): both are required.
 - Pass `--draft` only when the user asks for a draft.
 - Title: `[TAG] module: summary`, with `TAG` one of `FIX IMP ADD REF REM MOV REV PERF I18N MIG CLN LINT REL MERGE`.
-- Write the title and the description in English, whatever language you speak with the user: the platform refuses anything else.
-- Write the summary in the imperative.
-- Write the description in these sections, in this order:
+- Write the title in English, in the imperative, like the commits.
+- Write the description for the people who review it, in the user's language, under the headings `$DOOSERVICE_PULL_TEMPLATE` gives, in its order (`echo "$DOOSERVICE_PULL_TEMPLATE"`). Its sections are these, here with their English headings:
 
 | Section | What goes in it |
 | --- | --- |
@@ -141,7 +140,7 @@ So: commit as you go, and publish before the session ends.
 | `## Changes` | a bullet per module: what changed in it |
 | `## How to test` | numbered steps on this environment, with the expected result |
 | `## Deployment` | modules to update (`-u`), migrations, new `requirements.txt` lines, restart |
-| `## Risks` | what could break and for whom, or `None.` |
+| `## Risks` | what could break and for whom, or that nothing does |
 | `## References` | ticket or task, only when the user gave one; never invented |
 
 - Write from what you did and verified, plainly: no marketing, no emoji, no closing line.
@@ -151,6 +150,8 @@ So: commit as you go, and publish before the session ends.
 - A changed submodule gets its own pull request: tell the user to merge it first, with a merge commit, then the project's.
 - Give the user every link it prints. Nothing reaches an environment until somebody merges.
 - When this session cannot publish, give the commits as patches: `git format-patch origin/$DOOSERVICE_BRANCH --stdout`.
+
+For a user who writes in English:
 
 ```bash
 dooservice publish --title "[FIX] acme_sale: keep the delivery date on duplicate" --body-file - <<'BODY'
@@ -181,6 +182,6 @@ BODY
 
 `DOOSERVICE_STAGE` (`development` or `production`), `DOOSERVICE_ENVIRONMENT`,
 `DOOSERVICE_PROJECT`, `DOOSERVICE_SERVER`, `DOOSERVICE_BRANCH`, `DOOSERVICE_BUILD_URL`,
-`DOOSERVICE_LANGUAGE` (`es`, `en`, `pt`, `fr`, `it`, `de`), `ODOO_VERSION`, `ADDONS_PATH`. The database
+`DOOSERVICE_LANGUAGE` (`es`, `en`, `pt`, `fr`, `it`, `de`), `DOOSERVICE_PULL_TEMPLATE` (the description's headings in that language), `ODOO_VERSION`, `ADDONS_PATH`. The database
 connection is in the `PGHOST`/`PGUSER`/`PGDATABASE`... variables, already used by `psql`
 and `odoo-bin`.

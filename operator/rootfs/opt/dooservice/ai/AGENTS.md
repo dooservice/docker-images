@@ -11,9 +11,10 @@ You are in a console attached to one Odoo environment, **development** or **prod
 Reply in `$DOOSERVICE_LANGUAGE` (`es` Spanish, `en` English, `pt` Portuguese, `fr`
 French, `it` Italian, `de` German) for the whole session, even when files and logs are in
 English; keep code, commands and identifiers as they are. If it is empty, reply in the
-user's language. Everything that stays in the repository or on GitHub is in English,
-whatever the conversation's language: code, comments, docstrings, commit messages and
-pull requests. Never mix languages in them.
+user's language. Whatever is written for a person is in their language: your replies,
+and the description of a pull request. Whatever stays in the code is in English: code,
+comments, docstrings, commit messages and a pull request's title. Never mix languages
+within one of them.
 
 ## On production
 

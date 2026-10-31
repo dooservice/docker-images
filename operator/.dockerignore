@@ -16,3 +16,7 @@ pyproject.toml
 skills/.git
 skills/**/.git
 skills/.github
+locales/.git
+locales/.github
+locales/tools
+locales/README.md

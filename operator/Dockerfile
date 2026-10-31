@@ -45,6 +45,7 @@ RUN mkdir -p /opt/ai \
  && rm -rf /tmp/claude-install /tmp/opencode-install /tmp/rtk.tar.gz
 
 COPY rootfs/ /
+COPY locales/ /opt/dooservice/locales/
 COPY skills/odoo/${ODOO_VERSION}/ /opt/dooservice/ai/skills/code/
 COPY skills/odoo/common/ /opt/dooservice/ai/skills/code/
 ENV PYTHONPATH=/opt/dooservice/lib

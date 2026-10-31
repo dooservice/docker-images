@@ -172,17 +172,11 @@ CO_AUTHOR = "Co-authored-by: Dooservice <noreply@dooservice.sh>"
 #: The hook git runs to prepare a commit message.
 PREPARE_COMMIT_MSG = "prepare-commit-msg"
 
-#: The name of each language the console speaks, in English, for the agent's instructions.
-LANGUAGE_NAMES = {
-    "es": "Spanish",
-    "en": "English",
-    "pt": "Portuguese",
-    "fr": "French",
-    "it": "Italian",
-    "de": "German",
-}
-#: The texts the console prints, one TOML file per language code.
-LOCALES_DIR = Path(__file__).parent / "locales"
+#: Every text Dooservice shows a person, from dooservice/locales: `<code>/console.json` and
+#: `languages.json`. The variable points elsewhere only for the tests.
+LOCALES_DIR = Path(os.environ.get("DOOSERVICE_LOCALES_DIR", "/opt/dooservice/locales"))
+#: The console's own file inside each language's folder.
+CONSOLE_LOCALE = "console.json"
 #: The language every locale falls back to, key by key, and the one whose file has every text.
 DEFAULT_LANGUAGE = "en"
 #: Ctrl+Z as the terminal sends it; it never reaches the agent.

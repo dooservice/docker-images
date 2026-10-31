@@ -2,18 +2,18 @@
 
 from __future__ import annotations
 
+import json
 import os
 from functools import cached_property
 from pathlib import Path
 
-import tomllib
-
-from .constants import DEFAULT_LANGUAGE, LANGUAGE_NAMES, LANGUAGE_VARIABLE, LOCALES_DIR
+from .constants import CONSOLE_LOCALE, DEFAULT_LANGUAGE, LANGUAGE_VARIABLE, LOCALES_DIR
 
 
 class Catalog:
-    """The console's texts in one language, read from `locales/<code>.toml`, English for any text it lacks.
+    """The console's texts in one language, from dooservice/locales' `<code>/console.json`.
 
+    English fills any text the language lacks.
     Keys are dotted paths into the file: `starting`, `welcome.place`, `stages.production`.
     A language without a file reads entirely in English.
     """
@@ -24,15 +24,14 @@ class Catalog:
 
     def load(self, code: str) -> dict[str, str]:
         """One locale file's texts by dotted key; nothing for a language without a file or an odd code."""
-        path = self.directory / f"{code}.toml"
+        path = self.directory / code / CONSOLE_LOCALE
         if not code.isalpha() or not path.is_file():
             return {}
-        with path.open("rb") as file:
-            return self.flatten(tomllib.load(file))
+        return self.flatten(json.loads(path.read_text(encoding="utf-8")))
 
     @classmethod
     def flatten(cls, table: dict, prefix: str = "") -> dict[str, str]:
-        """A TOML document's strings, keyed by their dotted path."""
+        """A JSON document's strings, keyed by their dotted path."""
         texts: dict[str, str] = {}
         for name, value in table.items():
             key = f"{prefix}{name}"
@@ -60,8 +59,12 @@ class Language:
 
     @property
     def name(self) -> str | None:
-        """The language's English name, when the console speaks it."""
-        return LANGUAGE_NAMES.get(self.code)
+        """The language's English name, when the platform offers it (dooservice/locales' `languages.json`)."""
+        listed = LOCALES_DIR / "languages.json"
+        if not listed.is_file():
+            return None
+        names = {entry["code"]: entry["name"] for entry in json.loads(listed.read_text(encoding="utf-8"))}
+        return names.get(self.code)
 
     @cached_property
     def catalog(self) -> Catalog:

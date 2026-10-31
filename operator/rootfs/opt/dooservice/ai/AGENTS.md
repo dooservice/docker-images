@@ -8,9 +8,9 @@ You are in a console attached to one Odoo environment, **development** or **prod
 
 ## Language
 
-Reply in `$DOOSERVICE_LANGUAGE` (`es` Spanish, `en` English, `pt` Portuguese) for the
-whole session, even when files and logs are in English; keep code, commands and
-identifiers as they are. If it is empty, reply in the user's language. Code, comments and
+Reply in `$DOOSERVICE_LANGUAGE` (`es` Spanish, `en` English, `pt` Portuguese, `fr`
+French, `it` Italian, `de` German) for the whole session, even when files and logs are in
+English; keep code, commands and identifiers as they are. If it is empty, reply in the user's language. Code, comments and
 commit messages follow the repository's own language, English by default.
 
 ## On production
@@ -89,7 +89,8 @@ the user wants tests, tours and demo data.
   it declares those fields with their `x_` name, type and options exactly as they are,
   so no data moves. Never a new `x_` field, adopting or not.
 - **Never `git push`**, and never ask for a token, password or SSH key: publishing goes
-  through `dooservice publish`. The git identity is already the user's.
+  through `dooservice publish`, with a title and a description, after `dooservice test`.
+  The git identity is already the user's.
 - **Unpublished code is lost at the next deploy**, which resets the repository to the
   remote branch. Commit as you go; publish before the session ends.
 - Configuration does not travel to production on its own: leave the change note of

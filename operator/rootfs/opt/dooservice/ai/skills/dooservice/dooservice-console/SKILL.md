@@ -61,13 +61,13 @@ For what the tools do not cover.
 | --- | --- |
 | `dooservice install <mod>[,<mod>]` | install modules (`odoo-bin -i ... --stop-after-init`) |
 | `dooservice update <mod>[,<mod>]` | update modules after a change (`-u`), `all` for everything |
-| `dooservice test <mod>` | update installed modules and run their tests (`-u ... --test-enable`) |
+| `dooservice test <mod>` | update installed modules and run their tests (`-u ... --test-enable`); every run is listed in the pull request |
 | `dooservice shell` | Odoo shell on this database (`env` is ready); end a script with `env.cr.commit()` |
 | `dooservice restart` | restart the environment's Odoo so it loads changed Python |
 | `dooservice logs -n 200` / `-f` | the environment's Odoo log |
 | `dooservice status` | whether the environment is running |
 | `dooservice storage` | what the repository, filestore and database occupy |
-| `dooservice publish --title ... --body-file -` | push what was committed and open its pull requests |
+| `dooservice publish --title ... --body-file -` | push what was committed and open or update its pull requests |
 
 `odoo-bin` is a wrapper that injects the database, its host, the addons path, the data
 directory and `--workers=0`: never pass those, and never `cd` before calling it. Use it
@@ -124,26 +124,14 @@ So: commit as you go, and publish before the session ends.
 
 ## Publishing
 
-`git push` has no credentials here on purpose. Commit following `odoo-git` (a change
-inside a submodule is committed in the submodule first, then in the project), then
-publish. `dooservice publish` refuses a pull request that breaks the rules below and
-says what to fix, before anything is pushed: fix it and publish again.
-
-### Title
-
-Odoo's commit header: `[TAG] module: summary`.
-
-- `TAG` is one of `FIX IMP ADD REF REM MOV REV PERF I18N MIG`.
-- `module` is the technical name, lowercase; several separated by commas
-  (`acme_sale, acme_stock`), `*` for many.
-- The summary is imperative, without a final period. The whole title is 80 characters
-  at most. It stays in English when the commits are in English.
-
-### Description
-
-These sections, in this order, headed in the language of `$DOOSERVICE_LANGUAGE`
-(`es` Spanish, anything else English). Every section has content; only the last may be
-empty, and a risk-free change says so (`Ninguno.` / `None.`).
+- Never `git push`: it has no credentials here. Publish with `dooservice publish`.
+- Commit following `odoo-git`; inside a submodule, commit there first, then in the project.
+- Test with `dooservice test <mod>` before publishing: the session's runs go into the pull request by themselves.
+- Always pass `--title` and a description (`--body` or `--body-file -`): both are required.
+- Pass `--draft` only when the user asks for a draft.
+- Title: `[TAG] module: summary`, with `TAG` one of `FIX IMP ADD REF REM MOV REV PERF I18N MIG CLN LINT REL MERGE`.
+- Write the summary in the imperative, in English when the commits are in English.
+- Write the description in these sections, in this order, headed in the language of `$DOOSERVICE_LANGUAGE` (`es` Spanish, anything else English):
 
 | English | Español | What goes in it |
 | --- | --- | --- |
@@ -152,13 +140,16 @@ empty, and a risk-free change says so (`Ninguno.` / `None.`).
 | `## Changes` | `## Cambios` | a bullet per module: what changed in it |
 | `## How to test` | `## Cómo probar` | numbered steps on this environment, with the expected result |
 | `## Deployment` | `## Despliegue` | modules to update (`-u`), migrations, new `requirements.txt` lines, restart |
-| `## Risks` | `## Riesgos` | what could break and for whom, or none |
+| `## Risks` | `## Riesgos` | what could break and for whom, or `None.` / `Ninguno.` |
 | `## References` | `## Referencias` | ticket or task, only when the user gave one; never invented |
 
-Write it from what you did and verified, plainly and technically: no marketing, no
-emoji, no closing line. The platform signs every pull request
-(`🤖 Generado con Dooservice` / `🤖 Generated with Dooservice`) and every commit made by
-an AI session gets `Co-authored-by: Dooservice` by itself: do not add either.
+- Write from what you did and verified, plainly: no marketing, no emoji, no closing line.
+- Do not sign: the platform signs every pull request and co-authors the AI's commits.
+- When `publish` refuses, fix what it says and publish again.
+- Publish again in the same session to update its pull requests: it never opens new ones for the session.
+- A changed submodule gets its own pull request: tell the user to merge it first, with a merge commit, then the project's.
+- Give the user every link it prints. Nothing reaches an environment until somebody merges.
+- When this session cannot publish, give the commits as patches: `git format-patch origin/$DOOSERVICE_BRANCH --stdout`.
 
 ```bash
 dooservice publish --title "[FIX] acme_sale: keep the delivery date on duplicate" --body-file - <<'BODY'
@@ -185,18 +176,10 @@ Ninguno: solo afecta a pedidos duplicados.
 BODY
 ```
 
-It pushes everything committed to a new branch `dooservice/<environment>-<timestamp>`,
-opens one pull request per changed submodule (into that submodule's default branch)
-and one for the project (into `$DOOSERVICE_BRANCH`), and prints their links: give them
-to the user. Nothing reaches any environment until somebody merges.
-
-If it answers that this session cannot publish, give the user the commits as patches:
-`git format-patch origin/$DOOSERVICE_BRANCH --stdout`.
-
 ## Environment variables
 
 `DOOSERVICE_STAGE` (`development` or `production`), `DOOSERVICE_ENVIRONMENT`,
 `DOOSERVICE_PROJECT`, `DOOSERVICE_SERVER`, `DOOSERVICE_BRANCH`, `DOOSERVICE_BUILD_URL`,
-`DOOSERVICE_LANGUAGE` (`es`, `en`, `pt`), `ODOO_VERSION`, `ADDONS_PATH`. The database
+`DOOSERVICE_LANGUAGE` (`es`, `en`, `pt`, `fr`, `it`, `de`), `ODOO_VERSION`, `ADDONS_PATH`. The database
 connection is in the `PGHOST`/`PGUSER`/`PGDATABASE`... variables, already used by `psql`
 and `odoo-bin`.

@@ -57,7 +57,6 @@ class PageTest(unittest.TestCase):
             html = self.page.render(Card(case))
             self.assertIn("data-dooservice-status", html)
             self.assertIn("support@dooservice.sh", html)
-            self.assertIn("soporte@apiservicesac.com", html)
 
     def test_progress_shows_its_step_escaped(self) -> None:
         html = self.page.render(Card(Case.CREATING, "<b>Installing</b>", 62))

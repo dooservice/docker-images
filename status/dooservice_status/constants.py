@@ -25,5 +25,4 @@ FINAL_STATUS = 404
 
 PANEL_URL = "https://app.dooservice.sh"
 SITE_URL = "https://dooservice.sh"
-GLOBAL_SUPPORT = "support@dooservice.sh"
-PERU_SUPPORT = "soporte@apiservicesac.com"
+SUPPORT = "support@dooservice.sh"

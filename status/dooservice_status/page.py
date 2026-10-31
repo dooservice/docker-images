@@ -9,16 +9,15 @@ from .cases import WORDING, Case
 from .constants import (
     ACTIVE_POLL_MILLISECONDS,
     FINAL_POLL_MILLISECONDS,
-    GLOBAL_SUPPORT,
     PANEL_URL,
-    PERU_SUPPORT,
     SITE_URL,
+    SUPPORT,
 )
 
 CHOICES = (
     (" primary", SITE_URL, "Discover Dooservice", "If you do not know why you landed here"),
     ("", PANEL_URL, "My projects", "Check the list of your environments"),
-    ("", f"mailto:{GLOBAL_SUPPORT}", "Get help", "If you want to recover a deleted environment"),
+    ("", f"mailto:{SUPPORT}", "Get help", "If you want to recover a deleted environment"),
 )
 
 HERE = Path(__file__).parent
@@ -41,8 +40,7 @@ class Page:
             progress=self.progress(card) if card.progress is not None else self.dots(wording.final),
             actions=self.choices() if card.case == Case.UNKNOWN else self.actions(),
             every=FINAL_POLL_MILLISECONDS if wording.final else ACTIVE_POLL_MILLISECONDS,
-            global_support=GLOBAL_SUPPORT,
-            peru_support=PERU_SUPPORT,
+            support=SUPPORT,
             site_url=SITE_URL,
         )
 

@@ -1,0 +1,132 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    "helpers:pinGitHubActionDigests",
+    "docker:pinDigests"
+  ],
+  "schedule": [
+    "before 6am on monday"
+  ],
+  "timezone": "UTC",
+  "automerge": false,
+  "dependencyDashboard": true,
+  "labels": [
+    "dependencies"
+  ],
+  "ignoreDeps": [
+    "dooservice-odoo"
+  ],
+  "git-submodules": {
+    "enabled": true
+  },
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "The digest of the official odoo image each version is built on, in docker-bake.hcl",
+      "managerFilePatterns": [
+        "/^docker-bake\\.hcl$/"
+      ],
+      "matchStrings": [
+        "\"(?<currentValue>\\d+\\.\\d+)\"\\s*=\\s*\"(?<currentDigest>sha256:[a-f0-9]{64})\""
+      ],
+      "depNameTemplate": "odoo",
+      "datasourceTemplate": "docker",
+      "versioningTemplate": "docker"
+    },
+    {
+      "customType": "regex",
+      "description": "Claude Code, which the console installs, in operator/Dockerfile",
+      "managerFilePatterns": [
+        "/^operator/Dockerfile$/"
+      ],
+      "matchStrings": [
+        "ARG CLAUDE_CODE_VERSION=(?<currentValue>\\S+)"
+      ],
+      "depNameTemplate": "@anthropic-ai/claude-code",
+      "datasourceTemplate": "npm"
+    },
+    {
+      "customType": "regex",
+      "description": "opencode, which the console installs, in operator/Dockerfile",
+      "managerFilePatterns": [
+        "/^operator/Dockerfile$/"
+      ],
+      "matchStrings": [
+        "ARG OPENCODE_VERSION=(?<currentValue>\\S+)"
+      ],
+      "depNameTemplate": "opencode-ai",
+      "datasourceTemplate": "npm"
+    },
+    {
+      "customType": "regex",
+      "description": "rtk, which the console installs, in operator/Dockerfile",
+      "managerFilePatterns": [
+        "/^operator/Dockerfile$/"
+      ],
+      "matchStrings": [
+        "ARG RTK_VERSION=(?<currentValue>\\S+)"
+      ],
+      "depNameTemplate": "rtk-ai/rtk",
+      "datasourceTemplate": "github-releases",
+      "extractVersionTemplate": "^v(?<version>.*)$"
+    }
+  ],
+  "packageRules": [
+    {
+      "description": "Actions, one weekly pull request",
+      "matchManagers": [
+        "github-actions"
+      ],
+      "groupName": "GitHub Actions"
+    },
+    {
+      "description": "Base images, one weekly pull request",
+      "matchDatasources": [
+        "docker"
+      ],
+      "groupName": "base images"
+    },
+    {
+      "description": "Odoo's own tags are versions, not semver: only the digest of each version moves",
+      "matchDepNames": [
+        "odoo"
+      ],
+      "matchUpdateTypes": [
+        "major",
+        "minor",
+        "patch"
+      ],
+      "enabled": false
+    },
+    {
+      "description": "Postgres stays on 16 and Python on 3.13 until the platform moves them",
+      "matchDepNames": [
+        "postgres",
+        "python"
+      ],
+      "matchUpdateTypes": [
+        "major",
+        "minor"
+      ],
+      "enabled": false
+    },
+    {
+      "description": "The Odoo skills submodule",
+      "matchManagers": [
+        "git-submodules"
+      ],
+      "groupName": "Odoo skills"
+    },
+    {
+      "description": "The console's tools, one weekly pull request",
+      "matchFileNames": [
+        "operator/Dockerfile"
+      ],
+      "matchManagers": [
+        "custom.regex"
+      ],
+      "groupName": "console tools"
+    }
+  ]
+}

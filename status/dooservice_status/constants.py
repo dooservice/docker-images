@@ -26,3 +26,23 @@ FINAL_STATUS = 404
 PANEL_URL = "https://app.dooservice.sh"
 SITE_URL = "https://dooservice.sh"
 SUPPORT = "support@dooservice.sh"
+
+#: Every text the page shows, from dooservice/locales: `<code>/status.json`. Beside the
+#: package both in the image (/app/locales) and in a checkout (the status/locales submodule).
+LOCALES_DIR = Path(__file__).resolve().parent.parent / "locales"
+#: The page's own file inside each language's folder.
+STATUS_LOCALE = "status.json"
+#: The language a visitor gets when the browser asks for none the page speaks, and the one
+#: every other language falls back to, text by text.
+DEFAULT_LANGUAGE = "en"
+#: The blank the heading of an address with no Odoo fills with that address.
+HOST_BLANK = "{host}"
+#: Cases nothing moves on from by itself: they poll slowly and answer FINAL_STATUS.
+FINAL_CASES = frozenset({"stopped", "expired", "unknown"})
+#: What the page of an address with no Odoo offers: the button's class, where it leads, and
+#: the key of its label and hint under `choices` of `status.json`.
+CHOICES = (
+    (" primary", SITE_URL, "discover"),
+    ("", PANEL_URL, "projects"),
+    ("", f"mailto:{SUPPORT}", "help"),
+)

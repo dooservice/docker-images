@@ -8,4 +8,4 @@ RUN apt-get update \
 COPY init-extensions.sh /docker-entrypoint-initdb.d/10-extensions.sh
 
 HEALTHCHECK --interval=5s --timeout=3s --start-period=10s --retries=3 \
-    CMD pg_isready -U "$POSTGRES_USER" || exit 1
+    CMD ["/bin/sh", "-c", "pg_isready -U \"$POSTGRES_USER\" || exit 1"]

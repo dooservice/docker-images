@@ -24,8 +24,14 @@ class ProductionSettingsTest(unittest.TestCase):
     def test_claude_production_denies(self):
         permissions = self.layers.settings("claude", PRODUCTION)["permissions"]
         for rule in (
-            "Edit", "Write", "NotebookEdit", "Read(/run/dooservice/**)", "Bash(*/run/dooservice*)",
-            "Bash(*write-credentials*)", "mcp__dooservice__module_install", "mcp__dooservice__module_update",
+            "Edit",
+            "Write",
+            "NotebookEdit",
+            "Read(/run/dooservice/**)",
+            "Bash(*/run/dooservice*)",
+            "Bash(*write-credentials*)",
+            "mcp__dooservice__module_install",
+            "mcp__dooservice__module_update",
         ):
             self.assertIn(rule, permissions["deny"])
 

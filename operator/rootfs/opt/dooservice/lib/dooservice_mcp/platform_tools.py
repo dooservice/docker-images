@@ -91,7 +91,9 @@ class OdooFind(Tool):
             raise ToolRefused(f"{where} is not in this image.")
         found = subprocess.run(
             ["grep", "-rnF", "--include=*.md", "--include=*.py", "--include=*.xml", arguments["text"], where],
-            capture_output=True, text=True, check=False,
+            capture_output=True,
+            text=True,
+            check=False,
         ).stdout.splitlines()
         shown = [line.replace(where + "/", "")[:MATCH_WIDTH] for line in found[:SOURCE_MATCHES]]
         more = f"\n… {len(found) - SOURCE_MATCHES} more" if len(found) > SOURCE_MATCHES else ""

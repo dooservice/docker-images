@@ -27,12 +27,14 @@ class TestRuns:
         moment = datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds")
         started = time.monotonic()
         code = subprocess.run(command, check=False).returncode
-        self.record({
-            "modules": modules,
-            "passed": code == 0,
-            "at": moment,
-            "seconds": round(time.monotonic() - started),
-        })
+        self.record(
+            {
+                "modules": modules,
+                "passed": code == 0,
+                "at": moment,
+                "seconds": round(time.monotonic() - started),
+            }
+        )
         return code
 
     def record(self, run):

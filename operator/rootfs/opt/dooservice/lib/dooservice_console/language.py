@@ -30,7 +30,11 @@ class Language:
         written to, and drifts to English after a few screens of logs and source code.
         """
         if self.name is None:
-            return ("Always reply to the user in the language they write in, for the whole session, even when "
-                    "files, logs, code or command output are in another language.")
-        return (f"Always reply to the user in {self.name}, for the whole session, even when files, logs, code or "
-                "command output are in another language. Keep code, commands and identifiers as they are.")
+            return (
+                "Always reply to the user in the language they write in, for the whole session, even when "
+                "files, logs, code or command output are in another language."
+            )
+        return (
+            f"Always reply to the user in {self.name}, for the whole session, even when files, logs, code or "
+            "command output are in another language. Keep code, commands and identifiers as they are."
+        )

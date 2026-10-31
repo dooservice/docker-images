@@ -4,5 +4,11 @@ from .odoo_tools import OdooRead, OdooSettings, OdooWrite
 from .platform_tools import ModuleInstall, ModuleUpdate, OdooFind, OdooLogs
 
 TOOLS = (
-    OdooRead(), OdooWrite(), OdooSettings(), ModuleInstall(), ModuleUpdate(), OdooLogs(), OdooFind(),
+    OdooRead(),
+    OdooWrite(),
+    OdooSettings(),
+    ModuleInstall(),
+    ModuleUpdate(),
+    OdooLogs(),
+    OdooFind(),
 )

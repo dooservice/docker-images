@@ -61,13 +61,18 @@ class OdooCommand:
         if command is None or command in DATABASE_COMMANDS:
             database = os.environ["PGDATABASE"]
             injected = [
-                "--db_host", os.environ["PGHOST"],
-                "--db_port", os.environ.get("PGPORT", DEFAULT_DATABASE_PORT),
-                "--db_user", os.environ["PGUSER"],
-                "--database", database,
+                "--db_host",
+                os.environ["PGHOST"],
+                "--db_port",
+                os.environ.get("PGPORT", DEFAULT_DATABASE_PORT),
+                "--db_user",
+                os.environ["PGUSER"],
+                "--database",
+                database,
                 f"--db-filter=^{database}$",
                 "--no-database-list",
-                "--data-dir", DATA_DIR,
+                "--data-dir",
+                DATA_DIR,
                 "--workers=0",
             ]
             if not any(argument.startswith("--db_maxconn") for argument in args):

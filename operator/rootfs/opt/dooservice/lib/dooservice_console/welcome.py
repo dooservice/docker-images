@@ -55,15 +55,19 @@ class Welcome:
         stage_colour = alarm if self.stage == PRODUCTION else teal
         stage = self.texts.get(self.stage, self.stage)
         lines = [teal + "\n".join(LOGO) + RESET, ""]
-        lines.append(self.texts["place"].format(
-            project=f"{white}{self.environ.get(PROJECT_VARIABLE, '')}{RESET}",
-            stage=f"{stage_colour}{stage}{RESET}",
-            environment=f"{white}{self.environ.get(ENVIRONMENT_VARIABLE, '')}{RESET}",
-        ))
-        lines.append(self.texts["odoo"].format(
-            odoo=f"{white}Odoo {self.environ.get(ODOO_VERSION_VARIABLE, '')}{RESET}",
-            server=f"{white}{self.environ.get(SERVER_VARIABLE, '')}{RESET}",
-        ))
+        lines.append(
+            self.texts["place"].format(
+                project=f"{white}{self.environ.get(PROJECT_VARIABLE, '')}{RESET}",
+                stage=f"{stage_colour}{stage}{RESET}",
+                environment=f"{white}{self.environ.get(ENVIRONMENT_VARIABLE, '')}{RESET}",
+            )
+        )
+        lines.append(
+            self.texts["odoo"].format(
+                odoo=f"{white}Odoo {self.environ.get(ODOO_VERSION_VARIABLE, '')}{RESET}",
+                server=f"{white}{self.environ.get(SERVER_VARIABLE, '')}{RESET}",
+            )
+        )
         lines += ["", f"{white}{self.texts['commands']}{RESET}", ""]
         commands = [(name.format(modules=self.texts["modules"]), self.texts[text]) for name, text in WELCOME_COMMANDS]
         width = max(len(name) for name, description in commands) + 4

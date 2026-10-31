@@ -88,4 +88,4 @@ answer['settings'] = {name: settings.default_get([name]).get(name) for name in n
 #: A text argument of a tool.
 TEXT = {"type": "string"}
 #: An Odoo domain argument of a tool.
-DOMAIN = {"type": "array", "description": "An Odoo domain, e.g. [[\"state\", \"=\", \"sale\"]]"}
+DOMAIN = {"type": "array", "description": 'An Odoo domain, e.g. [["state", "=", "sale"]]'}

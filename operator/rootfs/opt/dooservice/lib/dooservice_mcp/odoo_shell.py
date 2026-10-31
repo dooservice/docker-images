@@ -31,13 +31,18 @@ class OdooShell:
         }
         try:
             finished = subprocess.run(
-                [ODOO_WRAPPER, "shell", "--log-level=warn"], input=SCRIPT, text=True,
-                capture_output=True, env=environment, timeout=TIMEOUT_SECONDS, check=False,
+                [ODOO_WRAPPER, "shell", "--log-level=warn"],
+                input=SCRIPT,
+                text=True,
+                capture_output=True,
+                env=environment,
+                timeout=TIMEOUT_SECONDS,
+                check=False,
             )
         except subprocess.TimeoutExpired as late:
             raise ToolRefused(f"Odoo did not answer within {TIMEOUT_SECONDS} seconds.") from late
         for line in finished.stdout.splitlines():
             if line.startswith(MARK):
-                return json.loads(line[len(MARK):])
+                return json.loads(line[len(MARK) :])
         tail = "\n".join(finished.stderr.strip().splitlines()[-LOG_TAIL:])
         raise ToolRefused(f"Odoo stopped before answering:\n{tail}")

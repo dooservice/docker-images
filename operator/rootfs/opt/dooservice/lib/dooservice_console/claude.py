@@ -73,8 +73,12 @@ class ClaudeLauncher:
         try:
             with open(AI_LOG, "a") as log_file:
                 subprocess.run(
-                    ["rtk", "init", "-g", "--auto-patch"], input="n\n", text=True, stdout=log_file,
-                    stderr=log_file, check=True,
+                    ["rtk", "init", "-g", "--auto-patch"],
+                    input="n\n",
+                    text=True,
+                    stdout=log_file,
+                    stderr=log_file,
+                    check=True,
                 )
         except (OSError, subprocess.CalledProcessError):
             open(marker, "a").close()
@@ -85,11 +89,14 @@ class ClaudeLauncher:
         if os.path.exists(config_path):
             return
         with open(config_path, "w") as config:
-            json.dump({
-                "hasTrustDialogAccepted": True,
-                "theme": "dark",
-                "projects": {project: {"hasTrustDialogAccepted": True, "allowedTools": []}},
-            }, config)
+            json.dump(
+                {
+                    "hasTrustDialogAccepted": True,
+                    "theme": "dark",
+                    "projects": {project: {"hasTrustDialogAccepted": True, "allowedTools": []}},
+                },
+                config,
+            )
 
     def arguments(self):
         """The person's arguments, and the environment's unless they asked for a subcommand."""

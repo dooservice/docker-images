@@ -38,11 +38,13 @@ class McpServer:
         method = message.get("method", "")
         params = message.get("params") or {}
         if method == "initialize":
-            return {"result": {
-                "protocolVersion": params.get("protocolVersion", PROTOCOL_VERSION),
-                "capabilities": {"tools": {}},
-                "serverInfo": {"name": self.name, "version": self.version},
-            }}
+            return {
+                "result": {
+                    "protocolVersion": params.get("protocolVersion", PROTOCOL_VERSION),
+                    "capabilities": {"tools": {}},
+                    "serverInfo": {"name": self.name, "version": self.version},
+                }
+            }
         if method == "tools/list":
             return {"result": {"tools": [tool.describe() for tool in self.tools.values()]}}
         if method == "tools/call":

@@ -41,7 +41,11 @@ class OpencodeLauncher:
         self.session_config_dir = os.path.join(home, ".config", "dooservice")
         self.opencode_config_dir = os.path.join(home, ".config", "opencode")
         self.sessions_db = os.environ.get(OPENCODE_DB_VARIABLE) or os.path.join(
-            home, ".local", "share", "opencode", "opencode.db",
+            home,
+            ".local",
+            "share",
+            "opencode",
+            "opencode.db",
         )
         self.session = AiSession("opencode")
 
@@ -61,7 +65,11 @@ class OpencodeLauncher:
         try:
             with open(AI_LOG, "a") as log_file:
                 subprocess.run(
-                    ["rtk", "init", "-g", "--opencode"], input="n\n", text=True, stdout=log_file, stderr=log_file,
+                    ["rtk", "init", "-g", "--opencode"],
+                    input="n\n",
+                    text=True,
+                    stdout=log_file,
+                    stderr=log_file,
                     check=False,
                 )
         except OSError:

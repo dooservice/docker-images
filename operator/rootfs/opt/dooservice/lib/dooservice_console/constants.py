@@ -67,8 +67,27 @@ OPENCODE_BINARY = "/opt/ai/opencode"
 CLAUDE_PASSTHROUGH = ("agents", "auth", "doctor", "install", "mcp", "plugin", "setup-token", "update", "upgrade")
 #: opencode's subcommands that are run as they are, without the project or `--continue`.
 OPENCODE_PASSTHROUGH = (
-    "completion", "acp", "mcp", "attach", "run", "debug", "providers", "agent", "upgrade", "uninstall", "serve",
-    "web", "models", "stats", "export", "import", "github", "pr", "session", "db", "auth",
+    "completion",
+    "acp",
+    "mcp",
+    "attach",
+    "run",
+    "debug",
+    "providers",
+    "agent",
+    "upgrade",
+    "uninstall",
+    "serve",
+    "web",
+    "models",
+    "stats",
+    "export",
+    "import",
+    "github",
+    "pr",
+    "session",
+    "db",
+    "auth",
 )
 #: The settings file of each tool, by the case it is for.
 SETTINGS_FILES = {
@@ -316,7 +335,7 @@ WELCOME_TEXTS = {
         "psql": "Base de datos del entorno",
         "no_repository": "Sin repositorio: la IA configura Odoo, pero no crea ni modifica módulos.",
         "production_data": "PRODUCCIÓN: datos reales. Se está haciendo una copia de la base: hasta que termine, "
-                           "solo lectura.",
+        "solo lectura.",
         "production_deploy": "No se instalan módulos ni se publica código desde aquí.",
         "idle": "La sesión se cierra tras {minutes} minutos sin actividad.",
         "idle_unknown": "La sesión se cierra tras un tiempo sin actividad.",
@@ -342,7 +361,7 @@ WELCOME_TEXTS = {
         "psql": "Base de dados do ambiente",
         "no_repository": "Sem repositório: a IA configura o Odoo, mas não cria nem altera módulos.",
         "production_data": "PRODUÇÃO: dados reais. Está sendo feita uma cópia da base de dados: até terminar, "
-                           "somente leitura.",
+        "somente leitura.",
         "production_deploy": "Daqui não se instalam módulos nem se publica código.",
         "idle": "A sessão é encerrada após {minutes} minutos sem atividade.",
         "idle_unknown": "A sessão é encerrada após um tempo sem atividade.",
@@ -368,7 +387,7 @@ WELCOME_TEXTS = {
         "psql": "Base de données de l'environnement",
         "no_repository": "Sans dépôt : l'IA configure Odoo, mais ne crée ni ne modifie de modules.",
         "production_data": "PRODUCTION : données réelles. Une copie de la base est en cours : jusqu'à la fin, "
-                           "lecture seule.",
+        "lecture seule.",
         "production_deploy": "Ici, on n'installe pas de modules et on ne publie pas de code.",
         "idle": "La session se ferme après {minutes} minutes d'inactivité.",
         "idle_unknown": "La session se ferme après un moment d'inactivité.",

@@ -47,7 +47,8 @@ class DooserviceCommand:
         commands.add_parser("shell", help="Open an Odoo shell on this database")
         commands.add_parser("storage", help="Show what the environment occupies")
         publish = commands.add_parser(
-            "publish", help="Publish what was committed as pull requests, or update this session's",
+            "publish",
+            help="Publish what was committed as pull requests, or update this session's",
         )
         publish.add_argument("--title", required=True, help="The pull request's title: [TAG] module: summary")
         described = publish.add_mutually_exclusive_group(required=True)
@@ -115,15 +116,18 @@ class DooserviceCommand:
                 with open(options.body_file) as described:
                     body = described.read()
         if not title:
-            self.refuse("publish needs a title: --title \"[TAG] module: summary\".")
+            self.refuse('publish needs a title: --title "[TAG] module: summary".')
         if not body.strip():
-            self.refuse("publish needs a description: --body \"...\" or --body-file FILE (- for stdin).")
-        self.platform.run("publish", {
-            "title": title,
-            "body": body,
-            "draft": options.draft,
-            "tests": TestRuns().all(),
-        })
+            self.refuse('publish needs a description: --body "..." or --body-file FILE (- for stdin).')
+        self.platform.run(
+            "publish",
+            {
+                "title": title,
+                "body": body,
+                "draft": options.draft,
+                "tests": TestRuns().all(),
+            },
+        )
 
     @staticmethod
     def refuse(message):
@@ -137,11 +141,16 @@ class DooserviceCommand:
     @staticmethod
     def storage(options):
         sizes = subprocess.run(
-            ["du", "-sh", REPOSITORY, DATA_DIR], capture_output=True, text=True, check=False,
+            ["du", "-sh", REPOSITORY, DATA_DIR],
+            capture_output=True,
+            text=True,
+            check=False,
         ).stdout.strip()
         database = subprocess.run(
             ["psql", "-tAc", "SELECT pg_size_pretty(pg_database_size(current_database()))"],
-            capture_output=True, text=True, check=False,
+            capture_output=True,
+            text=True,
+            check=False,
         ).stdout.strip()
         print(sizes)
         print(f"{database or '?'}\tdatabase {os.environ.get('PGDATABASE', '')}")

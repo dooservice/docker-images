@@ -109,11 +109,13 @@ class Splash:
         spinner = SPINNER[self.frame % len(SPINNER)]
         dots = "." * (self.frame // 4 % 4)
         title = f"{spinner}  {self.title}{dots:<3}"
-        for offset, (visible, styled) in enumerate((
-            (len(title), Shade.escape(TEAL) + title),
-            (BAR_WIDTH, self.bar()),
-            (len(self.subtitle), GRAY + self.subtitle),
-        )):
+        for offset, (visible, styled) in enumerate(
+            (
+                (len(title), Shade.escape(TEAL) + title),
+                (BAR_WIDTH, self.bar()),
+                (len(self.subtitle), GRAY + self.subtitle),
+            )
+        ):
             left = max(1, (columns - visible) // 2 + 1)
             frame.append(f"\033[{top_row + len(LOGO) + 2 + offset};{left}H\033[2K\033[{left}G{styled}")
         frame.append(RESET + "\0338")

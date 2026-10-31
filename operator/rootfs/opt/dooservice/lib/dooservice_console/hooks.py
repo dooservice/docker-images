@@ -40,8 +40,16 @@ class Hook:
         if not message_file:
             return
         subprocess.run(
-            ["git", "interpret-trailers", "--in-place", "--if-exists", "addIfDifferent", "--trailer", CO_AUTHOR,
-             message_file],
+            [
+                "git",
+                "interpret-trailers",
+                "--in-place",
+                "--if-exists",
+                "addIfDifferent",
+                "--trailer",
+                CO_AUTHOR,
+                message_file,
+            ],
             check=False,
         )
 
@@ -53,7 +61,9 @@ class Hook:
         """
         found = subprocess.run(
             ["git", "rev-parse", "--path-format=absolute", "--git-common-dir"],
-            capture_output=True, text=True, check=False,
+            capture_output=True,
+            text=True,
+            check=False,
         )
         common = found.stdout.strip()
         if found.returncode != 0 or not common:

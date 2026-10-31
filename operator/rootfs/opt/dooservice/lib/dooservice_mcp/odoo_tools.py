@@ -13,8 +13,13 @@ class OdooRead(Tool):
 
     name = "odoo_read"
     description = "Read records of an Odoo model: how many match, and the first ones with the fields asked for."
-    schema = {"model": TEXT, "domain": DOMAIN, "fields": {"type": "array", "items": TEXT},
-              "limit": {"type": "integer"}, "order": TEXT}
+    schema = {
+        "model": TEXT,
+        "domain": DOMAIN,
+        "fields": {"type": "array", "items": TEXT},
+        "limit": {"type": "integer"},
+        "order": TEXT,
+    }
     required = ("model",)
 
     def run(self, arguments):
@@ -30,8 +35,13 @@ class OdooWrite(Tool):
         "Create records (values_list) or write values on the records a domain matches, through the ORM. "
         "Many records, access rights, accounting and users need confirmed=true after the user said yes."
     )
-    schema = {"model": TEXT, "domain": DOMAIN, "values": {"type": "object"},
-              "values_list": {"type": "array", "items": {"type": "object"}}, "confirmed": {"type": "boolean"}}
+    schema = {
+        "model": TEXT,
+        "domain": DOMAIN,
+        "values": {"type": "object"},
+        "values_list": {"type": "array", "items": {"type": "object"}},
+        "confirmed": {"type": "boolean"},
+    }
     required = ("model",)
 
     def run(self, arguments):

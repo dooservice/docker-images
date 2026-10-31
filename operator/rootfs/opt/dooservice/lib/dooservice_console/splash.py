@@ -43,12 +43,12 @@ class Shade:
     """A colour between two, as the terminal's escape for it."""
 
     @staticmethod
-    def escape(rgb):
-        return f"\033[38;2;{rgb[0]};{rgb[1]};{rgb[2]}m"
+    def escape(colour):
+        return f"\033[38;2;{colour[0]};{colour[1]};{colour[2]}m"
 
     @staticmethod
-    def blend(start, end, amount):
-        return tuple(round(first + (second - first) * amount) for first, second in zip(start, end))
+    def blend(start, finish, amount):
+        return tuple(round(first + (second - first) * amount) for first, second in zip(start, finish))
 
     @classmethod
     def between(cls, amount):
@@ -93,12 +93,12 @@ class Splash:
         except OSError:
             columns, rows = DEFAULT_TERMINAL_SIZE
         width = max(len(line) for line in LOGO)
-        top = max(1, (rows - len(LOGO) - 5) // 2)
+        top_row = max(1, (rows - len(LOGO) - 5) // 2)
         sweep = (self.frame * 1.5) % (width + 24) - 12
         frame = ["\0337"]
         for index, line in enumerate(LOGO):
             left = max(1, (columns - width) // 2 + 1)
-            frame.append(f"\033[{top + index};{left}H")
+            frame.append(f"\033[{top_row + index};{left}H")
             current = None
             for column, char in enumerate(line):
                 shade = Shade.between(round(max(0.0, 1 - abs(column - sweep) / 6), 1))
@@ -115,7 +115,7 @@ class Splash:
             (len(self.subtitle), GRAY + self.subtitle),
         )):
             left = max(1, (columns - visible) // 2 + 1)
-            frame.append(f"\033[{top + len(LOGO) + 2 + offset};{left}H\033[2K\033[{left}G{styled}")
+            frame.append(f"\033[{top_row + len(LOGO) + 2 + offset};{left}H\033[2K\033[{left}G{styled}")
         frame.append(RESET + "\0338")
         self.write("".join(frame))
         self.frame += 1

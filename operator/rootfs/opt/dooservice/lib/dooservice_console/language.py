@@ -11,8 +11,8 @@ class Language:
     """`es`, `pt-BR` or `en_US` from the platform, read as `es`, `pt` or `en`."""
 
     def __init__(self, value: str | None = None) -> None:
-        raw = os.environ.get(LANGUAGE_VARIABLE, "") if value is None else value
-        self.code = raw.replace("_", "-").partition("-")[0].lower()
+        given = os.environ.get(LANGUAGE_VARIABLE, "") if value is None else value
+        self.code = given.replace("_", "-").partition("-")[0].lower()
 
     @property
     def name(self) -> str | None:

@@ -36,8 +36,8 @@ class SettingsLayers:
         """`later` laid over `earlier`, without changing either."""
         if isinstance(earlier, dict) and isinstance(later, dict):
             merged = dict(earlier)
-            for key, value in later.items():
-                merged[key] = cls.merge(earlier[key], value) if key in earlier else value
+            for name, value in later.items():
+                merged[name] = cls.merge(earlier[name], value) if name in earlier else value
             return merged
         if isinstance(earlier, list) and isinstance(later, list):
             return earlier + [item for item in later if item not in earlier]

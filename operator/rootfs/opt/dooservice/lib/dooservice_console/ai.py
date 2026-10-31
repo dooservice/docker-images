@@ -253,11 +253,11 @@ class AiSession:
         is never announced half written.
         """
         self.seen = (self.seen + data)[-SEEN_BYTES:]
-        url = self.linked_login() or self.printed_login()
-        if url is None or url in self.announced:
+        login_url = self.linked_login() or self.printed_login()
+        if login_url is None or login_url in self.announced:
             return data
-        self.announced.add(url)
-        announcement = json.dumps({"action": "open_url", "url": url.decode("utf-8", errors="ignore")})
+        self.announced.add(login_url)
+        announcement = json.dumps({"action": "open_url", "url": login_url.decode("utf-8", errors="ignore")})
         return data + ANNOUNCE_OPEN + base64.b64encode(announcement.encode()) + ANNOUNCE_CLOSE
 
     def linked_login(self):
@@ -276,7 +276,7 @@ class AiSession:
             if not token:
                 continue
             if token.lower() in URL_TERMINATORS:
-                url = b"".join(pieces)
-                return url if url.startswith(LOGIN_URLS) else None
+                login_url = b"".join(pieces)
+                return login_url if login_url.startswith(LOGIN_URLS) else None
             pieces.append(token)
         return None

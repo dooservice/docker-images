@@ -51,8 +51,8 @@ class Welcome:
         print("\n".join(self.lines()) + "\n")
 
     def lines(self):
-        teal, white, gray, red = (WELCOME_COLOURS[name] for name in ("teal", "white", "gray", "red"))
-        stage_colour = red if self.stage == PRODUCTION else teal
+        teal, white, gray, alarm = (WELCOME_COLOURS[name] for name in ("teal", "white", "gray", "red"))
+        stage_colour = alarm if self.stage == PRODUCTION else teal
         stage = self.texts.get(self.stage, self.stage)
         lines = [teal + "\n".join(LOGO) + RESET, ""]
         lines.append(self.texts["place"].format(
@@ -65,15 +65,15 @@ class Welcome:
             server=f"{white}{self.environ.get(SERVER_VARIABLE, '')}{RESET}",
         ))
         lines += ["", f"{white}{self.texts['commands']}{RESET}", ""]
-        commands = [(name.format(modules=self.texts["modules"]), self.texts[key]) for name, key in WELCOME_COMMANDS]
+        commands = [(name.format(modules=self.texts["modules"]), self.texts[text]) for name, text in WELCOME_COMMANDS]
         width = max(len(name) for name, description in commands) + 4
         lines += [f"  {white}${RESET} {teal}{name.ljust(width)}{RESET}{description}" for name, description in commands]
         lines.append("")
         if not os.path.isdir(os.path.join(REPOSITORY, ".git")):
             lines.append(f"{gray}{self.texts['no_repository']}{RESET}")
         if self.stage == PRODUCTION:
-            lines.append(f"{red}{self.texts['production_data']}{RESET}")
-            lines.append(f"{red}{self.texts['production_deploy']}{RESET}")
+            lines.append(f"{alarm}{self.texts['production_data']}{RESET}")
+            lines.append(f"{alarm}{self.texts['production_deploy']}{RESET}")
         lines.append(f"{gray}{self.duration()}{RESET}")
         return lines
 

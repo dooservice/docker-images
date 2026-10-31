@@ -40,14 +40,14 @@ class OdooCommand:
 
     def run(self):
         if not os.path.isdir(os.path.join(REPOSITORY, ".git")) and any(
-            arg.startswith("--addons-path") for arg in self.args
+            argument.startswith("--addons-path") for argument in self.args
         ):
             sys.stderr.write(
                 "This project has no repository: only the modules the environment already has can be installed.\n"
                 "Link a repository to the project to develop modules of its own.\n"
             )
             sys.exit(2)
-        if any(arg in MODULE_OPTIONS or arg.startswith(MODULE_OPTION_PREFIXES) for arg in self.args):
+        if any(argument in MODULE_OPTIONS or argument.startswith(MODULE_OPTION_PREFIXES) for argument in self.args):
             Production.refuse("Installing or updating modules")
         os.environ.update(Production.environment(writes=True))
         command = self.args[0] if self.args and not self.args[0].startswith("-") else None
@@ -70,9 +70,9 @@ class OdooCommand:
                 "--data-dir", DATA_DIR,
                 "--workers=0",
             ]
-            if not any(arg.startswith("--db_maxconn") for arg in args):
+            if not any(argument.startswith("--db_maxconn") for argument in args):
                 injected.append(DEFAULT_MAXCONN)
-            if not any(arg.startswith(("--http-port", "--http-interface")) for arg in args):
+            if not any(argument.startswith(("--http-port", "--http-interface")) for argument in args):
                 injected.append("--no-http")
         addons_path = os.environ.get(ADDONS_PATH_VARIABLE)
         base = [f"--addons-path={addons_path}"] if addons_path else []

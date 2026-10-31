@@ -10,6 +10,9 @@
             "*": "allow",
             "/run/dooservice/*": "deny"
         },
+        "external_directory": {
+            "/run/dooservice/*": "deny"
+        },
         "bash": {
             "*": "ask",
             "psql*": "allow",

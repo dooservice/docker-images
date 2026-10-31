@@ -426,3 +426,10 @@ WELCOME_TEXTS = {
         "limit_unknown": "Sie hat eine Höchstdauer.",
     },
 }
+
+#: The tests run in this session with `dooservice test`, one JSON line per run; `publish` sends them.
+TEST_RUNS = "~/.local/state/dooservice/tests.jsonl"
+#: The exit code of a command stopped with Ctrl+C.
+INTERRUPTED = 130
+#: The exit code of a command refused because of how it was called.
+USAGE = 2

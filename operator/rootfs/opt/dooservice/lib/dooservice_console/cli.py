@@ -4,6 +4,9 @@ What this container can do by itself runs here: installing, updating and testing
 opening an Odoo shell, measuring storage. What it cannot — restarting the environment,
 reading its live log, publishing — is asked of the platform, which does it outside this
 container and only for this environment.
+
+`test` runs the tests as a child and records each run, so `publish` can list every test
+run of the session in the pull request.
 """
 
 from __future__ import annotations
@@ -13,9 +16,10 @@ import os
 import subprocess
 import sys
 
-from .constants import DATA_DIR, ODOO_WRAPPER, REPOSITORY
+from .constants import DATA_DIR, INTERRUPTED, ODOO_WRAPPER, REPOSITORY, USAGE
 from .control import ControlClient
 from .production import Production
+from .runs import TestRuns
 
 
 class DooserviceCommand:
@@ -38,15 +42,18 @@ class DooserviceCommand:
         update.add_argument("modules", help="Comma-separated modules, or 'all'")
         install = commands.add_parser("install", help="Install modules in the database")
         install.add_argument("modules", help="Comma-separated modules")
-        test = commands.add_parser("test", help="Run a module's tests")
+        test = commands.add_parser("test", help="Run modules' tests; publish lists every run")
         test.add_argument("modules", help="Comma-separated modules")
         commands.add_parser("shell", help="Open an Odoo shell on this database")
         commands.add_parser("storage", help="Show what the environment occupies")
-        publish = commands.add_parser("publish", help="Publish what was committed as pull requests")
-        publish.add_argument("--title", default="", help="The pull request's title; made from the commits when empty")
-        described = publish.add_mutually_exclusive_group()
-        described.add_argument("--body", default="", help="The pull request's description")
+        publish = commands.add_parser(
+            "publish", help="Publish what was committed as pull requests, or update this session's",
+        )
+        publish.add_argument("--title", required=True, help="The pull request's title: [TAG] module: summary")
+        described = publish.add_mutually_exclusive_group(required=True)
+        described.add_argument("--body", help="The pull request's description")
         described.add_argument("--body-file", help="Read the description from a file, or from stdin with '-'")
+        publish.add_argument("--draft", action="store_true", help="Open the pull requests as drafts")
         return parser
 
     def run(self, argv):
@@ -58,7 +65,7 @@ class DooserviceCommand:
             "logs": self.logs,
             "update": self.modules,
             "install": self.modules,
-            "test": self.modules,
+            "test": self.test,
             "shell": self.shell,
             "storage": self.storage,
             "publish": self.publish,
@@ -81,18 +88,47 @@ class DooserviceCommand:
     def modules(self, options):
         Production.refuse("Installing, updating or testing modules")
         flag = "-i" if options.command == "install" else "-u"
-        extra = ["--test-enable"] if options.command == "test" else []
-        self.odoo(flag, options.modules, *extra, "--stop-after-init")
+        self.odoo(flag, options.modules, "--stop-after-init")
+
+    def test(self, options):
+        """Update the modules with their tests, as a child, and record the run for `publish`."""
+        Production.refuse("Installing, updating or testing modules")
+        command = [ODOO_WRAPPER, "-u", options.modules, "--test-enable", "--stop-after-init"]
+        try:
+            code = TestRuns().run(options.modules, command)
+        except KeyboardInterrupt:
+            sys.exit(INTERRUPTED)
+        sys.exit(code)
 
     def shell(self, options):
         self.odoo("shell")
 
     def publish(self, options):
+        """Send the title, the description and this session's test runs; print what the platform answers."""
         Production.refuse("Publishing")
+        title = options.title.strip()
         body = options.body
         if options.body_file:
-            body = sys.stdin.read() if options.body_file == "-" else open(options.body_file).read()
-        self.platform.run("publish", {"title": options.title, "body": body})
+            if options.body_file == "-":
+                body = sys.stdin.read()
+            else:
+                with open(options.body_file) as described:
+                    body = described.read()
+        if not title:
+            self.refuse("publish needs a title: --title \"[TAG] module: summary\".")
+        if not body.strip():
+            self.refuse("publish needs a description: --body \"...\" or --body-file FILE (- for stdin).")
+        self.platform.run("publish", {
+            "title": title,
+            "body": body,
+            "draft": options.draft,
+            "tests": TestRuns().all(),
+        })
+
+    @staticmethod
+    def refuse(message):
+        sys.stderr.write(f"dooservice: {message}\n")
+        sys.exit(USAGE)
 
     @staticmethod
     def odoo(*args):

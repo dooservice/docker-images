@@ -10,6 +10,8 @@ from pathlib import Path
 
 from dooservice_status.card import Card, Cards, Host
 from dooservice_status.cases import Case
+from dooservice_status.constants import LOCALES_DIR
+from dooservice_status.language import AcceptLanguage
 from dooservice_status.page import Page
 
 
@@ -72,6 +74,44 @@ class PageTest(unittest.TestCase):
         self.assertIn("<mark>erp.acme.pe</mark> does not exist (anymore?)", html)
         self.assertIn("My projects", html)
         self.assertNotIn("<mark>", self.page.render(Card(Case.STOPPED), "erp.acme.pe"))
+
+
+class AcceptLanguageTest(unittest.TestCase):
+    def test_base_codes_best_first(self) -> None:
+        self.assertEqual(AcceptLanguage("fr;q=0.5, es-PE, de;q=0.8").codes, ["es", "de", "fr"])
+
+    def test_ties_keep_their_order_and_nothing_odd_is_asked_for(self) -> None:
+        self.assertEqual(AcceptLanguage("pt_BR,it,*;q=0.9,en;q=0,de;q=x,").codes, ["pt", "it"])
+
+
+class LanguageTest(unittest.TestCase):
+    def setUp(self) -> None:
+        self.page = Page()
+
+    def test_spanish_browser_reads_spanish(self) -> None:
+        html = self.page.render(Card(Case.UNKNOWN), "erp.acme.pe", "es-PE,es;q=0.9,en;q=0.8")
+        self.assertIn('<html lang="es">', html)
+        self.assertIn("<mark>erp.acme.pe</mark> no existe", html)
+        self.assertIn("Mis proyectos", html)
+
+    def test_a_language_it_does_not_speak_reads_english(self) -> None:
+        html = self.page.render(Card(Case.STOPPED), accept_language="ja,zh;q=0.9")
+        self.assertIn('<html lang="en">', html)
+        self.assertIn("This Odoo is stopped", html)
+
+    def test_weights_choose_the_language(self) -> None:
+        html = self.page.render(Card(Case.STOPPED), accept_language="ja,es;q=0.5,de;q=0.7")
+        self.assertIn('<html lang="de">', html)
+
+    def test_every_case_in_every_language(self) -> None:
+        codes = sorted(path.parent.name for path in LOCALES_DIR.glob("*/status.json"))
+        self.assertIn("es", codes)
+        for code in codes:
+            for case in Case:
+                html = self.page.render(Card(case), "erp.acme.pe", code)
+                self.assertIn(f'<html lang="{code}">', html, (code, case))
+                self.assertNotIn("$", html, (code, case))
+                self.assertNotIn("{", html.partition("<script>")[0].partition("</style>")[2], (code, case))
 
 
 if __name__ == "__main__":

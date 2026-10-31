@@ -7,10 +7,9 @@
 # only runs `odoo-bin -u`, `odoo-bin shell` and tests against the same database, with
 # the same addons, as the same user (uid 1500) so files it writes are files the agent
 # can still manage.
-
-ARG ODOO_VERSION=19.0
-ARG ODOO_IMAGE=ghcr.io/dooservice/dooservice-odoo
-FROM ${ODOO_IMAGE}:${ODOO_VERSION}
+#
+# `dooservice-odoo` is the Odoo image of the same build, which docker-bake.hcl passes in.
+FROM dooservice-odoo
 
 ARG ODOO_VERSION
 ARG CLAUDE_CODE_VERSION=2.1.295

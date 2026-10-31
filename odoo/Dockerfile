@@ -1,6 +1,9 @@
-ARG ODOO_VERSION=17.0
-ARG ODOO_BASE=odoo:${ODOO_VERSION}
-FROM ${ODOO_BASE}
+# Odoo's official image, plus the dooservice user, the patched `odoo db` command, the
+# Dooservice addons and an entrypoint that installs the addons' Python requirements.
+# Built with `docker buildx bake` (docker-bake.hcl at the repository's root).
+
+ARG ODOO_VERSION=19.0
+FROM odoo:${ODOO_VERSION}
 
 USER root
 
@@ -21,7 +24,6 @@ RUN chmod +x /tmp/cli-patches/apply.sh \
 # installed only when somebody installs it from Apps, Connect loaded as a server-wide module
 # from odoo.conf and never installed.
 ARG ADDONS_COMMIT
-LABEL sh.dooservice.addons-commit="${ADDONS_COMMIT}"
 RUN test -n "${ADDONS_COMMIT}" \
  && mkdir -p /tmp/dooservice-addons /opt/dooservice/addons \
  && curl -fsSL "https://codeload.github.com/dooservice/odoo-addons/tar.gz/${ADDONS_COMMIT}" \

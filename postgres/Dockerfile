@@ -1,5 +1,5 @@
-ARG PG_VERSION=16
-FROM postgres:${PG_VERSION}
+# PostgreSQL 16 with pgvector, the database every environment of a server shares.
+FROM postgres:16
 
 RUN apt-get update \
  && apt-get install -y --no-install-recommends postgresql-"${PG_MAJOR}"-pgvector \

@@ -4,3 +4,6 @@
 [submodule "operator/locales"]
 	path = operator/locales
 	url = https://github.com/dooservice/locales.git
+[submodule "status/locales"]
+	path = status/locales
+	url = https://github.com/dooservice/locales.git

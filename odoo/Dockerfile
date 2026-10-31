@@ -19,11 +19,13 @@ RUN chmod +x /tmp/cli-patches/apply.sh \
  && /tmp/cli-patches/apply.sh ${ODOO_VERSION} \
  && rm -rf /tmp/cli-patches/
 
-# The Dooservice module (tickets to the consultancy) and Connect, at the commit
-# odoo/addons.toml names for this version, on every environment's addons path: the module
-# installed only when somebody installs it from Apps, Connect loaded as a server-wide module
-# from odoo.conf and never installed.
+# The Dooservice addons, from dooservice/odoo-addons at the commit docker-bake.hcl pins for
+# this version, on every environment's addons path. dooservice_connect is loaded as a
+# server-wide module from odoo.conf and never installed. dooservice_brain is retired: it
+# stays only so that environments that still have it installed can uninstall it, and
+# leaves the image once every environment has.
 ARG ADDONS_COMMIT
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 RUN test -n "${ADDONS_COMMIT}" \
  && mkdir -p /tmp/dooservice-addons /opt/dooservice/addons \
  && curl -fsSL "https://codeload.github.com/dooservice/odoo-addons/tar.gz/${ADDONS_COMMIT}" \

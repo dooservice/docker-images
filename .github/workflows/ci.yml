@@ -1,0 +1,74 @@
+name: CI
+
+# What every pull request and every push to main must pass, the same checks as `make check`:
+# the Dockerfiles, shell scripts, Python and workflows are linted, the bake file is valid,
+# every Odoo version has its skills, and the Python compiles and passes its tests. Nothing
+# is built or pushed here; that is the Build workflow.
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          submodules: true
+          persist-credentials: false
+
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+
+      - name: Dockerfiles
+        uses: hadolint/hadolint-action@06be81baf89a55ffd0e24b8f04a4185738dd3387 # v3.5.0
+        with:
+          recursive: true
+          config: .hadolint.yaml
+          failure-threshold: warning
+
+      - name: Shell scripts
+        if: ${{ !cancelled() }}
+        run: make shellcheck
+
+      - name: Python
+        if: ${{ !cancelled() }}
+        run: make ruff
+
+      - name: Workflows
+        if: ${{ !cancelled() }}
+        run: make actionlint
+
+      - name: Bake file
+        if: ${{ !cancelled() }}
+        run: make bake
+
+      - name: Skills for every Odoo version, each named as its directory
+        if: ${{ !cancelled() }}
+        run: make skills
+
+  test:
+    name: Test
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.13"
+
+      - name: Python compiles
+        run: make compile
+
+      - name: Unit tests
+        run: make unittest

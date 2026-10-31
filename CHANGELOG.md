@@ -7,6 +7,28 @@ server takes the platform with this build: one line per change and language (`- 
 agent does not sign a platform with a build that has no Novedades here, and reads that
 heading by name. The rest of an entry, when needed, is technical.
 
+## [20261031-5] — 2026-10-31
+
+### Novedades
+- es: La bienvenida de la consola y las pull requests usan las traducciones comunes de la
+  plataforma, en español, inglés, portugués, francés, italiano o alemán.
+- en: The console's welcome and pull requests use the platform's shared translations, in
+  Spanish, English, Portuguese, French, Italian or German.
+- pt: As boas-vindas do console e as pull requests usam as traduções comuns da plataforma,
+  em espanhol, inglês, português, francês, italiano ou alemão.
+- fr: L'accueil de la console et les pull requests utilisent les traductions communes de
+  la plateforme, en espagnol, anglais, portugais, français, italien ou allemand.
+- it: Il benvenuto della console e le pull request usano le traduzioni comuni della
+  piattaforma, in spagnolo, inglese, portoghese, francese, italiano o tedesco.
+- de: Die Begrüßung der Konsole und Pull Requests nutzen die gemeinsamen Übersetzungen der
+  Plattform, auf Spanisch, Englisch, Portugiesisch, Französisch, Italienisch oder Deutsch.
+
+### Changed
+- `operator`: [dooservice/locales](https://github.com/dooservice/locales) is a submodule at
+  `operator/locales`, copied to `/opt/dooservice/locales`. The console reads
+  `<code>/console.json` and the languages' names from `languages.json`; its TOML files and
+  `LANGUAGE_NAMES` are gone. CI's unit tests check out submodules.
+
 ## [20261031-4] — 2026-10-31
 
 ### Novedades

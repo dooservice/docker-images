@@ -4,9 +4,9 @@ cd status && python3 -m unittest discover tests
 """
 
 import json
-from pathlib import Path
 import tempfile
 import unittest
+from pathlib import Path
 
 from dooservice_status.card import Card, Cards, Host
 from dooservice_status.cases import Case

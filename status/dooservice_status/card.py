@@ -1,7 +1,7 @@
 """The card the agent wrote for an address, read without trusting the address or the file."""
 
-from dataclasses import dataclass
 import json
+from dataclasses import dataclass
 from pathlib import Path
 
 from .cases import Case

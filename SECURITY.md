@@ -7,12 +7,13 @@ report seriously.
 
 Do not open a public issue. Report it privately through GitHub:
 [**Report a vulnerability**](https://github.com/dooservice/docker-images/security/advisories/new),
-in the *Security* tab of this repository. If you cannot use GitHub, write to
-[soporte@apiservicesac.com](mailto:soporte@apiservicesac.com) with «Security» in the subject.
+in the *Security* tab of this repository, or write to
+[security@dooservice.sh](mailto:security@dooservice.sh). For anything that is not a
+vulnerability, write to [support@dooservice.sh](mailto:support@dooservice.sh).
 
 Include what you can of:
 
-- the image and tag (`dooservice-operator:18.0-20261013`, for instance);
+- the image and tag (`dooservice-operator:19.0-20261031`, for instance);
 - what an attacker can do, and from where: inside a console session, from the
   environment's Odoo, from the network;
 - the steps to reproduce it.

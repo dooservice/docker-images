@@ -55,8 +55,6 @@ Built on the official `odoo` image of the same version, pinned by digest in
     environment's Odoo as their own user, through a signed link that works once, without
     typing a password. It is loaded as a server-wide module from `odoo.conf` and never
     installed, so a database taken elsewhere keeps nothing of it.
-  - `dooservice_brain`, retired: it stays only so that environments that still have it
-    installed can uninstall it, and leaves once every environment has.
 - **An entrypoint** that installs the Python requirements of every `requirements.txt` in
   `/mnt/addons`, the project's repository, before Odoo starts. A file pip cannot install
   is logged as an `ERROR` with pip's output, and Odoo still starts.

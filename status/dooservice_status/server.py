@@ -6,7 +6,7 @@ which is in `Host`."""
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 from .card import Card, Cards, Host
-from .cases import WORDING, Case
+from .cases import Case
 from .constants import FAILED_PATH, FINAL_STATUS, HEALTH_PATH, PORT, RETRY_AFTER_SECONDS, WAITING_STATUS
 from .page import Page
 
@@ -35,10 +35,9 @@ class StatusHandler(BaseHTTPRequestHandler):
         card = self.cards.of(host)
         if self.path.partition("?")[0] == FAILED_PATH and card.case == Case.NOT_RESPONDING:
             card = Card(Case.FAILING)
-        final = WORDING[card.case].final
         self.send(
-            FINAL_STATUS if final else WAITING_STATUS,
-            self.page.render(card, host).encode(),
+            FINAL_STATUS if card.case.final else WAITING_STATUS,
+            self.page.render(card, host, self.headers.get("Accept-Language", "")).encode(),
             "text/html; charset=utf-8",
             with_body,
         )
@@ -49,6 +48,7 @@ class StatusHandler(BaseHTTPRequestHandler):
         self.send_header("Content-Length", str(len(body)))
         self.send_header("Cache-Control", "no-store")
         self.send_header("X-Robots-Tag", "noindex")
+        self.send_header("Vary", "Accept-Language")
         if status == WAITING_STATUS:
             self.send_header("Retry-After", RETRY_AFTER_SECONDS)
         self.end_headers()

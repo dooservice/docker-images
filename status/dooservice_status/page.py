@@ -1,48 +1,54 @@
-"""A card made into the page the browser sees."""
+"""A card made into the page the browser sees, in the visitor's language."""
 
 from html import escape
 from pathlib import Path
 from string import Template
 
 from .card import Card
-from .cases import WORDING, Case
+from .cases import Case
 from .constants import (
     ACTIVE_POLL_MILLISECONDS,
+    CHOICES,
     FINAL_POLL_MILLISECONDS,
+    HOST_BLANK,
     PANEL_URL,
     SITE_URL,
     SUPPORT,
 )
-
-CHOICES = (
-    (" primary", SITE_URL, "Discover Dooservice", "If you do not know why you landed here"),
-    ("", PANEL_URL, "My projects", "Check the list of your environments"),
-    ("", f"mailto:{SUPPORT}", "Get help", "If you want to recover a deleted environment"),
-)
+from .language import Catalog, Catalogs
 
 HERE = Path(__file__).parent
 
 
 class Page:
-    def __init__(self) -> None:
+    def __init__(self, catalogs: Catalogs | None = None) -> None:
         self.template = Template((HERE / "page.html").read_text())
         self.logo = (HERE / "logo.svg").read_text().strip()
+        self.catalogs = catalogs or Catalogs()
 
-    def render(self, card: Card, host: str = "") -> str:
-        wording = WORDING[card.case]
+    def render(self, card: Card, host: str = "", accept_language: str = "") -> str:
+        catalog = self.catalogs.of(accept_language)
+        key = f"cases.{card.case.value}"
+        title = escape(catalog.text(f"{key}.title"))
         missing = card.case == Case.UNKNOWN and bool(host)
         return self.template.substitute(
+            lang=catalog.code,
             logo=self.logo,
-            label=escape(wording.label),
-            title=escape(wording.title),
-            heading=f"<mark>{escape(host)}</mark> does not exist (anymore?)" if missing else escape(wording.title),
-            text=escape(wording.text),
-            progress=self.progress(card) if card.progress is not None else self.dots(wording.final),
-            actions=self.choices() if card.case == Case.UNKNOWN else self.actions(),
-            every=FINAL_POLL_MILLISECONDS if wording.final else ACTIVE_POLL_MILLISECONDS,
+            label=escape(catalog.text(f"{key}.label")),
+            title=title,
+            heading=self.missing(catalog, host) if missing else title,
+            text=escape(catalog.text(f"{key}.text")),
+            progress=self.progress(card) if card.progress is not None else self.dots(card.case.final),
+            actions=self.choices(catalog) if card.case == Case.UNKNOWN else self.actions(catalog),
+            every=FINAL_POLL_MILLISECONDS if card.case.final else ACTIVE_POLL_MILLISECONDS,
+            help=escape(catalog.text("help")),
             support=SUPPORT,
             site_url=SITE_URL,
         )
+
+    @staticmethod
+    def missing(catalog: Catalog, host: str) -> str:
+        return escape(catalog.text("missing")).replace(HOST_BLANK, f"<mark>{escape(host)}</mark>")
 
     @staticmethod
     def progress(card: Card) -> str:
@@ -57,19 +63,20 @@ class Page:
         return "" if final else '<div class="dots" aria-hidden="true"><i></i><i></i><i></i></div>'
 
     @staticmethod
-    def actions() -> str:
+    def actions(catalog: Catalog) -> str:
         return (
-            f'<div class="actions"><a class="btn primary" href="{PANEL_URL}">Open Dooservice</a>'
-            f'<a class="btn" href="{SITE_URL}">Visit dooservice.sh</a></div>'
+            f'<div class="actions"><a class="btn primary" href="{PANEL_URL}">{escape(catalog.text("actions.open"))}</a>'
+            f'<a class="btn" href="{SITE_URL}">{escape(catalog.text("actions.visit"))}</a></div>'
         )
 
     @staticmethod
-    def choices() -> str:
+    def choices(catalog: Catalog) -> str:
         return (
             '<div class="choices">'
             + "".join(
-                f'<div><a class="btn{kind}" href="{url}">{label}</a><small>{caption}</small></div>'
-                for kind, url, label, caption in CHOICES
+                f'<div><a class="btn{kind}" href="{url}">{escape(catalog.text(f"choices.{key}.label"))}</a>'
+                f"<small>{escape(catalog.text(f'choices.{key}.hint'))}</small></div>"
+                for kind, url, key in CHOICES
             )
             + "</div>"
         )

@@ -7,6 +7,19 @@ server takes the platform with this build: one line per change and language (`- 
 agent does not sign a platform with a build that has no Novedades here, and reads that
 heading by name. The rest of an entry, when needed, is technical.
 
+## [20261031-3] — 2026-10-31
+
+### Novedades
+- es: La página que se ve mientras un entorno no está disponible muestra un único correo de
+  soporte: support@dooservice.sh.
+- en: The page shown while an environment is unavailable lists a single support address:
+  support@dooservice.sh.
+
+### Removed
+- `odoo`: `dooservice_brain`, retired since 17 October; no database has it installed. It
+  is also gone from every branch of `dooservice/odoo-addons`.
+- `status`: the Peru support line; support@dooservice.sh is the only contact.
+
 ## [20261031-2] — 2026-10-31
 
 ### Novedades

@@ -6,12 +6,20 @@
     "lsp": false,
     "permission": {
         "edit": "deny",
-        "bash": {
+        "read": {
             "*": "allow",
-            "dooservice shell*": "ask",
-            "odoo-bin*": "ask",
-            "python3*": "ask",
-            "dooservice restart*": "ask"
+            "/run/dooservice/*": "deny"
+        },
+        "bash": {
+            "*": "ask",
+            "psql*": "allow",
+            "dooservice status": "allow",
+            "dooservice logs*": "allow",
+            "dooservice storage": "allow",
+            "ls*": "allow",
+            "echo*": "allow",
+            "*/run/dooservice*": "deny",
+            "*write-credentials*": "deny"
         },
         "webfetch": "allow",
         "dooservice_odoo_write": "ask",

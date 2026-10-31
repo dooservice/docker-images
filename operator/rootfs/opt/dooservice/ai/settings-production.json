@@ -10,10 +10,6 @@
             "Bash(dooservice logs:*)",
             "Bash(dooservice storage)",
             "Bash(ls:*)",
-            "Bash(grep:*)",
-            "Bash(head:*)",
-            "Bash(tail:*)",
-            "Bash(wc:*)",
             "Bash(echo *)",
             "Bash(echo)",
             "mcp__dooservice__odoo_read",
@@ -32,6 +28,8 @@
             "Write",
             "NotebookEdit",
             "Read(/run/dooservice/**)",
+            "Bash(*/run/dooservice*)",
+            "Bash(*write-credentials*)",
             "mcp__dooservice__module_install",
             "mcp__dooservice__module_update"
         ]

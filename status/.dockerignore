@@ -10,3 +10,6 @@
 **/.vscode
 .dockerignore
 tests
+locales/**
+!locales/*/status.json
+!locales/LICENSE

@@ -1,0 +1,23 @@
+# One configuration for every Python file in the repository. The console's code runs on the
+# Python of each Odoo image, 3.9 under Odoo 16.0, so that is the version to stay within; the
+# status page runs on its own image's Python.
+line-length = 120
+target-version = "py39"
+extend-include = [
+  "operator/rootfs/usr/local/bin/*",
+  "operator/rootfs/opt/dooservice/git-hooks/dispatch",
+]
+extend-exclude = [
+  "odoo/cli-patches",
+  "operator/skills",
+]
+
+[per-file-target-version]
+"status/**" = "py313"
+"versions.py" = "py312"
+
+[lint]
+select = ["E", "F", "W", "I", "UP", "B"]
+
+[lint.isort]
+force-sort-within-sections = true

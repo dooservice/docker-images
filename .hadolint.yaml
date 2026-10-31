@@ -1,0 +1,8 @@
+# DL3008: Debian packages come from the base image's release, which is pinned by digest;
+# pinning each package to a version breaks the build at every point release.
+# DL3006: the console starts FROM dooservice-odoo, the Odoo image of the same build, which
+# docker-bake.hcl passes in as a named context and which has no tag of its own.
+failure-threshold: warning
+ignored:
+  - DL3006
+  - DL3008

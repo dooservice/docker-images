@@ -1,0 +1,2 @@
+# The scripts are bash; a file without a shebang, such as a profile.d snippet, is too.
+shell=bash

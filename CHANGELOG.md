@@ -44,8 +44,8 @@ heading by name. The rest of an entry, when needed, is technical.
   gets the names and values of your Odoo version right more often.
 
 ### Changed
-- `operator`: skills de odoo-skills 2.0.0 (información por capas, descripciones con
-  valores exactos).
+- `operator`: skills from odoo-skills 2.0.0 (layered information, descriptions with exact
+  values).
 
 ## [20261030-2] — 2026-10-30
 
@@ -58,7 +58,7 @@ heading by name. The rest of an entry, when needed, is technical.
   journals...), so it no longer mixes in code or fields from another version.
 
 ### Changed
-- `operator`: skills de odoo-skills 1.1.1 (descripciones con los nombres de cada versión).
+- `operator`: skills from odoo-skills 1.1.1 (descriptions with the names of each version).
 
 ## [20261030] — 2026-10-30
 
@@ -75,8 +75,8 @@ heading by name. The rest of an entry, when needed, is technical.
   your version. It always writes for the version you run.
 
 ### Changed
-- `operator`: skills de odoo-skills 1.1.0 (70 recetas, guías de desarrollo completas por
-  versión, sin localizaciones).
+- `operator`: skills from odoo-skills 1.1.0 (70 recipes, complete development guides per
+  version, no localizations).
 
 ## [20261020-2] — 2026-10-20
 
@@ -91,12 +91,11 @@ heading by name. The rest of an entry, when needed, is technical.
   products, imports, purchases, CRM, mail, reports and languages.
 
 ### Changed
-- `operator`: skills de odoo-skills 1.0.0. `odoo-functional` pasa a `odoo/common` y se
-  instala con las de código; ya no hay grupo `functional`.
-- `dooservice-console` vive en esta imagen (`rootfs/opt/dooservice/ai/skills/dooservice/`),
-  al día con producción y con las herramientas `odoo_*` y `module_*`.
-- `AGENTS.md` deja las herramientas, los comandos y el bucle de código a
-  `dooservice-console`.
+- `operator`: skills from odoo-skills 1.0.0. `odoo-functional` moves to `odoo/common` and
+  is installed with the code skills; there is no `functional` group any more.
+- `dooservice-console` lives in this image (`rootfs/opt/dooservice/ai/skills/dooservice/`),
+  up to date with production and with the `odoo_*` and `module_*` tools.
+- `AGENTS.md` leaves the tools, the commands and the code loop to `dooservice-console`.
 
 ## [20261018] — 2026-10-18
 
@@ -108,10 +107,10 @@ heading by name. The rest of an entry, when needed, is technical.
   see a Dooservice page that keeps retrying instead of an "Internal Server Error".
 
 ### Added
-- `dooservice-status`: caso `failing` («This Odoo ran into a problem»). Lo muestra cuando el
-  proxy le manda un 500 de producción (`/_dooservice/status/500`) y la tarjeta dice que el
-  entorno corre; si hay un despliegue o una restauración en curso, manda la tarjeta. Responde
-  503 con `Retry-After`, así que la página se recarga sola.
+- `dooservice-status`: the `failing` case («This Odoo ran into a problem»). It is shown
+  when the proxy sends it a production 500 (`/_dooservice/status/500`) and the card says
+  the environment is running; if a deployment or a restore is under way, the card wins. It
+  answers 503 with `Retry-After`, so the page reloads itself.
 
 ## [20261017] — 2026-10-17
 
@@ -122,14 +121,14 @@ heading by name. The rest of an entry, when needed, is technical.
   “Dooservice” module is uninstalled from each Odoo as its environment takes this image.
 
 ### Removed
-- Las herramientas MCP `business_index`, `business_area`, `business_fact` y
-  `business_changes` de la consola, la variable `DOOSERVICE_BUSINESS` y la sección de la
-  capa en el `AGENTS.md` del operador.
+- The console's MCP tools `business_index`, `business_area`, `business_fact` and
+  `business_changes`, the `DOOSERVICE_BUSINESS` variable and the layer's section in the
+  operator's `AGENTS.md`.
 
 ### Kept
-- `dooservice_brain` sigue en las imágenes de Odoo de esta revisión: el agente lo
-  desinstala al cambiar de imagen y necesita su código para hacerlo. Sale en un build
-  posterior, cuando todos los servidores lo hayan desinstalado.
+- `dooservice_brain` stays in this revision's Odoo images: the agent uninstalls it when
+  the image changes and needs its code to do so. It leaves in a later build, once every
+  server has uninstalled it.
 
 ## [20261016-2] — 2026-10-16
 
@@ -146,18 +145,18 @@ heading by name. The rest of an entry, when needed, is technical.
   Discuss, each with its own chat; it arrives when the module is updated in each Odoo.
 
 ### Changed
-- Operador: la lectura se monta en `/opt/dooservice/business` (`DOOSERVICE_BUSINESS`) con
-  `facts.json`, `changes.json`, `reading.json` e `index.md`; las herramientas MCP pasan a
-  `business_index`, `business_area`, `business_fact` y `business_changes`
-  (`business_tools.py`). Desaparecen `brain_process` y `brain_memory`: ya no hay
-  `processes.json` ni `memory.jsonl`.
-- `dooservice_brain` 2.0.0 (`<odoo>.2.0.0` por rama): nombre visible «Dooservice»; tickets
-  con un chat cada uno en lugar del asistente único y sus solicitudes. Los commits de
-  `odoo/addons.toml` se mueven cuando cada rama esté publicada.
+- Operator: the reading is mounted at `/opt/dooservice/business` (`DOOSERVICE_BUSINESS`)
+  with `facts.json`, `changes.json`, `reading.json` and `index.md`; the MCP tools become
+  `business_index`, `business_area`, `business_fact` and `business_changes`
+  (`business_tools.py`). `brain_process` and `brain_memory` are gone: there is no
+  `processes.json` or `memory.jsonl` any more.
+- `dooservice_brain` 2.0.0 (`<odoo>.2.0.0` per branch): display name «Dooservice»; tickets,
+  each with its own chat, instead of the single assistant and its requests. The commits in
+  `odoo/addons.toml` move once each branch is published.
 
 ### Removed
-- `dooservice-build`, `dooservice_build*.py`, `settings-build.json` y `opencode-build.json`:
-  la construcción desatendida de solicitudes (`brain.build`) ya no existe.
+- `dooservice-build`, `dooservice_build*.py`, `settings-build.json` and
+  `opencode-build.json`: the unattended build of requests (`brain.build`) no longer exists.
 
 ## [20261016] — 2026-10-16
 
@@ -168,10 +167,10 @@ heading by name. The rest of an entry, when needed, is technical.
   Odoo starts or updates are now always light.
 
 ### Fixed
-- `dooservice_brain` 1.2.1: las piezas se cargan después de pintar el mensaje y con el ORM
-  del cliente web; antes, un mensaje que Odoo rehacía dejaba sin respuesta la carga y la
-  conversación entera esperaba sin pintarse.
-- `dooservice-status`: solo tema claro.
+- `dooservice_brain` 1.2.1: the cards load after the message is rendered and with the web
+  client's ORM; before, a message Odoo re-rendered left the load unanswered and the whole
+  conversation waited without rendering.
+- `dooservice-status`: light theme only.
 
 ## [20261015-8] — 2026-10-15
 
@@ -186,10 +185,10 @@ heading by name. The rest of an entry, when needed, is technical.
   Assistant” module is updated in each Odoo.
 
 ### Changed
-- `dooservice_brain` 1.2.0 en las cinco versiones: las piezas de cada respuesta se guardan
-  en su mensaje (`dooservice_cards`, `dooservice_card_state`); en 17–20 las dibuja un
-  componente OWL bajo el mensaje, en 16 van como enlaces firmados en la respuesta. El
-  icono del asistente vuelve a abrir el chat en Odoo 20 (Owl 3).
+- `dooservice_brain` 1.2.0 on all five versions: the cards of each answer are stored on
+  its message (`dooservice_cards`, `dooservice_card_state`); on 17–20 an OWL component
+  draws them under the message, on 16 they come as signed links in the answer. The
+  assistant's icon opens the chat again on Odoo 20 (Owl 3).
 
 ## [20261015-7] — 2026-10-15
 
@@ -201,7 +200,7 @@ heading by name. The rest of an entry, when needed, is technical.
 
 ### Changed
 - `brain.py` → `addons.py`, `odoo/brain.toml` → `odoo/addons.toml`, `BRAIN_COMMIT` →
-  `ADDONS_COMMIT`, la etiqueta `sh.dooservice.addons-commit` y la descarga en
+  `ADDONS_COMMIT`, the `sh.dooservice.addons-commit` label and the download into
   `/tmp/dooservice-addons`.
 
 ## [20261015-6] — 2026-10-15
@@ -213,8 +212,8 @@ heading by name. The rest of an entry, when needed, is technical.
   under its new name, `dooservice/odoo-addons`.
 
 ### Changed
-- `odoo/Dockerfile` descarga de `dooservice/odoo-addons` (antes `odoo-brain`, que GitHub
-  redirige).
+- `odoo/Dockerfile` downloads from `dooservice/odoo-addons` (formerly `odoo-brain`, which
+  GitHub redirects).
 
 ## [20261015-5] — 2026-10-15
 
@@ -227,10 +226,10 @@ heading by name. The rest of an entry, when needed, is technical.
   cannot, it lands on Odoo's login instead of an error.
 
 ### Changed
-- `dooservice_connect` 1.0.1 en las cinco versiones: sesión de `base.user_admin`, y el
-  correo de quien entra solo en el log.
-- `dooservice-status` se etiqueta `latest` y su revisión es la fecha sola.
-- Artefactos del build en Node 24 (`upload-artifact@v7`, `download-artifact@v8`).
+- `dooservice_connect` 1.0.1 on all five versions: a session of `base.user_admin`, and the
+  email of whoever signs in only in the log.
+- `dooservice-status` is tagged `latest` and its revision is the date alone.
+- Build artifacts on Node 24 (`upload-artifact@v7`, `download-artifact@v8`).
 
 ## [20261015-4] — 2026-10-15
 
@@ -244,9 +243,9 @@ heading by name. The rest of an entry, when needed, is technical.
   answers. An address with no Odoo says so, as Odoo's own does.
 
 ### Added
-- `ghcr.io/dooservice/dooservice-status:latest` (revisión `20261015-4`): un contenedor
-  pequeño por servidor que lee las fichas que escribe el agente (`/status/<host>.json`, en
-  solo lectura) y sirve la página, en inglés, sin credenciales ni base de datos.
+- `ghcr.io/dooservice/dooservice-status:latest` (revision `20261015-4`): one small
+  container per server that reads the cards the agent writes (`/status/<host>.json`, read
+  only) and serves the page, in English, with no credentials and no database.
 
 ## [20261015-3] — 2026-10-15
 
@@ -257,9 +256,9 @@ heading by name. The rest of an entry, when needed, is technical.
   typing a password. It works after each environment's next restart.
 
 ### Added
-- `dooservice_connect` en `/opt/dooservice/addons`, junto a `dooservice_brain`: módulo de
-  servidor que se carga desde `odoo.conf` y no se instala, así que una base llevada a otro
-  sitio no guarda nada de él.
+- `dooservice_connect` in `/opt/dooservice/addons`, beside `dooservice_brain`: a
+  server-wide module loaded from `odoo.conf` and never installed, so a database taken
+  elsewhere keeps nothing of it.
 
 ## [20261015-2] — 2026-10-15
 
@@ -272,12 +271,13 @@ heading by name. The rest of an entry, when needed, is technical.
   install, and the chat shows the Dooservice logo once the module is updated.
 
 ### Changed
-- `dooservice_brain` 1.1.0 en las cinco versiones: grupos bajo un privilegio (19–20) o una
-  categoría (16–18), el admin con «Pedir cambios», y migración que pone la foto del bot.
-- Sin expresiones regulares en las imágenes: la pantalla de inicio de la consola lee las
-  secuencias de terminal con `TerminalText` (que ahora salta también DCS, SOS, PM y APC),
-  y el parche de `dump_db` de Odoo 16–18 reemplaza texto exacto y para el build si no
-  encuentra el bloque, en vez de dejar la imagen sin parchear.
+- `dooservice_brain` 1.1.0 on all five versions: groups under a privilege (19–20) or a
+  category (16–18), the admin with «Request changes», and a migration that sets the bot's
+  picture.
+- No regular expressions in the images: the console's start screen reads terminal
+  sequences with `TerminalText` (which now also skips DCS, SOS, PM and APC), and the
+  `dump_db` patch for Odoo 16–18 replaces exact text and stops the build if it does not
+  find the block, instead of leaving the image unpatched.
 
 ## [20261015] — 2026-10-15
 
@@ -301,29 +301,29 @@ heading by name. The rest of an entry, when needed, is technical.
   touching their data or renaming them. The code written by hand never reaches the AI.
 
 ### Added
-- Odoo: `dooservice_brain` de `dooservice/odoo-brain` en `/opt/dooservice/addons`, al
-  commit que `odoo/brain.toml` fija para cada versión (`brain.py` lo lee y el workflow
-  comprueba que cada versión ofrecida tenga el suyo). La etiqueta
-  `sh.dooservice.brain-commit` de la imagen dice cuál lleva.
-- Operador: `dooservice-build`, la construcción sin nadie delante que lanza `brain.build`:
-  Claude Code (`claude -p`) para Anthropic y opencode (`run --format json`) para OpenAI y
-  compatibles, con `settings-build.json` y `opencode-build.json` (sin web, sin commit, sin
-  push, sin `env`), las reglas de `AGENTS.md` y su sección nueva «Unattended builds».
-  Recibe todo por variables `DOOSERVICE_BUILD_*`; la clave solo llega al proceso de la
-  herramienta. Su última línea es JSON con los cambios, el modelo y los tokens.
-- Operador: `AGENTS.md` y las reglas de `dooservice-build` cubren los tres tipos de
-  solicitud que se construyen (`view`, `automate`, `adopt`). La única excepción a «sin
-  `x_` en un módulo» es adoptar lo hecho a mano: los campos conservan su nombre, tipo y
-  opciones, y un `pre_init_hook` enlaza los registros existentes con sus xml ids.
-  El código hecho a mano nunca llega a la IA: ve marcadores `DOOSERVICE_ADOPTED_CODE_…`
-  que deja tal cual en el XML, y la plataforma pone después el contenido original.
-- Operador: `ODOO_IMAGE` como argumento de construcción, para construirlo sobre otra
-  imagen de Odoo (por defecto la del registro).
+- Odoo: `dooservice_brain` from `dooservice/odoo-brain` in `/opt/dooservice/addons`, at
+  the commit `odoo/brain.toml` pins for each version (`brain.py` reads it and the workflow
+  checks that every offered version has its own). The image's `sh.dooservice.brain-commit`
+  label says which one it carries.
+- Operator: `dooservice-build`, the unattended build that `brain.build` launches: Claude
+  Code (`claude -p`) for Anthropic and opencode (`run --format json`) for OpenAI and
+  compatible providers, with `settings-build.json` and `opencode-build.json` (no web, no
+  commit, no push, no `env`), the rules of `AGENTS.md` and its new «Unattended builds»
+  section. It receives everything through `DOOSERVICE_BUILD_*` variables; the key reaches
+  only the tool's process. Its last line is JSON with the changes, the model and the tokens.
+- Operator: `AGENTS.md` and the rules of `dooservice-build` cover the three kinds of
+  request that get built (`view`, `automate`, `adopt`). The only exception to «no `x_` in a
+  module» is adopting what was made by hand: the fields keep their name, type and options,
+  and a `pre_init_hook` links the existing records to their xml ids. Code written by hand
+  never reaches the AI: it sees `DOOSERVICE_ADOPTED_CODE_…` markers, which it leaves as they
+  are in the XML, and the platform puts the original content back afterwards.
+- Operator: `ODOO_IMAGE` as a build argument, to build it on another Odoo image (by
+  default the registry's).
 
 ### Changed
-- `dooservice_ai.py` ya no usa regex: las secuencias de escape de la terminal se leen
-  byte a byte en `dooservice_terminal.py` (`TerminalText`), y el idioma y las URL partidas
-  se separan con `split`. Fuera `ANSI_ESCAPE`, `OSC_SEQUENCE` y `OSC_LINK`.
+- `dooservice_ai.py` no longer uses regex: terminal escape sequences are read byte by byte
+  in `dooservice_terminal.py` (`TerminalText`), and the language and split URLs are
+  separated with `split`. `ANSI_ESCAPE`, `OSC_SEQUENCE` and `OSC_LINK` are gone.
 
 ## [20261014] — 2026-10-14
 
@@ -340,13 +340,13 @@ heading by name. The rest of an entry, when needed, is technical.
   by hand in Odoo.
 
 ### Added
-- Operador: herramientas MCP `brain_index`, `brain_fact`, `brain_process` y `brain_memory`
-  sobre `$DOOSERVICE_BRAIN`; la lista de herramientas pasa a `mcp/catalog.py`. `AGENTS.md`
-  explica el cerebro.
+- Operator: MCP tools `brain_index`, `brain_fact`, `brain_process` and `brain_memory` over
+  `$DOOSERVICE_BRAIN`; the list of tools moves to `mcp/catalog.py`. `AGENTS.md` explains
+  the brain.
 
 ### Changed
-- Las constantes del operador viven juntas: `lib/dooservice_constants.py` y
-  `mcp/constants.py`. `AGENTS.md` fija que un módulo nunca define campos `x_`.
+- The operator's constants live together: `lib/dooservice_constants.py` and
+  `mcp/constants.py`. `AGENTS.md` states that a module never defines `x_` fields.
 
 ## [20261013] — 2026-10-13
 
@@ -363,19 +363,19 @@ heading by name. The rest of an entry, when needed, is technical.
   SQL. On production it asks you before each change.
 
 ### Changed
-- `dooservice_production.py`: en producción, `psql` y `odoo-bin` escriben con
-  `write-credentials` en cuanto la copia previa de la sesión está lista; la IA también
-  escribe con `odoo-bin` (su shell de Odoo y sus herramientas MCP), y su `psql` sigue
-  siendo de solo lectura en producción y en desarrollo.
-- `settings-production.json` y `opencode-production.json`: en producción Claude Code y
-  opencode piden permiso antes de `dooservice shell`, `odoo-bin`, `python3`,
-  `odoo_write` y `odoo_settings`; las herramientas de módulos no están. Sin el hook de rtk
-  en producción, para que nada apruebe un comando por su cuenta.
-- `AGENTS.md`: sección «On production» nueva.
+- `dooservice_production.py`: on production, `psql` and `odoo-bin` write with
+  `write-credentials` as soon as the session's backup is ready; the AI also writes with
+  `odoo-bin` (its Odoo shell and its MCP tools), and its `psql` stays read only on
+  production and on development.
+- `settings-production.json` and `opencode-production.json`: on production Claude Code and
+  opencode ask before `dooservice shell`, `odoo-bin`, `python3`, `odoo_write` and
+  `odoo_settings`; the module tools are not there. No rtk hook on production, so nothing
+  approves a command on its own.
+- `AGENTS.md`: new «On production» section.
 
 ### Removed
-- `dooservice record`, el envío de cada comando de la terminal (`PROMPT_COMMAND`) y de
-  cada llamada a una herramienta MCP: la plataforma ya no guarda lo que se ejecuta.
+- `dooservice record`, and the sending of every terminal command (`PROMPT_COMMAND`) and of
+  every MCP tool call: the platform no longer keeps what is run.
 
 ## [20261012-2] — 2026-10-12
 
@@ -390,13 +390,13 @@ heading by name. The rest of an entry, when needed, is technical.
   everything run there is recorded.
 
 ### Added
-- `dooservice_production.py`: en producción, `psql`, `odoo-bin` y las herramientas MCP
-  leen con el usuario de solo lectura de la sesión y escriben con `write-credentials` solo
-  mientras valen; el `psql` y el `dooservice shell` de la IA, nunca. `dooservice install`,
-  `update`, `test` y `publish` se niegan, y `restart` pide cambios permitidos.
-- Cada comando de la terminal (`PROMPT_COMMAND`) y cada llamada a una herramienta MCP se
-  envían a la plataforma con `dooservice record`.
-- `AGENTS.md`: sección «On production»; el lanzador de la IA abre también en producción.
+- `dooservice_production.py`: on production, `psql`, `odoo-bin` and the MCP tools read
+  with the session's read-only user and write with `write-credentials` only while they are
+  valid; the AI's `psql` and `dooservice shell`, never. `dooservice install`, `update`,
+  `test` and `publish` refuse, and `restart` needs changes allowed.
+- Every terminal command (`PROMPT_COMMAND`) and every MCP tool call is sent to the
+  platform with `dooservice record`.
+- `AGENTS.md`: «On production» section; the AI launcher opens on production too.
 
 ## [20261012] — 2026-10-12
 
@@ -418,20 +418,20 @@ heading by name. The rest of an entry, when needed, is technical.
   the terminal, and asks for your yes before wide, access or accounting changes.
 
 ### Changed
-- Una sola sesión de IA (`Workspace` en `dooservice_ai.py`): instrucciones únicas en
-  `AGENTS.md`; sin repositorio, `settings-no-repository.json` y
-  `opencode-no-repository.json` con la edición de ficheros desactivada. `CONFIGURATION.md`
-  desaparece y `DOOSERVICE_AI_MODE_CHOSEN` ya no se lee.
-- `psql` en solo lectura en toda sesión de IA (`DOOSERVICE_AI_SESSION`); `odoo-bin` rechaza
-  `--addons-path` solo cuando no hay repositorio.
-- Skill `odoo-reference` (generada desde el código de cada versión) y recetas en
+- One AI session (`Workspace` in `dooservice_ai.py`): one set of instructions in
+  `AGENTS.md`; with no repository, `settings-no-repository.json` and
+  `opencode-no-repository.json` with file editing turned off. `CONFIGURATION.md` is gone
+  and `DOOSERVICE_AI_MODE_CHOSEN` is no longer read.
+- `psql` read only in every AI session (`DOOSERVICE_AI_SESSION`); `odoo-bin` refuses
+  `--addons-path` only when there is no repository.
+- The `odoo-reference` skill (generated from each version's code) and recipes in
   `odoo-functional/recipes`.
 
 ### Added
-- Servidor MCP `dooservice` (`/opt/dooservice/mcp`), registrado en Claude Code y opencode:
-  `odoo_read`, `odoo_write`, `odoo_settings`, `module_install`, `module_update`,
-  `odoo_logs`, `odoo_find`. Cambios amplios, de permisos, contables o de usuarios piden
-  `confirmed=true`; en producción solo con cambios permitidos y sin módulos.
+- The `dooservice` MCP server (`/opt/dooservice/mcp`), registered in Claude Code and
+  opencode: `odoo_read`, `odoo_write`, `odoo_settings`, `module_install`, `module_update`,
+  `odoo_logs`, `odoo_find`. Wide, access, accounting or user changes need
+  `confirmed=true`; on production only with changes allowed and without modules.
 
 ## [20261010] — 2026-10-10
 
@@ -442,13 +442,14 @@ heading by name. The rest of an entry, when needed, is technical.
   follows a fixed structure (title and sections) in your language.
 
 ### Changed
-- Hook `prepare-commit-msg` de la consola (`/opt/dooservice/git-hooks`, vía `core.hooksPath`
-  en `/etc/gitconfig`): añade `Co-authored-by: Dooservice <noreply@dooservice.sh>` a los
-  commits de una sesión de IA, una sola vez, y después ejecuta el hook del repositorio si
-  lo tiene. Los commits hechos a mano en la terminal no lo llevan.
-- Claude Code ya no añade su propia atribución (`attribution.commit` y `attribution.pr`
-  vacíos): el coautor lo pone el hook y la firma del pull request `dooservice publish`.
-- Skill `dooservice-console`: reglas y plantilla de los pull requests.
+- The console's `prepare-commit-msg` hook (`/opt/dooservice/git-hooks`, through
+  `core.hooksPath` in `/etc/gitconfig`): adds `Co-authored-by: Dooservice
+  <noreply@dooservice.sh>` to the commits of an AI session, once, and then runs the
+  repository's own hook if it has one. Commits made by hand in the terminal do not get it.
+- Claude Code no longer adds its own attribution (`attribution.commit` and
+  `attribution.pr` empty): the hook adds the co-author and `dooservice publish` signs the
+  pull request.
+- `dooservice-console` skill: rules and template for pull requests.
 
 ## [20261009-3] — 2026-10-09
 
@@ -459,7 +460,7 @@ heading by name. The rest of an entry, when needed, is technical.
   with every build.
 
 ### Changed
-- Las skills son el submódulo `dooservice/odoo-skills`.
+- The skills are the `dooservice/odoo-skills` submodule.
 
 ## [20261009-2] — 2026-10-09
 
@@ -477,4 +478,4 @@ heading by name. The rest of an entry, when needed, is technical.
 - en: Images are built outside the servers, with an immutable, dated revision.
 
 ### Changed
-- Un build pone la misma revisión a todas sus imágenes, como las oficiales de Odoo.
+- A build gives the same revision to all its images, like Odoo's official ones.

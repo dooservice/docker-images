@@ -130,18 +130,19 @@ So: commit as you go, and publish before the session ends.
 - Always pass `--title` and a description (`--body` or `--body-file -`): both are required.
 - Pass `--draft` only when the user asks for a draft.
 - Title: `[TAG] module: summary`, with `TAG` one of `FIX IMP ADD REF REM MOV REV PERF I18N MIG CLN LINT REL MERGE`.
-- Write the summary in the imperative, in English when the commits are in English.
-- Write the description in these sections, in this order, headed in the language of `$DOOSERVICE_LANGUAGE` (`es` Spanish, anything else English):
+- Write the title and the description in English, whatever language you speak with the user: the platform refuses anything else.
+- Write the summary in the imperative.
+- Write the description in these sections, in this order:
 
-| English | Español | What goes in it |
-| --- | --- | --- |
-| `## Summary` | `## Resumen` | what changes, 1 to 3 lines |
-| `## Why` | `## Motivo` | the problem or the request, for whom |
-| `## Changes` | `## Cambios` | a bullet per module: what changed in it |
-| `## How to test` | `## Cómo probar` | numbered steps on this environment, with the expected result |
-| `## Deployment` | `## Despliegue` | modules to update (`-u`), migrations, new `requirements.txt` lines, restart |
-| `## Risks` | `## Riesgos` | what could break and for whom, or `None.` / `Ninguno.` |
-| `## References` | `## Referencias` | ticket or task, only when the user gave one; never invented |
+| Section | What goes in it |
+| --- | --- |
+| `## Summary` | what changes, 1 to 3 lines |
+| `## Why` | the problem or the request, for whom |
+| `## Changes` | a bullet per module: what changed in it |
+| `## How to test` | numbered steps on this environment, with the expected result |
+| `## Deployment` | modules to update (`-u`), migrations, new `requirements.txt` lines, restart |
+| `## Risks` | what could break and for whom, or `None.` |
+| `## References` | ticket or task, only when the user gave one; never invented |
 
 - Write from what you did and verified, plainly: no marketing, no emoji, no closing line.
 - Do not sign: the platform signs every pull request and co-authors the AI's commits.
@@ -153,26 +154,26 @@ So: commit as you go, and publish before the session ends.
 
 ```bash
 dooservice publish --title "[FIX] acme_sale: keep the delivery date on duplicate" --body-file - <<'BODY'
-## Resumen
-Al duplicar un pedido confirmado se conserva la fecha de entrega prometida.
+## Summary
+Duplicating a confirmed sale order keeps the promised delivery date.
 
-## Motivo
-La copia salía con la fecha de hoy y el cliente recibía una fecha equivocada.
+## Why
+The copy took today's date, and the customer was given a wrong date.
 
-## Cambios
-- acme_sale: `commitment_date` se copia al duplicar; las plantillas la limpian en su `copy()`.
+## Changes
+- acme_sale: `commitment_date` is copied on duplicate; quotation templates clear it in their `copy()`.
 
-## Cómo probar
-1. Ventas → un pedido confirmado con fecha de entrega → Acción → Duplicar.
-2. La copia tiene la misma fecha de entrega.
+## How to test
+1. Sales → a confirmed order with a delivery date → Action → Duplicate.
+2. The copy has the same delivery date.
 
-## Despliegue
-`dooservice update acme_sale`. Sin migraciones ni dependencias nuevas.
+## Deployment
+`dooservice update acme_sale`. No migrations or new dependencies.
 
-## Riesgos
-Ninguno: solo afecta a pedidos duplicados.
+## Risks
+None: it only affects duplicated orders.
 
-## Referencias
+## References
 BODY
 ```
 

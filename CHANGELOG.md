@@ -1,14 +1,37 @@
 # Changelog
 
-Una entrada por build, con su revisión: la fecha del build, y `-2`, `-3` si ese día ya
-tenía uno. La sección `### Novedades` es lo que ven los clientes en el panel cuando su
-servidor recibe la plataforma con este build: una línea por cambio y por idioma (`- es:`,
-`- en:`), escrita para quien usa Odoo, no para quien mantiene las imágenes. `make platform`
-no firma una plataforma con un build que no tenga sus Novedades aquí. El estilo es el de
-las notas de versión del agente: ver «Cómo se escriben» en
-[docs/actualizaciones.md](https://github.com/dooservice/agent/blob/main/docs/actualizaciones.md).
+One entry per build, under its revision: the build's UTC date, with `-2`, `-3`... when
+that day already had one. `### Novedades` is what customers see in the panel when their
+server takes the platform with this build: one line per change and language (`- es:`,
+`- en:`), written for people who use Odoo, not for those who maintain the images. The
+agent does not sign a platform with a build that has no Novedades here, and reads that
+heading by name. The rest of an entry, when needed, is technical.
 
-El resto de la entrada, si hace falta, es técnico.
+## [20261031] — 2026-10-31
+
+### Novedades
+- es: La IA de la consola en producción es más segura: pide permiso antes de leer
+  cualquier archivo del servidor y nunca puede ver las credenciales con las que la consola
+  escribe en tu base de datos, así que solo cambia datos con tu aprobación.
+- en: The console's AI on production is safer: it asks before reading any file on the
+  server and can never see the credentials the console writes to your database with, so
+  it changes data only with your approval.
+
+### Security
+- `operator`: on production, Claude Code no longer runs `head`, `grep`, `tail` or `wc`
+  without asking, and any command naming `/run/dooservice` or `write-credentials` is
+  denied; opencode asks for every command outside a short list and cannot read or search
+  that directory.
+
+### Changed
+- Every image is built with `docker-bake.hcl`; nothing is pushed unless asked.
+- The console is built on the Odoo image of the same build, not on the moving version tag.
+- The revision is checked against every image a build pushes, and builds never overlap.
+- OCI labels on every image: source, commit, version and license.
+
+### Removed
+- `dooservice-postgres` 17 and 18: the platform runs 16 only.
+- The four `build.sh` scripts, `addons.py` and `odoo/addons.toml` (now in `docker-bake.hcl`).
 
 ## [20261030-3] — 2026-10-30
 

@@ -29,8 +29,6 @@ from .constants import (
     STAGE_VARIABLE,
     WELCOME_COLOURS,
     WELCOME_COMMANDS,
-    WELCOME_DEFAULT,
-    WELCOME_TEXTS,
 )
 from .language import Language
 
@@ -40,8 +38,7 @@ class Welcome:
 
     def __init__(self, environ=None):
         self.environ = os.environ if environ is None else environ
-        code = Language(self.environ.get(LANGUAGE_VARIABLE, "")).code
-        self.texts = WELCOME_TEXTS.get(code, WELCOME_TEXTS[WELCOME_DEFAULT])
+        self.language = Language(self.environ.get(LANGUAGE_VARIABLE, ""))
         self.stage = self.environ.get(STAGE_VARIABLE, "")
 
     def show(self):
@@ -53,43 +50,47 @@ class Welcome:
     def lines(self):
         teal, white, gray, alarm = (WELCOME_COLOURS[name] for name in ("teal", "white", "gray", "red"))
         stage_colour = alarm if self.stage == PRODUCTION else teal
-        stage = self.texts.get(self.stage, self.stage)
+        stage = self.language.text(f"stages.{self.stage}", self.stage)
         lines = [teal + "\n".join(LOGO) + RESET, ""]
         lines.append(
-            self.texts["place"].format(
+            self.text("place").format(
                 project=f"{white}{self.environ.get(PROJECT_VARIABLE, '')}{RESET}",
                 stage=f"{stage_colour}{stage}{RESET}",
                 environment=f"{white}{self.environ.get(ENVIRONMENT_VARIABLE, '')}{RESET}",
             )
         )
         lines.append(
-            self.texts["odoo"].format(
+            self.text("odoo").format(
                 odoo=f"{white}Odoo {self.environ.get(ODOO_VERSION_VARIABLE, '')}{RESET}",
                 server=f"{white}{self.environ.get(SERVER_VARIABLE, '')}{RESET}",
             )
         )
-        lines += ["", f"{white}{self.texts['commands']}{RESET}", ""]
-        commands = [(name.format(modules=self.texts["modules"]), self.texts[text]) for name, text in WELCOME_COMMANDS]
+        lines += ["", f"{white}{self.text('commands')}{RESET}", ""]
+        commands = [(name.format(modules=self.text("modules")), self.text(text)) for name, text in WELCOME_COMMANDS]
         width = max(len(name) for name, description in commands) + 4
         lines += [f"  {white}${RESET} {teal}{name.ljust(width)}{RESET}{description}" for name, description in commands]
         lines.append("")
         if not os.path.isdir(os.path.join(REPOSITORY, ".git")):
-            lines.append(f"{gray}{self.texts['no_repository']}{RESET}")
+            lines.append(f"{gray}{self.text('no_repository')}{RESET}")
         if self.stage == PRODUCTION:
-            lines.append(f"{alarm}{self.texts['production_data']}{RESET}")
-            lines.append(f"{alarm}{self.texts['production_deploy']}{RESET}")
+            lines.append(f"{alarm}{self.text('production_data')}{RESET}")
+            lines.append(f"{alarm}{self.text('production_deploy')}{RESET}")
         lines.append(f"{gray}{self.duration()}{RESET}")
         return lines
+
+    def text(self, key):
+        """One of the welcome's texts, in the person's language."""
+        return self.language.text(f"welcome.{key}")
 
     def duration(self):
         """How long the session lasts, with the platform's numbers when it passed them."""
         idle = self.minutes(IDLE_SECONDS_VARIABLE)
-        sentences = [self.texts["idle"].format(minutes=idle) if idle else self.texts["idle_unknown"]]
+        sentences = [self.text("idle").format(minutes=idle) if idle else self.text("idle_unknown")]
         limit = self.minutes(MAX_SECONDS_VARIABLE)
         if limit:
-            sentences.append(self.texts["limit"].format(minutes=limit))
+            sentences.append(self.text("limit").format(minutes=limit))
         elif self.stage == PRODUCTION:
-            sentences.append(self.texts["limit_unknown"])
+            sentences.append(self.text("limit_unknown"))
         return " ".join(sentences)
 
     def minutes(self, variable):

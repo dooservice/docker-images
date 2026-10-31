@@ -31,8 +31,6 @@ from .constants import (
     PROJECT_VARIABLE,
     RESET,
     SPINNER,
-    STARTING,
-    STARTING_DEFAULT,
     TEAL,
     WHITE,
 )
@@ -60,7 +58,7 @@ class Splash:
     """The animation, drawn one frame at a time by the session's copy loop."""
 
     def __init__(self, tool_name):
-        self.title = f"{Language().pick(STARTING, STARTING_DEFAULT)} {tool_name}"
+        self.title = f"{Language().text('starting')} {tool_name}"
         environment = os.environ.get(ENVIRONMENT_VARIABLE, "")
         project = os.environ.get(PROJECT_VARIABLE, "")
         self.subtitle = " · ".join(part for part in ("dooservice", project, environment) if part)

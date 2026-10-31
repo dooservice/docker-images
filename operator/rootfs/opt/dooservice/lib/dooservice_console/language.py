@@ -3,8 +3,52 @@
 from __future__ import annotations
 
 import os
+from functools import cached_property
+from pathlib import Path
 
-from .constants import LANGUAGE_NAMES, LANGUAGE_VARIABLE
+import tomllib
+
+from .constants import DEFAULT_LANGUAGE, LANGUAGE_NAMES, LANGUAGE_VARIABLE, LOCALES_DIR
+
+
+class Catalog:
+    """The console's texts in one language, read from `locales/<code>.toml`, English for any text it lacks.
+
+    Keys are dotted paths into the file: `starting`, `welcome.place`, `stages.production`.
+    A language without a file reads entirely in English.
+    """
+
+    def __init__(self, code: str, directory: Path = LOCALES_DIR) -> None:
+        self.directory = directory
+        self.texts = self.load(DEFAULT_LANGUAGE) | self.load(code)
+
+    def load(self, code: str) -> dict[str, str]:
+        """One locale file's texts by dotted key; nothing for a language without a file or an odd code."""
+        path = self.directory / f"{code}.toml"
+        if not code.isalpha() or not path.is_file():
+            return {}
+        with path.open("rb") as file:
+            return self.flatten(tomllib.load(file))
+
+    @classmethod
+    def flatten(cls, table: dict, prefix: str = "") -> dict[str, str]:
+        """A TOML document's strings, keyed by their dotted path."""
+        texts: dict[str, str] = {}
+        for name, value in table.items():
+            key = f"{prefix}{name}"
+            if isinstance(value, dict):
+                texts |= cls.flatten(value, f"{key}.")
+            else:
+                texts[key] = value
+        return texts
+
+    def text(self, key: str, default: str | None = None) -> str:
+        """A key's text in this language, else in English, else the default; with no default, a KeyError."""
+        if key in self.texts:
+            return self.texts[key]
+        if default is None:
+            raise KeyError(key)
+        return default
 
 
 class Language:
@@ -19,9 +63,14 @@ class Language:
         """The language's English name, when the console speaks it."""
         return LANGUAGE_NAMES.get(self.code)
 
-    def pick(self, table: dict[str, str], default: str) -> str:
-        """This language's entry of a translation table, or the default."""
-        return table.get(self.code, default)
+    @cached_property
+    def catalog(self) -> Catalog:
+        """This language's texts, read once."""
+        return Catalog(self.code)
+
+    def text(self, key: str, default: str | None = None) -> str:
+        """One of the console's texts in this language; see `Catalog.text`."""
+        return self.catalog.text(key, default)
 
     def rule(self) -> str:
         """The one sentence that keeps the agent in the person's language all session.

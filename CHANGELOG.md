@@ -7,7 +7,7 @@ server takes the platform with this build: one line per change and language (`- 
 agent does not sign a platform with a build that has no Novedades here, and reads that
 heading by name. The rest of an entry, when needed, is technical.
 
-## [20261101] — 2026-11-01
+## [20261101-2] — 2026-11-01
 
 ### Novedades
 - es: Actualizaciones de seguridad del sistema y de librerías en las imágenes de Odoo y de

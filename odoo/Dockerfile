@@ -8,6 +8,19 @@ FROM odoo:${ODOO_VERSION}@${ODOO_DIGEST}
 
 USER root
 
+# The official images are not rebuilt for every security update of their release, and
+# 16.0 and 17.0 no longer are at all: every build takes the updates itself. Odoo itself and
+# wkhtmltopdf come from .deb files, not from a repository, so they never move.
+# Debian 11, under Odoo 16.0, left security support in August 2026 and its security
+# updates moved to the archive: from deb.debian.org they answer 404.
+RUN . /etc/os-release \
+ && if [ "${VERSION_CODENAME}" = "bullseye" ]; then \
+      sed -i 's#http://deb.debian.org/debian-security#http://archive.debian.org/debian-security#' /etc/apt/sources.list; \
+    fi \
+ && apt-get update \
+ && DEBIAN_FRONTEND=noninteractive apt-get upgrade -y --no-install-recommends \
+ && rm -rf /var/lib/apt/lists/*
+
 RUN groupadd -g 1500 dooservice \
  && useradd -u 1500 -g 1500 -d /var/lib/odoo -s /bin/bash dooservice \
  && mkdir -p /mnt/addons /mnt/backups \

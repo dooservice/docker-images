@@ -19,13 +19,6 @@ ARG RTK_SHA256=e4e650fa1677c0de2f6839a6040d7b17f312d32f163c402b75af70e9e5af1a91
 
 USER root
 
-# Debian 11, under Odoo 16.0, left security support in August 2026 and its security
-# updates moved to the archive: from deb.debian.org they answer 404.
-RUN . /etc/os-release \
- && if [ "${VERSION_CODENAME}" = "bullseye" ]; then \
-      sed -i 's#http://deb.debian.org/debian-security#http://archive.debian.org/debian-security#' /etc/apt/sources.list; \
-    fi
-
 RUN apt-get update \
  && apt-get install -y --no-install-recommends \
       ca-certificates curl git less vim-tiny procps tini postgresql-client \

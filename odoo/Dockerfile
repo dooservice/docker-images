@@ -8,6 +8,28 @@ FROM odoo:${ODOO_VERSION}@${ODOO_DIGEST}
 
 USER root
 
+# The official images are not rebuilt for every security update of their release, and
+# 16.0 and 17.0 no longer are at all: every build takes the updates itself. Odoo itself and
+# wkhtmltopdf come from .deb files, not from a repository, so they never move.
+# Debian 11, under Odoo 16.0, left security support in August 2026 and its security
+# updates moved to the archive: from deb.debian.org they answer 404.
+RUN . /etc/os-release \
+ && if [ "${VERSION_CODENAME}" = "bullseye" ]; then \
+      sed -i 's#http://deb.debian.org/debian-security#http://archive.debian.org/debian-security#' /etc/apt/sources.list; \
+    fi \
+ && apt-get update \
+ && DEBIAN_FRONTEND=noninteractive apt-get upgrade -y --no-install-recommends \
+ && rm -rf /var/lib/apt/lists/*
+
+# rtlcss, which Odoo runs to build right-to-left stylesheets, reinstalled so its postcss,
+# nanoid and source-map-js are the latest releases of their ranges, not the image's. The old
+# one is removed by hand: npm cannot replace a package that a lower image layer holds.
+ARG RTLCSS_VERSION=4.3.0
+RUN rm -rf "$(npm root -g)/rtlcss" "$(npm prefix -g)/bin/rtlcss" \
+ && npm install -g "rtlcss@${RTLCSS_VERSION}" \
+ && npm cache clean --force \
+ && rtlcss --version
+
 RUN groupadd -g 1500 dooservice \
  && useradd -u 1500 -g 1500 -d /var/lib/odoo -s /bin/bash dooservice \
  && mkdir -p /mnt/addons /mnt/backups \

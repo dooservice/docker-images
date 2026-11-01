@@ -7,9 +7,9 @@ name: Build
 # agent's platform.toml, read with the GH_PAT secret.
 #
 # Every pushed image carries an SBOM and a provenance attestation from BuildKit, gets a
-# GitHub artifact attestation, and has its SBOM scanned by Trivy into code scanning (a
-# report only: findings never fail the build). Once every build succeeded, the built commit
-# is tagged with the revision.
+# GitHub artifact attestation, and is scanned by Trivy into code scanning (a report only:
+# findings never fail the build). Once every build succeeded, the built commit is tagged
+# with the revision.
 #
 #   gh workflow run build.yml --repo dooservice/docker-images
 #   gh workflow run build.yml --repo dooservice/docker-images -f versions=18.0 -f postgres=false
@@ -238,15 +238,13 @@ jobs:
           password: ${{ secrets.GHCR_TOKEN || github.token }}
 
       - id: image
-        name: Digest and SBOM
+        name: Digest
         run: |
           reference="ghcr.io/dooservice/${IMAGE}"
           if ! digest="$(docker buildx imagetools inspect "${reference}" --format '{{ json .Manifest }}' | jq -r .digest)"; then
             echo "::warning::${reference} was not pushed; its build failed"
             exit 0
           fi
-          docker buildx imagetools inspect "${reference}" --format '{{ json .SBOM }}' \
-            | jq 'if has("SPDX") then .SPDX else .["linux/amd64"].SPDX end' > "${RUNNER_TEMP}/sbom.spdx.json"
           tag="${IMAGE#*:}"
           tag="${tag%"${REVISION}"}"
           tag="${tag%-}"
@@ -266,18 +264,24 @@ jobs:
           subject-digest: ${{ steps.image.outputs.digest }}
           push-to-registry: true
 
+      # The image itself, pulled by digest, not its SBOM: from an SBOM Trivy cannot tell that
+      # a Python or Node package was installed by apt, so it reports Debian's and Ubuntu's
+      # patched packages by their upstream version, and it misses the OS packages.
       - name: Vulnerabilities
         if: ${{ steps.image.outputs.digest }}
         continue-on-error: true
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
-          scan-type: sbom
-          scan-ref: ${{ runner.temp }}/sbom.spdx.json
+          scan-type: image
+          image-ref: ${{ steps.image.outputs.name }}@${{ steps.image.outputs.digest }}
+          scanners: vuln
           severity: HIGH,CRITICAL
           ignore-unfixed: true
           format: sarif
           limit-severities-for-sarif: true
           output: ${{ runner.temp }}/trivy.sarif
+        env:
+          TRIVY_IMAGE_SRC: remote
 
       - if: ${{ steps.image.outputs.digest }}
         continue-on-error: true

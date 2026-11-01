@@ -36,6 +36,18 @@
     },
     {
       "customType": "regex",
+      "description": "rtlcss, which the Odoo image reinstalls, in odoo/Dockerfile",
+      "managerFilePatterns": [
+        "/^odoo/Dockerfile$/"
+      ],
+      "matchStrings": [
+        "ARG RTLCSS_VERSION=(?<currentValue>\\S+)"
+      ],
+      "depNameTemplate": "rtlcss",
+      "datasourceTemplate": "npm"
+    },
+    {
+      "customType": "regex",
       "description": "Claude Code, which the console installs, in operator/Dockerfile",
       "managerFilePatterns": [
         "/^operator/Dockerfile$/"

@@ -7,6 +7,33 @@ server takes the platform with this build: one line per change and language (`- 
 agent does not sign a platform with a build that has no Novedades here, and reads that
 heading by name. The rest of an entry, when needed, is technical.
 
+## [20261101] — 2026-11-01
+
+### Novedades
+- es: Actualizaciones de seguridad del sistema y de librerías en las imágenes de Odoo y de
+  las páginas de estado.
+- en: Security updates of the system and libraries in the Odoo and status page images.
+- pt: Atualizações de segurança do sistema e de bibliotecas nas imagens do Odoo e das
+  páginas de status.
+- fr: Mises à jour de sécurité du système et des bibliothèques dans les images d'Odoo et
+  des pages d'état.
+- it: Aggiornamenti di sicurezza del sistema e delle librerie nelle immagini di Odoo e
+  delle pagine di stato.
+- de: Sicherheitsupdates des Systems und der Bibliotheken in den Odoo- und
+  Statusseiten-Images.
+
+### Security
+- `odoo` (and the console images built on it): every build runs `apt-get upgrade`; Odoo 16
+  (Debian 11) reads the Debian security archive. Odoo 16 goes from 97 high or critical
+  findings with a fix to none; Odoo 17 from 4.
+- `rtlcss` pinned (`RTLCSS_VERSION`, tracked by Renovate) and reinstalled: postcss, nanoid
+  and source-map-js past their advisories.
+- `status`: the image carries no pip, and with it no msgpack, setuptools or urllib3.
+
+### Changed
+- CI: Trivy scans each pushed image by digest instead of its SBOM, which flagged packages
+  Debian and Ubuntu had already patched and missed the system's own.
+
 ## [20261031-6] — 2026-10-31
 
 ### Novedades

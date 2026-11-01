@@ -21,14 +21,22 @@ RUN . /etc/os-release \
  && DEBIAN_FRONTEND=noninteractive apt-get upgrade -y --no-install-recommends \
  && rm -rf /var/lib/apt/lists/*
 
-# rtlcss, which Odoo runs to build right-to-left stylesheets, reinstalled so its postcss,
-# nanoid and source-map-js are the latest releases of their ranges, not the image's. The old
-# one is removed by hand: npm cannot replace a package that a lower image layer holds.
+# rtlcss, which Odoo runs to build right-to-left stylesheets, reinstalled where the official
+# image put it with npm (16.0 and 17.0), so its postcss, nanoid and source-map-js are the
+# latest releases of their ranges. 17.0 dropped npm after using it: it is added for this and
+# removed again. The newer images take rtlcss from their distribution and are left as they are.
 ARG RTLCSS_VERSION=4.3.0
-RUN rm -rf "$(npm root -g)/rtlcss" "$(npm prefix -g)/bin/rtlcss" \
- && npm install -g "rtlcss@${RTLCSS_VERSION}" \
- && npm cache clean --force \
- && rtlcss --version
+RUN if [ -d /usr/local/lib/node_modules/rtlcss ]; then \
+      added=""; \
+      if ! command -v npm >/dev/null; then \
+        apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends npm && added=npm; \
+      fi; \
+      rm -rf /usr/local/lib/node_modules/rtlcss /usr/local/bin/rtlcss \
+      && npm install -g --prefix /usr/local "rtlcss@${RTLCSS_VERSION}" \
+      && npm cache clean --force \
+      && if [ -n "${added}" ]; then apt-get purge -y --auto-remove npm && rm -rf /var/lib/apt/lists/*; fi \
+      && rtlcss --version; \
+    fi
 
 RUN groupadd -g 1500 dooservice \
  && useradd -u 1500 -g 1500 -d /var/lib/odoo -s /bin/bash dooservice \

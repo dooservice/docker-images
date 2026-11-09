@@ -7,6 +7,22 @@ server takes the platform with this build: one line per change and language (`- 
 agent does not sign a platform with a build that has no Novedades here, and reads that
 heading by name. The rest of an entry, when needed, is technical.
 
+## [20261109] — 2026-11-09
+
+Odoo 20.0 only; the other versions keep their revision.
+
+### Novedades
+- es: Odoo 20.0 se actualiza con las últimas correcciones publicadas por Odoo.
+- en: Odoo 20.0 is updated with the latest fixes Odoo published.
+- pt: O Odoo 20.0 é atualizado com as correções mais recentes publicadas pela Odoo.
+- fr: Odoo 20.0 est mis à jour avec les derniers correctifs publiés par Odoo.
+- it: Odoo 20.0 viene aggiornato con le ultime correzioni pubblicate da Odoo.
+- de: Odoo 20.0 wird mit den neuesten von Odoo veröffentlichten Korrekturen aktualisiert.
+
+### Changed
+- `odoo` 20.0 (and its console image): built on the official `odoo:20.0` of 3 November
+  (`sha256:a97a7665e2b9…`), in place of the one pinned on 31 October.
+
 ## [20261101-2] — 2026-11-01
 
 ### Novedades

@@ -7,6 +7,21 @@ server takes the platform with this build: one line per change and language (`- 
 agent does not sign a platform with a build that has no Novedades here, and reads that
 heading by name. The rest of an entry, when needed, is technical.
 
+## [20261113] — 2026-11-13
+
+Odoo 16.0 to 20.0; Postgres and the status page keep their revision.
+
+### Novedades
+- es: Los despliegues y reinicios de Odoo son más rápidos: si las dependencias de tus módulos no cambiaron, no se vuelven a instalar.
+- en: Odoo deployments and restarts are faster: when your modules' dependencies did not change, they are not installed again.
+- pt: As implantações e reinícios do Odoo ficam mais rápidos: se as dependências dos seus módulos não mudaram, não são instaladas de novo.
+- fr: Les déploiements et redémarrages d'Odoo sont plus rapides : si les dépendances de vos modules n'ont pas changé, elles ne sont pas réinstallées.
+- it: I deploy e i riavvii di Odoo sono più rapidi: se le dipendenze dei tuoi moduli non sono cambiate, non vengono reinstallate.
+- de: Deployments und Neustarts von Odoo sind schneller: Wenn sich die Abhängigkeiten deiner Module nicht geändert haben, werden sie nicht erneut installiert.
+
+### Changed
+- `odoo` entrypoint: a restart of the same container skips pip when no `requirements.txt` under `/mnt/addons` changed since all of them installed; the mark is in the container's layer (`/tmp`), so a new container installs everything.
+
 ## [20261109] — 2026-11-09
 
 Odoo 20.0 only; the other versions keep their revision.
